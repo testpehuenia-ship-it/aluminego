@@ -1,0 +1,189 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Category {
+  id         String     @id @default(cuid())
+  title      String     @unique
+  link       String
+  image      String
+  businesses Business[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Business {
+  id         String     @id @default(cuid())
+  name       String
+  image      String
+  whatsapp   String
+  category   Category   @relation(fields: [categoryId], references: [id])
+  categoryId   String
+  menu         MenuItem[]
+  subscription Subscription?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  image       String?
+  business    Business @relation(fields: [businessId], references: [id])
+  businessId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Accommodation {
+  id          String    @id @default(cuid())
+  name        String
+  type        String    // e.g., "Cabaña", "Hotel"
+  image       String
+  whatsapp    String
+  description  String?
+  features     Feature[]
+  subscription Subscription?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Feature {
+  id              String        @id @default(cuid())
+  name            String
+  accommodation   Accommodation @relation(fields: [accommodationId], references: [id])
+  accommodationId String
+}
+
+model Adventure {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  image       String
+  whatsapp    String
+  category     String   // e.g., "Trekking", "Pesca"
+  details      String   // Guardaremos como JSON string o separado por comas
+  subscription Subscription?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model LocalService {
+  id          String   @id @default(cuid())
+  name        String
+  category    String   // e.g., "Salud", "Seguridad", "Comercios"
+  address     String?
+  whatsapp     String?
+  image        String?
+  subscription Subscription?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Admin {
+  id       String @id @default(cuid())
+  username String @unique
+  password String // En producción esto debería estar hasheado
+}
+
+model Route {
+  id          String   @id @default(cuid())
+  title       String
+  status      String   // e.g., "Transitable", "Precaución", "Cerrado"
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MapMarker {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  latitude    Float
+  longitude   Float
+  color       String   @default("#ea580c")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Publicity {
+  id        String    @id @default(cuid())
+  title     String?   // Nombre del comercio o referencia
+  page      String    // "Inicio", "QueComer", "Dormir", "GuiaLocal", "Aventuras"
+  section   Int       // 1, 2, 3, 4
+  order     Int       // 1, 2, 3
+  image     String
+  link      String?   // Redireccion opcional
+  size      String    // "grande" o "chico"
+  startDate DateTime? // Opcional
+  endDate   DateTime? // Opcional
+  isHeavy   Boolean   @default(false)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model PageVisit {
+  id        String   @id @default(cuid())
+  path      String
+  createdAt DateTime @default(now())
+}
+
+model PricingConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  name      String
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Subscription {
+  id               String   @id @default(cuid())
+  clientName       String   // Nombre para mostrar en el admin
+  planType         String   // e.g. "basico", "comercio_completo"
+  hasBannerTop     Boolean  @default(false)
+  hasBannerMiddle  Boolean  @default(false)
+  hasBannerBottom  Boolean  @default(false)
+  hasBannerPortada Boolean  @default(false)
+  
+  price            Float    // Mensual total
+
+  startDate        DateTime @default(now())
+  dueDate          DateTime // Próximo vencimiento
+  
+  businessId       String?  @unique
+  business         Business? @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  accommodationId  String?  @unique
+  accommodation    Accommodation? @relation(fields: [accommodationId], references: [id], onDelete: Cascade)
+  
+  adventureId      String?  @unique
+  adventure        Adventure? @relation(fields: [adventureId], references: [id], onDelete: Cascade)
+  
+  localServiceId   String?  @unique
+  localService     LocalService? @relation(fields: [localServiceId], references: [id], onDelete: Cascade)
+
+  payments         Payment[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Payment {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  amount         Float
+  paymentDate    DateTime     @default(now())
+  periodPaid     DateTime     // El mes/dueDate que cubrió
+}

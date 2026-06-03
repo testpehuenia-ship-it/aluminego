@@ -38,12 +38,12 @@ export default function Footer() {
               gap: '6px'
             }}
           >
-            <Smartphone size={18} /> Descargar App
+            <Smartphone size={18} color="var(--color-dark-green)" /> Descargar App
           </button>
         </div>
 
         <div style={{ marginTop: '8px', fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
-          Â© {new Date().getFullYear()} AlumineGo. Todos los derechos reservados.
+          © {new Date().getFullYear()} AlumineGo. Todos los derechos reservados.
         </div>
       </div>
     </footer>

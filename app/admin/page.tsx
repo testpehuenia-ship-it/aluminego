@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -92,7 +92,7 @@ export default function LoginPage() {
         </form>
 
         <div className="login-footer">
-          <p>Â© 2026 AlumineGo - Súper Admin Panel</p>
+          <p>© 2026 AlumineGo - Súper Admin Panel</p>
         </div>
       </div>
 

@@ -119,7 +119,7 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', borderTop: '1px solid rgba(255,255,255,0.3)', paddingTop: '20px' }}>
             {[
-              { icon: Bike, text: "DELIVERY\nRÃPIDO" },
+              { icon: Bike, text: "DELIVERY\nRÁPIDO" },
               { icon: BedDouble, text: "ALOJAMIENTOS\nPARA TODOS" },
               { icon: MountainSnow, text: "AVENTURAS\nY ACTIVIDADES" },
               { icon: ShoppingBag, text: "COMERCIOS\nLOCALES" }

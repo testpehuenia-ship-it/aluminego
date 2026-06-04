@@ -264,7 +264,7 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
               </div>
               <div className="weather-main">
                 <div className="weather-temp">
-                  <div className="temp-large">{Math.round(weatherData.current.temperature)}°</div>
+                  <span className="temp-value">{Math.round(weatherData.current.temperature)}°</span>
                   <div className="weather-desc">
                     {currentMeta.icon}
                     <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>{currentMeta.label}</span>

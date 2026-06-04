@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
@@ -195,7 +195,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                     alignItems: 'center',
                     gap: '12px'
                   }}>
-                    <span style={{ fontSize: '2rem' }}>ðŸ½ï¸</span>
+                    <span style={{ fontSize: '2rem' }}>🍽️</span>
                     <span>Próximamente más locales en la categoría {cat.title}</span>
                   </div>
                 ) : (
@@ -245,7 +245,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '4px' }}>{selectedComercio.name}</h2>
                 <p style={{ color: 'var(--color-orange)', fontWeight: 600, fontSize: '0.9rem' }}>{selectedComercio.category?.title}</p>
               </div>
-              <button onClick={() => setSelectedComercio(null)} style={{ fontSize: '1.5rem', fontWeight: 'bold', width: '40px', height: '40px', borderRadius: '50%', background: '#f1f5f9', border: 'none', cursor: 'pointer' }}>âœ•</button>
+              <button onClick={() => setSelectedComercio(null)} style={{ fontSize: '1.5rem', fontWeight: 'bold', width: '40px', height: '40px', borderRadius: '50%', background: '#f1f5f9', border: 'none', cursor: 'pointer' }}>✖</button>
             </div>
             
             <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
@@ -291,7 +291,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                   </span>
                 </div>
                 <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem', textDecoration: 'none', textAlign: 'center', display: 'block', borderRadius: '16px' }}>
-                  ðŸ“± Enviar pedido por WhatsApp
+                  📱 Enviar pedido por WhatsApp
                 </a>
               </div>
             )}

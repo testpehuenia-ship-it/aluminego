@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -195,7 +195,7 @@ export default function AventurasClient({ initialAdventures }: { initialAdventur
                 onClick={() => setSelectedAventura(null)}
                 style={{ position: 'absolute', top: '16px', right: '16px', width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.8)', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
               >
-                âœ•
+                ✖
               </button>
             </div>
             
@@ -235,7 +235,7 @@ export default function AventurasClient({ initialAdventures }: { initialAdventur
                 className="btn-primary"
                 style={{ width: '100%', padding: '16px', fontSize: '1.1rem', textDecoration: 'none', textAlign: 'center', display: 'block', borderRadius: '16px' }}
               >
-                ðŸ“± Consultar y Reservar
+                📱 Consultar y Reservar
               </a>
             </div>
           </div>

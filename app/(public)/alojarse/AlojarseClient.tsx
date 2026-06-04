@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -149,7 +149,7 @@ export default function AlojarseClient({ initialAccommodations }: { initialAccom
           <div style={{ backgroundColor: 'white', width: '100%', maxWidth: '600px', maxHeight: '90vh', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '24px', overflowY: 'auto', position: 'relative' }}
           onClick={e => e.stopPropagation()}
           >
-            <button onClick={() => setSelectedAlojamiento(null)} style={{ position: 'absolute', top: '16px', right: '16px', fontSize: '1.5rem', fontWeight: 'bold', zIndex: 10 }}>âœ•</button>
+            <button onClick={() => setSelectedAlojamiento(null)} style={{ position: 'absolute', top: '16px', right: '16px', fontSize: '1.5rem', fontWeight: 'bold', zIndex: 10 }}>✖</button>
             
             <div style={{ position: 'relative', height: '250px', borderRadius: '16px', overflow: 'hidden', marginBottom: '20px', marginTop: '10px' }}>
               {(() => {
@@ -217,14 +217,14 @@ export default function AlojarseClient({ initialAccommodations }: { initialAccom
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '32px' }}>
               {selectedAlojamiento.features?.map((f: any) => (
                 <div key={f.id} style={{ backgroundColor: 'var(--color-bg)', padding: '8px 16px', borderRadius: '50px', fontSize: '0.9rem', fontWeight: 500, border: '1px solid var(--color-border)' }}>
-                  âœ“ {f.name}
+                  ✓ {f.name}
                 </div>
               ))}
             </div>
 
             <div style={{ paddingTop: '16px', borderTop: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column' }}>
               <a href={buildWhatsAppUrl(selectedAlojamiento)} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ width: '100%', padding: '16px', fontSize: '1.1rem', textDecoration: 'none' }}>
-                ðŸ“± Consultar Disponibilidad
+                📱 Consultar Disponibilidad
               </a>
             </div>
           </div>

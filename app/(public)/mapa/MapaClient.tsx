@@ -264,7 +264,7 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
               </div>
               <div className="weather-main">
                 <div className="weather-temp">
-                  <span className="temp-value">{Math.round(weatherData.current.temperature)}Â°</span>
+                  <div className="temp-large">{Math.round(weatherData.current.temperature)}°</div>
                   <div className="weather-desc">
                     {currentMeta.icon}
                     <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>{currentMeta.label}</span>
@@ -273,7 +273,7 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
                 <div className="weather-details-grid">
                   <div className="detail-item"><Wind size={18} /> {weatherData.current.windSpeed} km/h</div>
                   <div className="detail-item"><Droplets size={18} /> {weatherData.current.humidity}%</div>
-                  <div className="detail-item">ST: {Math.round(weatherData.current.apparentTemperature)}Â°</div>
+                  <div className="detail-item">ST: {Math.round(weatherData.current.apparentTemperature)}°</div>
                   <div className="detail-item">Lluvia: {weatherData.current.precipitation} mm</div>
                 </div>
               </div>
@@ -297,8 +297,8 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
                     <span className="day-name">{idx === 0 ? 'Hoy' : dayName}</span>
                     <div className="daily-icon" style={{ color: '#0284c7' }}>{dayMeta.icon}</div>
                     <div className="daily-temps">
-                      <span className="temp-max">{Math.round(weatherData.daily.temperatureMax[idx])}Â°</span>
-                      <span className="temp-min">{Math.round(weatherData.daily.temperatureMin[idx])}Â°</span>
+                      <span style={{ fontWeight: 800, color: '#dc2626' }}>{Math.round(weatherData.daily.temperatureMax[idx])}°</span>
+                      <span style={{ fontWeight: 800, color: '#0284c7' }}>{Math.round(weatherData.daily.temperatureMin[idx])}°</span>
                     </div>
                     {weatherData.daily.precipitationSum[idx] > 0 && (
                       <span className="precip-prob"><Droplets size={12} /> {weatherData.daily.precipitationSum[idx]} mm</span>

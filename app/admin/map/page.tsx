@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { 
@@ -449,9 +449,9 @@ export default function MapAdminPage() {
                   required
                   className="admin-select"
                 >
-                  <option value="Transitable">ðŸŸ¢ Transitable</option>
-                  <option value="Transitable con precaución">ðŸŸ  Transitable con precaución</option>
-                  <option value="Cerrado">ðŸ”´ Cerrado / Intransitable</option>
+                  <option value="Transitable">🟢 Transitable</option>
+                  <option value="Transitable con precaución">🟠 Transitable con precaución</option>
+                  <option value="Cerrado">🔴 Cerrado / Intransitable</option>
                 </select>
               </div>
               <div className="form-group">

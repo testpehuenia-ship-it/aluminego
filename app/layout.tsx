@@ -1,4 +1,4 @@
-﻿import type { Metadata, Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Oswald, Caveat } from "next/font/google";
 import "./globals.css";
 import InstallPrompt from "@/components/InstallPrompt";
@@ -97,6 +97,22 @@ export default function RootLayout({
             }
           `
         }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "AlumineGo",
+              "url": "https://www.AlumineGo.ar",
+              "description": "Guía y Delivery en Aluminé. Alojamientos, gastronomía y aventuras.",
+              "publisher": {
+                "@type": "Organization",
+                "name": "AlumineGo"
+              }
+            })
+          }}
+        />
       </head>
       <body>
         {children}

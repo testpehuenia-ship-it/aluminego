@@ -317,6 +317,11 @@ export default function BusinessesAdminPage() {
                       </div>
                     </td>
                     <td>
+                      <span className="badge" style={{ backgroundColor: '#f8fafc', color: '#475569', border: '1px solid #e2e8f0' }}>
+                        {biz.subscription?.planType || 'Gratuito'}
+                      </span>
+                    </td>
+                    <td>
                       <button className="menu-count-btn" onClick={() => openModal(biz)}>
                         <UtensilsCrossed size={14} /> {biz.menu?.length || 0} items
                       </button>

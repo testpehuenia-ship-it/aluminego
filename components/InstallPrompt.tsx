@@ -159,7 +159,7 @@ export default function InstallPrompt() {
             <p style={{ color: '#444', fontSize: '1.1rem', margin: '0 0 24px 0', lineHeight: 1.4 }}>
               {isInstalling 
                 ? 'Preparando tu app... ¡Ya casi listo!' 
-                : <>¡Lleva AlumineGo siempre contigo!<br/>Instala la aplicación para disfrutar de Aluminé estés donde estés.</>}
+                : <>¡Lleva AluminéGO siempre con vos!<br/>Instala la aplicación para disfrutar de Aluminé estés donde estés.</>}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>

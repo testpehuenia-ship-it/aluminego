@@ -1,11 +1,11 @@
 :root {
   /* AluminéGO Identity Colors */
-  --color-green: #1a4f9c;         /* Azul AluminéGO */
-  --color-orange: #f07020;        /* Naranja GO */
+  --color-green: #1433CC;         /* Azul Royal del logo AluminéGO */
+  --color-orange: #E84600;        /* Naranja GO del logo */
   --color-celeste: #00b4d8;
-  --color-dark-green: #0d2d5e;   /* Azul oscuro */
+  --color-dark-green: #0d1f88;   /* Azul oscuro */
   --color-purple: #5c3a7a;
-  --color-light-green: #2563eb;  /* Azul medio */
+  --color-light-green: #1E50E0;  /* Azul medio */
   
   --color-primary: var(--color-green);
   --color-secondary: var(--color-orange);

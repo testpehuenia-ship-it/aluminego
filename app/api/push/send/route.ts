@@ -1,22 +1,26 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import webPush from 'web-push';
 
 export const dynamic = 'force-dynamic';
 
-const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
-const privateVapidKey = process.env.VAPID_PRIVATE_KEY!;
-
-// Initialize web-push
-// Se recomienda usar `mailto:` con tu email real para VAPID
-webPush.setVapidDetails(
-  'mailto:contacto@AluminéGO.ar',
-  publicVapidKey,
-  privateVapidKey
-);
-
 export async function POST(request: Request) {
   try {
+    // Inicializar VAPID dentro del handler (no en módulo) para evitar errores en build
+    const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    const privateVapidKey = process.env.VAPID_PRIVATE_KEY;
+
+    if (!publicVapidKey || !privateVapidKey) {
+      console.error('VAPID keys no configuradas en las variables de entorno');
+      return NextResponse.json({ error: 'Servicio de notificaciones no configurado' }, { status: 503 });
+    }
+
+    webPush.setVapidDetails(
+      'mailto:contacto@aluminego.ar',
+      publicVapidKey,
+      privateVapidKey
+    );
+
     const body = await request.json();
     const { title, message, url, segment = 'all' } = body;
 

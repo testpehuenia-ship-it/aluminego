@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -107,7 +107,7 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
           <div style={{ marginBottom: '0px' }}>
             <h1 style={{ fontFamily: 'var(--font-oswald), sans-serif', fontSize: '4.5rem', fontWeight: 700, lineHeight: 0.9, marginBottom: '0px', textTransform: 'uppercase', letterSpacing: '1px', textShadow: '2px 4px 10px rgba(0,0,0,0.5)' }}>
               <span className="swap-green">TO</span><span className="swap-orange">DO</span>{' '}
-              <span style={{ color: 'white' }}>ALUM</span><span className="swap-green">IN</span><span className="swap-orange">É</span>
+              <span style={{ color: 'white' }}>ALUMI</span><span className="swap-green">NÉ</span>
             </h1>
           </div>
           <h2 style={{ fontFamily: 'var(--font-caveat), cursive', fontSize: '3.5rem', color: '#f1c40f', lineHeight: 0.8, marginBottom: '24px', transform: 'rotate(-2deg)', textShadow: '1px 2px 4px rgba(0,0,0,0.5)' }}>

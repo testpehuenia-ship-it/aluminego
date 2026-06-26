@@ -47,16 +47,23 @@ export const formatDPVStatus = (statusCode: string) => {
 
 export async function getDPVStatus(): Promise<DPVUnifiedData | null> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 segundos de límite
+
     // Fetch live status and border crossings list in parallel
     // Using Next.js caching, revalidate every 15 minutes (900 seconds)
     const [parteRes, pasosRes] = await Promise.all([
       fetch('https://w2.dpvneuquen.gov.ar/parteopendata/api/parte', {
-        next: { revalidate: 900 }
+        cache: 'no-store',
+        signal: controller.signal
       }),
       fetch('https://w2.dpvneuquen.gov.ar/parteopendata/api/pasos', {
-        next: { revalidate: 86400 } // Pasos list doesn't change often, cache for 1 day
+        cache: 'no-store',
+        signal: controller.signal
       })
     ]);
+
+    clearTimeout(timeoutId);
 
     if (!parteRes.ok || !pasosRes.ok) {
       console.error('Failed to fetch from DPV API');

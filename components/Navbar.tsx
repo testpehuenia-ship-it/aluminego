@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -13,7 +13,7 @@ export default function Navbar() {
         
         {/* Left: Logo */}
         <Link href="/" className="logo-link" style={{ fontSize: '2.2rem', gap: '8px' }}>
-          <Image src="/images/logo.png" alt="Logo AlumineGo" width={40} height={40} style={{ objectFit: 'contain' }} />
+          <Image src="/images/logo.png" alt="Logo AluminéGO" width={40} height={40} style={{ objectFit: 'contain' }} />
           <div>
             <span style={{ color: 'var(--color-green)' }}>Aluminé</span>
             <span style={{ color: 'var(--color-orange)' }}>GO</span>
@@ -26,7 +26,10 @@ export default function Navbar() {
           <Link href="/comer" className={`nav-link ${pathname === '/comer' ? 'active' : ''}`}>Qué Comer</Link>
           <Link href="/alojarse" className={`nav-link ${pathname === '/alojarse' ? 'active' : ''}`}>Dormir</Link>
           <Link href="/aventuras" className={`nav-link ${pathname === '/aventuras' ? 'active' : ''}`}>Aventuras</Link>
-          <Link href="/comercios" className={`nav-link ${pathname === '/comercios' ? 'active' : ''}`}>Guía Local</Link>
+          <Link href="/comercios" className={`nav-link ${pathname === '/comercios' ? 'active' : ''}`}>Comercios</Link>
+          <Link href="/guia" className={`nav-link ${pathname === '/guia' ? 'active' : ''}`}>Guía Local</Link>
+          <Link href="/novedades" className={`nav-link ${pathname === '/novedades' ? 'active' : ''}`}>Novedades</Link>
+          <Link href="/favoritos" className={`nav-link ${pathname === '/favoritos' ? 'active' : ''}`}>Favoritos</Link>
           <Link href="/mapa" className={`nav-link ${pathname === '/mapa' ? 'active' : ''}`}>Mapa y Rutas</Link>
         </nav>
         
@@ -34,3 +37,4 @@ export default function Navbar() {
     </header>
   );
 }
+

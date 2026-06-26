@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
 }
 
@@ -23,12 +23,20 @@ model Category {
 model Business {
   id         String     @id @default(cuid())
   name       String
+  description String?
+  details    String?
   image      String
   whatsapp   String
+  latitude   Float?
+  longitude  Float?
   category   Category   @relation(fields: [categoryId], references: [id])
   categoryId   String
   menu         MenuItem[]
   subscription Subscription?
+  portalUserId String?
+  portalUser   PortalUser? @relation(fields: [portalUserId], references: [id])
+  reviews      Review[]
+  openingHours String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }
@@ -52,8 +60,14 @@ model Accommodation {
   image       String
   whatsapp    String
   description  String?
+  latitude     Float?
+  longitude    Float?
   features     Feature[]
   subscription Subscription?
+  portalUserId String?
+  portalUser   PortalUser? @relation(fields: [portalUserId], references: [id])
+  reviews      Review[]
+  openingHours String?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
@@ -73,7 +87,13 @@ model Adventure {
   whatsapp    String
   category     String   // e.g., "Trekking", "Pesca"
   details      String   // Guardaremos como JSON string o separado por comas
+  latitude     Float?
+  longitude    Float?
   subscription Subscription?
+  portalUserId String?
+  portalUser   PortalUser? @relation(fields: [portalUserId], references: [id])
+  reviews      Review[]
+  openingHours String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -82,12 +102,49 @@ model LocalService {
   id          String   @id @default(cuid())
   name        String
   category    String   // e.g., "Salud", "Seguridad", "Comercios"
+  subcategory String?  // e.g., "Poda", "Raleo"
   address     String?
-  whatsapp     String?
-  image        String?
+  whatsapp    String?
+  image       String?  // Ahora guardará múltiple separadas por coma
+  description String?  // Texto descriptivo para Plan Completo
+  details     String?  // Características/Servicios (JSON o separadas por coma)
+  latitude    Float?
+  longitude   Float?
   subscription Subscription?
+  portalUserId String?
+  portalUser   PortalUser? @relation(fields: [portalUserId], references: [id])
+  reviews      Review[]
+  openingHours String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model Commerce {
+  id           String           @id @default(cuid())
+  slug         String?          @unique
+  name         String
+  type         String           // e.g., "Supermercado", "Farmacia"
+  image        String
+  whatsapp     String
+  description  String?
+  latitude     Float?
+  longitude    Float?
+  locality     String?          @default("Villa Pehuenia")
+  details      CommerceDetail[]
+  subscription Subscription?
+  portalUserId String?
+  portalUser   PortalUser?      @relation(fields: [portalUserId], references: [id])
+  reviews      Review[]
+  openingHours String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+}
+
+model CommerceDetail {
+  id         String   @id @default(cuid())
+  name       String
+  commerce   Commerce @relation(fields: [commerceId], references: [id], onDelete: Cascade)
+  commerceId String
 }
 
 model Admin {
@@ -139,6 +196,29 @@ model PageVisit {
   createdAt DateTime @default(now())
 }
 
+model EventTracking {
+  id        String   @id @default(cuid())
+  entityId  String   // ID de Business, Accommodation, etc.
+  type      String   // e.g., "WHATSAPP_CLICK", "MENU_VIEW"
+  createdAt DateTime @default(now())
+}
+
+model PortalUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // Hasheado
+  name      String?
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  businesses      Business[]
+  accommodations  Accommodation[]
+  adventures      Adventure[]
+  localServices   LocalService[]
+  commerces       Commerce[]
+}
+
 model PricingConfig {
   id        String   @id @default(cuid())
   key       String   @unique
@@ -146,6 +226,18 @@ model PricingConfig {
   price     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Article {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   // Puede ser markdown o HTML
+  image       String?
+  author      String?  @default("PehueniaGO")
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Subscription {
@@ -158,6 +250,8 @@ model Subscription {
   hasBannerPortada Boolean  @default(false)
   
   price            Float    // Mensual total
+  bonifiedKeys     String?  // Ej: "banner_top, plan_basico_destacado"
+  discountAmount   Float    @default(0)
 
   startDate        DateTime @default(now())
   dueDate          DateTime // Próximo vencimiento
@@ -173,6 +267,9 @@ model Subscription {
   
   localServiceId   String?  @unique
   localService     LocalService? @relation(fields: [localServiceId], references: [id], onDelete: Cascade)
+  
+  commerceId       String?  @unique
+  commerce         Commerce? @relation(fields: [commerceId], references: [id], onDelete: Cascade)
 
   payments         Payment[]
   createdAt        DateTime @default(now())
@@ -186,4 +283,47 @@ model Payment {
   amount         Float
   paymentDate    DateTime     @default(now())
   periodPaid     DateTime     // El mes/dueDate que cubrió
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+}
+
+model PushHistory {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  url       String?
+  sentCount Int      @default(0)
+  errorCount Int     @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id              String         @id @default(cuid())
+  rating          Int
+  comment         String
+  author          String
+  email           String?
+  approved        Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  
+  businessId      String?
+  business        Business?      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  
+  accommodationId String?
+  accommodation   Accommodation? @relation(fields: [accommodationId], references: [id], onDelete: Cascade)
+  
+  adventureId     String?
+  adventure       Adventure?     @relation(fields: [adventureId], references: [id], onDelete: Cascade)
+  
+  localServiceId  String?
+  localService    LocalService?  @relation(fields: [localServiceId], references: [id], onDelete: Cascade)
+  
+  commerceId      String?
+  commerce        Commerce?      @relation(fields: [commerceId], references: [id], onDelete: Cascade)
 }

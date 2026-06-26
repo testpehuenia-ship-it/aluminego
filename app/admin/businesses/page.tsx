@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -17,8 +17,10 @@ import {
   Upload,
   Info,
   DollarSign,
-  Check
+  Check,
+  MapPin
 } from 'lucide-react';
+import OpeningHoursEditor, { DEFAULT_SCHEDULE_STRING } from '@/components/admin/OpeningHoursEditor';
 
 export default function BusinessesAdminPage() {
   const router = useRouter();
@@ -37,12 +39,18 @@ export default function BusinessesAdminPage() {
     whatsapp: '',
     categoryId: '',
     menu: [] as any[],
-    selectedPricingKeys: [] as string[]
+    selectedPricingKeys: [] as string[],
+    description: '',
+    details: '',
+    latitude: '-38.87942114574949',
+    longitude: '-71.18375154775678',
+    openingHours: DEFAULT_SCHEDULE_STRING
   });
   
   const [uploading, setUploading] = React.useState(false);
   const [uploadingItem, setUploadingItem] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
+  const [generatedCredentials, setGeneratedCredentials] = React.useState<any>(null);
 
   // Menu Item Local State (dentro del modal)
   const [newMenuItem, setNewMenuItem] = React.useState({ name: '', description: '', price: '', image: '' });
@@ -83,11 +91,16 @@ export default function BusinessesAdminPage() {
         whatsapp: business.whatsapp || '',
         categoryId: business.categoryId || '',
         menu: business.menu || [],
-        selectedPricingKeys: business.subscription ? business.subscription.planType.split(', ').filter(Boolean) : []
+        selectedPricingKeys: business.subscription ? business.subscription.planType.split(', ').filter(Boolean) : [],
+        description: business.description || '',
+        details: business.details || '',
+        latitude: business.latitude ? business.latitude.toString() : '',
+        longitude: business.longitude ? business.longitude.toString() : '',
+        openingHours: business.openingHours || ''
       });
     } else {
       setEditingBusiness(null);
-      setFormData({ name: '', image: '', whatsapp: '', categoryId: '', menu: [], selectedPricingKeys: [] });
+      setFormData({ name: '', image: '', whatsapp: '', categoryId: '', menu: [], selectedPricingKeys: [], description: '', details: '', latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING });
     }
     setNewMenuItem({ name: '', description: '', price: '', image: '' });
     setEditingMenuItemId(null);
@@ -181,6 +194,22 @@ export default function BusinessesAdminPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validaciones de Banners
+    const hasCategoryBanner = formData.selectedPricingKeys.includes('banner_top') || formData.selectedPricingKeys.includes('banner_middle') || formData.selectedPricingKeys.includes('banner_bottom');
+    const hasPortadaBanner = formData.selectedPricingKeys.includes('portada_principal');
+    const hasComercioCompleto = formData.selectedPricingKeys.includes('plan_comercio_completo');
+
+    if (hasCategoryBanner && !hasComercioCompleto) {
+      alert('Para poder contratar un Banner de Categoría (Top, Middle o Bottom), primero debe seleccionar el Plan Comercio Completo.');
+      return;
+    }
+
+    if (hasPortadaBanner && !hasCategoryBanner) {
+      alert('Para tener un Banner en la Portada Principal, debe tener también un Banner de Categoría contratado.');
+      return;
+    }
+
     setSaving(true);
 
     // Auto-commit any in-progress menu item before sending to the backend
@@ -210,13 +239,28 @@ export default function BusinessesAdminPage() {
       });
 
       if (res.ok) {
+        const data = await res.json();
         await fetchData();
         closeModal();
 
-        // Check if any banner plans were selected
-        const hasBanner = formData.selectedPricingKeys.some(k => k.includes('banner') || k.includes('portada'));
-        if (hasBanner) {
-          router.push(`/admin/publicity?businessName=${encodeURIComponent(formData.name)}`);
+        if (data.generatedCredentials) {
+          const creds = {
+            ...data.generatedCredentials,
+            businessName: formData.name,
+            whatsapp: formData.whatsapp
+          };
+          setGeneratedCredentials(creds);
+          
+          // Abrir WhatsApp automáticamente
+          const cleanPhone = (creds.whatsapp || '').replace(/\D/g, '');
+          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://AluminéGO.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
+          window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMsg)}`, '_blank');
+        } else {
+          // Check if any banner plans were selected
+          const hasBanner = formData.selectedPricingKeys.some(k => k.includes('banner') || k.includes('portada'));
+          if (hasBanner) {
+            router.push(`/admin/publicity?businessName=${encodeURIComponent(formData.name)}`);
+          }
         }
       } else {
         const errorData = await res.json();
@@ -231,7 +275,7 @@ export default function BusinessesAdminPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Estás seguro de eliminar este comercio?')) return;
+    if (!confirm('Â¿Estás seguro de eliminar este comercio?')) return;
 
     try {
       const res = await fetch(`/api/businesses/${id}`, {
@@ -259,9 +303,6 @@ export default function BusinessesAdminPage() {
           <h1>Comercios</h1>
           <p>Gestiona los locales, restaurantes y tiendas</p>
         </div>
-        <button className="add-btn" onClick={() => openModal()}>
-          <Plus size={20} /> Nuevo Comercio
-        </button>
       </div>
 
       <div className="content-card">
@@ -293,7 +334,7 @@ export default function BusinessesAdminPage() {
                   <th>Categoría</th>
                   <th>WhatsApp/Tel</th>
                   <th>Plan Actual</th>
-                  <th>Menú</th>
+                  <th>MenÁº</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -315,11 +356,6 @@ export default function BusinessesAdminPage() {
                       <div className="whatsapp-cell">
                         <MessageCircle size={14} /> {biz.whatsapp}
                       </div>
-                    </td>
-                    <td>
-                      <span className="badge" style={{ backgroundColor: '#f8fafc', color: '#475569', border: '1px solid #e2e8f0' }}>
-                        {biz.subscription?.planType || 'Gratuito'}
-                      </span>
                     </td>
                     <td>
                       <button className="menu-count-btn" onClick={() => openModal(biz)}>
@@ -377,9 +413,12 @@ export default function BusinessesAdminPage() {
                       className="admin-select"
                     >
                       <option value="">Seleccionar Categoría</option>
-                      {categories.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.title}</option>
-                      ))}
+                      {categories
+                        .filter(cat => cat.link?.startsWith('/comer') && !cat.link?.startsWith('/comercios'))
+                        .map(cat => (
+                          <option key={cat.id} value={cat.id}>{cat.title}</option>
+                        ))
+                      }
                     </select>
                   </div>
                   <div className="form-group">
@@ -412,11 +451,61 @@ export default function BusinessesAdminPage() {
                       </div>
                     )}
                   </div>
+                  <div className="form-group">
+                    <label>Descripción del Comercio</label>
+                    <textarea 
+                      value={formData.description} 
+                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      placeholder="Ej: Restaurant con especialidad en chivito y trucha..."
+                      rows={3}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Detalles / Características (Separar por comas)</label>
+                    <textarea 
+                      value={formData.details} 
+                      onChange={(e) => setFormData({...formData, details: e.target.value})}
+                      placeholder="Ej: WiFi, Estacionamiento, Tarjetas de crédito..."
+                      rows={2}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Horario de Atención</label>
+                    <OpeningHoursEditor 
+                      value={formData.openingHours} 
+                      onChange={(val) => setFormData({...formData, openingHours: val})}
+                    />
+                  </div>
+                  <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px', marginTop: '16px' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                      <MapPin size={16} /> Geolocalización (Mapa)
+                    </label>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label style={{ fontSize: '0.75rem', color: '#64748b' }}>Latitud</label>
+                        <input 
+                          type="text" 
+                          value={formData.latitude} 
+                          onChange={(e) => setFormData({...formData, latitude: e.target.value})}
+                          placeholder="-38.8833"
+                        />
+                      </div>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label style={{ fontSize: '0.75rem', color: '#64748b' }}>Longitud</label>
+                        <input 
+                          type="text" 
+                          value={formData.longitude} 
+                          onChange={(e) => setFormData({...formData, longitude: e.target.value})}
+                          placeholder="-71.1667"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Sección Menú */}
+                {/* Sección MenÁº */}
                 <div className="modal-section">
-                  <h3 className="section-title"><UtensilsCrossed size={18} /> Gestión del Menú</h3>
+                  <h3 className="section-title"><UtensilsCrossed size={18} /> Gestión del MenÁº</h3>
                   
                   <div 
                     className="menu-form" 
@@ -501,10 +590,10 @@ export default function BusinessesAdminPage() {
                   </div>
 
                   <div className="menu-list-container">
-                    <label>Items en Menú ({formData.menu.length})</label>
+                    <label>Items en MenÁº ({formData.menu.length})</label>
                     <div className="menu-scroll-list">
                       {formData.menu.length === 0 ? (
-                        <div className="empty-menu">Aún no hay platos en el menú</div>
+                        <div className="empty-menu">AÁºn no hay platos en el menÁº</div>
                       ) : (
                         formData.menu.map((item, idx) => (
                           <div key={item.id || idx} className="menu-item-card-full">
@@ -536,44 +625,6 @@ export default function BusinessesAdminPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* Sección Facturación */}
-                <div className="modal-section" style={{ gridColumn: '1 / -1', background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-                  <h3 className="section-title" style={{ borderBottom: 'none', paddingBottom: 0 }}><DollarSign size={18} /> Facturación y Publicidad</h3>
-                  <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '16px' }}>Selecciona los servicios de publicidad. Al guardar, se actualizará la suscripción automáticamente.</p>
-                    
-                    <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
-                      {pricingOptions.map(option => (
-                        <label key={option.key} className="pricing-option" style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'white', padding: '12px 16px', borderRadius: '12px', border: formData.selectedPricingKeys.includes(option.key) ? '2px solid #0d9488' : '1px solid #cbd5e1', cursor: 'pointer', transition: 'all 0.2s' }}>
-                          <input 
-                            type="checkbox" 
-                            checked={formData.selectedPricingKeys.includes(option.key)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setFormData(prev => ({ ...prev, selectedPricingKeys: [...prev.selectedPricingKeys, option.key] }));
-                              } else {
-                                setFormData(prev => ({ ...prev, selectedPricingKeys: prev.selectedPricingKeys.filter(k => k !== option.key) }));
-                              }
-                            }}
-                            style={{ width: '18px', height: '18px', accentColor: '#0d9488', cursor: 'pointer' }}
-                          />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.9rem' }}>{option.name}</div>
-                            <div style={{ color: '#0d9488', fontWeight: 700, fontSize: '0.9rem' }}>${new Intl.NumberFormat('es-AR').format(option.price)}/mes</div>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
-
-                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '16px', padding: '16px', background: 'white', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-                      <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>Total Mensual Estimado:</span>
-                      <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f766e' }}>
-                        ${new Intl.NumberFormat('es-AR').format(
-                          formData.selectedPricingKeys.reduce((sum, key) => sum + (pricingOptions.find(p => p.key === key)?.price || 0), 0)
-                        )}
-                      </span>
-                    </div>
-                  </div>
               </div>
               
               <div className="modal-footer">
@@ -588,7 +639,48 @@ export default function BusinessesAdminPage() {
         </div>
       )}
 
-      <style jsx>{`
+      {/* Modal de Credenciales Generadas */}
+      {generatedCredentials && (
+        <div className="modal-overlay" onClick={() => setGeneratedCredentials(null)}>
+          <div className="modal-content" style={{ maxWidth: '500px', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
+            <div style={{ backgroundColor: '#dcfce7', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: '#166534' }}>
+              <Check size={30} />
+            </div>
+            <h2 style={{ fontSize: '1.5rem', marginBottom: '8px', color: '#166534' }}>¡Comercio y Portal Creados!</h2>
+            <p style={{ color: '#475569', marginBottom: '24px' }}>
+              Se ha generado automáticamente el acceso para <strong>{generatedCredentials.businessName}</strong>.
+            </p>
+            
+            <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '24px', textAlign: 'left' }}>
+              <p style={{ margin: '0 0 8px', fontSize: '0.9rem', color: '#64748b' }}>Usuario (Email):</p>
+              <p style={{ margin: '0 0 16px', fontWeight: 'bold', fontSize: '1.1rem' }}>{generatedCredentials.email}</p>
+              
+              <p style={{ margin: '0 0 8px', fontSize: '0.9rem', color: '#64748b' }}>Contraseña Provisoria:</p>
+              <p style={{ margin: '0', fontWeight: 'bold', fontSize: '1.1rem' }}>{generatedCredentials.password}</p>
+            </div>
+
+            <a 
+              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://AluminéGO.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+              style={{ width: '100%', padding: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '1.1rem', textDecoration: 'none', backgroundColor: '#25D366', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold' }}
+              onClick={() => setGeneratedCredentials(null)}
+            >
+              <MessageCircle size={24} /> Enviar Datos por WhatsApp
+            </a>
+            
+            <button 
+              onClick={() => setGeneratedCredentials(null)}
+              style={{ marginTop: '16px', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontWeight: 600 }}
+            >
+              Cerrar y continuar
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style jsx global>{`
         .admin-view { padding: 20px; max-width: 1200px; margin: 0 auto; }
         h1 { font-size: 1.875rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
         p { color: #64748b; }
@@ -681,3 +773,5 @@ export default function BusinessesAdminPage() {
     </div>
   );
 }
+
+

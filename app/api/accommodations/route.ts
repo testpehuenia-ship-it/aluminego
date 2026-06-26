@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { verifySession, hashPassword } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,8 +23,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     const body = await request.json();
-    const { name, type, image, whatsapp, description, features, selectedPricingKeys } = body;
+    const { name, type, image, whatsapp, description, features, selectedPricingKeys, latitude, longitude, openingHours } = body;
 
     const result = await prisma.$transaction(async (tx: any) => {
       const accommodation = await tx.accommodation.create({
@@ -32,6 +39,9 @@ export async function POST(request: Request) {
           image,
           whatsapp,
           description,
+          latitude: latitude ? parseFloat(String(latitude)) : null,
+          longitude: longitude ? parseFloat(String(longitude)) : null,
+          openingHours: openingHours || null,
           features: {
             create: features.map((f: string) => ({ name: f }))
           }
@@ -41,6 +51,7 @@ export async function POST(request: Request) {
         }
       });
 
+      let generatedCredentials = null;
       if (selectedPricingKeys && Array.isArray(selectedPricingKeys) && selectedPricingKeys.length > 0) {
         const configs = await tx.pricingConfig.findMany({
           where: { key: { in: selectedPricingKeys } }
@@ -71,9 +82,41 @@ export async function POST(request: Request) {
             }
           });
         }
+        // 3. Auto-generate PortalUser if applicable
+        if (selectedPricingKeys.includes('plan_comercio_completo') || selectedPricingKeys.includes('plan_basico_destacado')) {
+          const safeName = accommodation.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          const email = `${safeName}@AluminéGO.ar`;
+          
+          const today = new Date();
+          const d = String(today.getDate()).padStart(2, '0');
+          const m = String(today.getMonth() + 1).padStart(2, '0');
+          const y = today.getFullYear();
+          const password = `AluminéGO${d}${m}${y}`;
+
+          // Check if user exists
+          let portalUser = await tx.portalUser.findUnique({ where: { email } });
+          if (!portalUser) {
+            portalUser = await tx.portalUser.create({
+              data: {
+                name: accommodation.name,
+                email,
+                password: hashPassword(password),
+              }
+            });
+            generatedCredentials = { email, password };
+          } else {
+            generatedCredentials = { email, password: "Tu contraseña ya fue creada anteriormente. Si la olvidaste, contactanos." };
+          }
+
+          // Connect Accommodation to PortalUser
+          await tx.accommodation.update({
+            where: { id: accommodation.id },
+            data: { portalUserId: portalUser.id }
+          });
+        }
       }
 
-      return accommodation;
+      return { accommodation, generatedCredentials };
     });
 
     return NextResponse.json(result);
@@ -82,3 +125,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+

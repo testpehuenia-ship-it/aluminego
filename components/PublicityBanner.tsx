@@ -52,7 +52,7 @@ export default function PublicityBanner({
     return (
       <div className="ad-banner-container" style={{ height: height, maxWidth: maxWidth, margin: '0 auto 24px auto', position: 'relative' }}>
         <a 
-          href="https://wa.me/5492942661000?text=Hola%20quiero%20publicitar%20en%20AlumineGo" 
+          href="https://wa.me/5492942524300?text=Hola%20quiero%20publicitar%20en%20AluminéGO" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="ad-slide ad-slide-1" 
@@ -70,7 +70,7 @@ export default function PublicityBanner({
           </p>
         </a>
         <a 
-          href="https://wa.me/5492942661000?text=Hola%20quiero%20publicitar%20en%20AlumineGo" 
+          href="https://wa.me/5492942524300?text=Hola%20quiero%20publicitar%20en%20AluminéGO" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="ad-slide ad-slide-2" 
@@ -81,6 +81,20 @@ export default function PublicityBanner({
           </h2>
           <p style={{ color: 'var(--color-orange)', fontSize: height === '100px' ? '0.9rem' : '1.1rem', marginTop: '4px', fontWeight: 700 }}>
             Haga crecer su negocio
+          </p>
+        </a>
+        <a 
+          href="https://wa.me/5492942524300?text=Hola%20quiero%20publicitar%20en%20AluminéGO" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="ad-slide ad-slide-3" 
+          style={{ textDecoration: 'none', animationDelay: delay }}
+        >
+          <h2 style={{ fontSize: height === '100px' ? '1.5rem' : '1.8rem', margin: 0, color: 'white', fontFamily: 'var(--font-oswald), sans-serif', textTransform: 'uppercase', textShadow: '1px 1px 2px rgba(0,0,0,0.2)' }}>
+            PROMOCIÁ“N LANZAMIENTO
+          </h2>
+          <p style={{ color: '#fffbeb', fontSize: height === '100px' ? '1.2rem' : '1.5rem', marginTop: '4px', fontWeight: 900, background: 'var(--color-green)', padding: '4px 12px', borderRadius: '8px', display: 'inline-block' }}>
+            50% DESCUENTO
           </p>
         </a>
       </div>
@@ -129,3 +143,6 @@ export default function PublicityBanner({
     </div>
   );
 }
+
+
+

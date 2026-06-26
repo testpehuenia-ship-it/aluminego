@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import maplibregl from 'maplibre-gl';
@@ -8,10 +8,11 @@ import PublicityBanner from '@/components/PublicityBanner';
 import { 
   Sun, CloudSun, Cloud, CloudRain, CloudSnow, CloudLightning, Wind, Droplets,
   MapPin, Map as MapIcon, Navigation, Route, AlertTriangle, CalendarDays,
-  Car, Info, ArrowRight, Search, CheckCircle, XCircle
+  Car, Info, ArrowRight, Search, CheckCircle, XCircle, Heart
 } from 'lucide-react';
 import type { DPVUnifiedData, DPVPaso, DPVRouteTramo } from '@/lib/services/dpv';
 import type { WeatherData } from '@/lib/services/weather';
+import { useFavorites } from '@/components/FavoritesContext';
 
 interface MapMarkerItem {
   id: string;
@@ -24,8 +25,8 @@ interface MapMarkerItem {
 
 interface MapaClientProps {
   initialMarkers: MapMarkerItem[];
-  dpvData: DPVUnifiedData | null;
-  weatherData: WeatherData | null;
+  dpvData?: DPVUnifiedData | null;
+  weatherData?: WeatherData | null;
 }
 
 // Helper: Weather Icons & Backgrounds
@@ -59,13 +60,65 @@ const getRouteColor = (status: string | undefined | null) => {
   return '#16a34a'; // Verde por defecto
 };
 
-export default function MapaClient({ initialMarkers, dpvData, weatherData }: MapaClientProps) {
+export default function MapaClient({ initialMarkers }: MapaClientProps) {
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   const [activeTab, setActiveTab] = useState<'clima'|'mapa'|'rutas'>('mapa');
   const [mapView, setMapView] = useState<'local'|'provincial'>('local');
   const [mapLayer, setMapLayer] = useState<'satelite'|'calle'>('satelite');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [routeSearch, setRouteSearch] = useState('');
   const [mapError, setMapError] = useState<string | null>(null);
-  
+
+  const [dpvData, setDpvData] = useState<DPVUnifiedData | null>(null);
+  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    async function loadRealTimeData() {
+      setLoadingData(true);
+      try {
+        const res = await fetch('/api/map-status');
+        if (res.ok) {
+          const data = await res.json();
+          setDpvData(data.dpvData);
+          setWeatherData(data.weatherData);
+        }
+      } catch (err) {
+        console.error('Error loading real-time map/weather/routes data:', err);
+      } finally {
+        setLoadingData(false);
+      }
+    }
+    loadRealTimeData();
+  }, []);
+
+  // Auto-Highlighting / Opening favorite link logic
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab');
+      const openParam = params.get('open');
+
+      if (tabParam === 'rutas' || openParam) {
+        setActiveTab('rutas');
+      }
+
+      if (openParam && dpvData) {
+        const openId = parseInt(openParam, 10);
+        const matchedPaso = dpvData.pasos.find(p => p.codTramo === openId);
+        if (matchedPaso) {
+          setRouteSearch(matchedPaso.descripcion);
+          return;
+        }
+
+        const matchedRuta = dpvData.rutas.find(r => r.codigoTramo === openId);
+        if (matchedRuta) {
+          setRouteSearch(matchedRuta.rutaTramo);
+        }
+      }
+    }
+  }, [dpvData]);
+
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
 
@@ -108,7 +161,7 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
                 ]
               }
             : 'https://tiles.openfreemap.org/styles/liberty',
-          center: isLocal ? [-70.9314, -39.2372] : [-70.3, -38.8], 
+          center: isLocal ? [-71.1667, -38.8833] : [-70.3, -38.8], 
           zoom: isLocal ? 12 : 6,
           pitch: 0, 
           bearing: 0
@@ -118,9 +171,20 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
 
         if (isLocal) {
           // Draw Aluminé Local Markers
-          const markersToRender = initialMarkers && initialMarkers.length > 0 ? initialMarkers : [
-            { id: '1', title: 'Aluminé', longitude: -70.9314, latitude: -39.2372, color: '#ea580c' }
+          let markersToRender = initialMarkers && initialMarkers.length > 0 ? initialMarkers : [
+            { id: '1', title: 'Aluminé', longitude: -71.1667, latitude: -38.8833, color: '#ea580c' }
           ];
+
+          if (categoryFilter !== 'all') {
+            const term = categoryFilter.toLowerCase();
+            markersToRender = markersToRender.filter(m => {
+              const text = `${m.title} ${m.description || ''}`.toLowerCase();
+              if (term === 'alojamiento') return text.includes('cabaña') || text.includes('hotel') || text.includes('alojamiento') || text.includes('hostel');
+              if (term === 'gastronomia') return text.includes('restaurante') || text.includes('comida') || text.includes('pizzer') || text.includes('cerve') || text.includes('cafe');
+              if (term === 'aventura') return text.includes('aventura') || text.includes('trekking') || text.includes('pesca') || text.includes('nieve') || text.includes('guia');
+              return text.includes(term);
+            });
+          }
 
           markersToRender.forEach((marker) => {
             if (!marker.longitude || !marker.latitude) return;
@@ -166,7 +230,7 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
         map.current = null;
       }
     };
-  }, [activeTab, mapView, mapLayer, initialMarkers, dpvData]);
+  }, [activeTab, mapView, mapLayer, initialMarkers, dpvData, categoryFilter]);
 
   // Filters for Routes
   const filteredRoutes = useMemo(() => {
@@ -188,11 +252,11 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <h1>Info Hub Aluminé</h1>
-          <p>Tu centro de planificación: Clima en tiempo real, mapa interactivo y estado oficial de rutas de la DPV Neuquén.</p>
+          <p>Tu centro de planificación: Clima en tiempo real, mapa interactivo y estado oficial de rutas de la DPV NeuQuén.</p>
         </div>
       </div>
 
-      <PublicityBanner height="100px" />
+      <PublicityBanner page="GuiaLocal" section={1} height="100px" />
 
       {/* Modern Tab Navigation */}
       <div className="tab-navigation">
@@ -215,12 +279,38 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
               <MapPin size={18} /> Aluminé Local
             </button>
             <button className={mapView === 'provincial' ? 'btn-toggle active' : 'btn-toggle'} onClick={() => setMapView('provincial')}>
-              <Navigation size={18} /> Neuquén y Fronteras
+              <Navigation size={18} /> NeuQuén y Fronteras
             </button>
             <button className="btn-toggle" onClick={() => setMapLayer(prev => prev === 'satelite' ? 'calle' : 'satelite')} style={{ marginLeft: 'auto', background: '#f8fafc', color: '#0f172a', border: '1px solid #cbd5e1' }}>
               <MapIcon size={18} /> Capa: {mapLayer === 'satelite' ? 'Satélite' : 'Calles'}
             </button>
           </div>
+
+          {mapView === 'local' && (
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '12px', marginBottom: '12px', scrollbarWidth: 'none' }}>
+              {['all', 'alojamiento', 'gastronomia', 'aventura'].map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setCategoryFilter(cat)}
+                  style={{
+                    padding: '6px 16px',
+                    borderRadius: '50px',
+                    border: '1px solid',
+                    borderColor: categoryFilter === cat ? 'var(--color-green)' : '#cbd5e1',
+                    backgroundColor: categoryFilter === cat ? 'var(--color-green)' : 'white',
+                    color: categoryFilter === cat ? 'white' : 'var(--color-text-main)',
+                    fontWeight: categoryFilter === cat ? 700 : 500,
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {cat === 'all' ? 'Todos' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </button>
+              ))}
+            </div>
+          )}
           
           <div className="map-wrapper">
             {mapError ? (
@@ -253,62 +343,71 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
       )}
 
       {/* --- TAB: CLIMA --- */}
-      {activeTab === 'clima' && weatherData && currentMeta && (
-        <div className="tab-content fade-in">
-          <div className="weather-dashboard">
-            {/* Current Weather Big Card */}
-            <div className="current-weather-card" style={{ background: currentMeta.bg, color: currentMeta.icon.type.name === 'Sun' ? '#111' : 'white' }}>
-              <div className="weather-header">
-                <h2>Aluminé</h2>
-                <div className="weather-badge">En vivo</div>
-              </div>
-              <div className="weather-main">
-                <div className="weather-temp">
-                  <span className="temp-value">{Math.round(weatherData.current.temperature)}°</span>
-                  <div className="weather-desc">
-                    {currentMeta.icon}
-                    <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>{currentMeta.label}</span>
-                  </div>
-                </div>
-                <div className="weather-details-grid">
-                  <div className="detail-item"><Wind size={18} /> {weatherData.current.windSpeed} km/h</div>
-                  <div className="detail-item"><Droplets size={18} /> {weatherData.current.humidity}%</div>
-                  <div className="detail-item">ST: {Math.round(weatherData.current.apparentTemperature)}°</div>
-                  <div className="detail-item">Lluvia: {weatherData.current.precipitation} mm</div>
-                </div>
-              </div>
-            </div>
-
-            {/* 7 Day Forecast */}
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: '32px', marginBottom: '16px', color: 'var(--color-dark-green)' }}>
-              Pronóstico Semanal
-            </h3>
-            <div className="weekly-forecast-grid">
-              {weatherData.daily.time.map((day, idx) => {
-                // Parse date manually to avoid SSR timezone hydration mismatch
-                const parts = day.split('-');
-                const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-                const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-                const dayName = days[d.getDay()];
-                const dayMeta = getWeatherMeta(weatherData.daily.weatherCode[idx], true);
-                
-                return (
-                  <div key={day} className="daily-card glass-panel">
-                    <span className="day-name">{idx === 0 ? 'Hoy' : dayName}</span>
-                    <div className="daily-icon" style={{ color: '#0284c7' }}>{dayMeta.icon}</div>
-                    <div className="daily-temps">
-                      <span style={{ fontWeight: 800, color: '#dc2626' }}>{Math.round(weatherData.daily.temperatureMax[idx])}°</span>
-                      <span style={{ fontWeight: 800, color: '#0284c7' }}>{Math.round(weatherData.daily.temperatureMin[idx])}°</span>
-                    </div>
-                    {weatherData.daily.precipitationSum[idx] > 0 && (
-                      <span className="precip-prob"><Droplets size={12} /> {weatherData.daily.precipitationSum[idx]} mm</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+      {activeTab === 'clima' && (
+        !weatherData ? (
+          <div className="tab-content fade-in" style={{ padding: '60px 20px', textAlign: 'center' }}>
+            <div className="spinner"></div>
+            <p style={{ marginTop: '16px', color: '#64748b', fontWeight: 500 }}>Cargando pronóstico meteorológico...</p>
           </div>
-        </div>
+        ) : (
+          currentMeta && (
+            <div className="tab-content fade-in">
+              <div className="weather-dashboard">
+                {/* Current Weather Big Card */}
+                <div className="current-weather-card" style={{ background: currentMeta.bg, color: currentMeta.icon.type.name === 'Sun' ? '#111' : 'white' }}>
+                  <div className="weather-header">
+                    <h2>Aluminé</h2>
+                    <div className="weather-badge">En vivo</div>
+                  </div>
+                  <div className="weather-main">
+                    <div className="weather-temp">
+                      <span className="temp-value">{Math.round(weatherData.current.temperature)}°</span>
+                      <div className="weather-desc">
+                        {currentMeta.icon}
+                        <span style={{ fontSize: '1.2rem', fontWeight: 600 }}>{currentMeta.label}</span>
+                      </div>
+                    </div>
+                    <div className="weather-details-grid">
+                      <div className="detail-item"><Wind size={18} /> {weatherData.current.windSpeed} km/h</div>
+                      <div className="detail-item"><Droplets size={18} /> {weatherData.current.humidity}%</div>
+                      <div className="detail-item">ST: {Math.round(weatherData.current.apparentTemperature)}°</div>
+                      <div className="detail-item">Lluvia: {weatherData.current.precipitation} mm</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 7 Day Forecast */}
+                <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: '32px', marginBottom: '16px', color: 'var(--color-dark-green)' }}>
+                  Pronóstico Semanal
+                </h3>
+                <div className="weekly-forecast-grid">
+                  {weatherData.daily.time.map((day, idx) => {
+                    // Parse date manually to avoid SSR timezone hydration mismatch
+                    const parts = day.split('-');
+                    const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+                    const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+                    const dayName = days[d.getDay()];
+                    const dayMeta = getWeatherMeta(weatherData.daily.weatherCode[idx], true);
+                    
+                    return (
+                      <div key={day} className="daily-card glass-panel">
+                        <span className="day-name">{idx === 0 ? 'Hoy' : dayName}</span>
+                        <div className="daily-icon" style={{ color: '#0284c7' }}>{dayMeta.icon}</div>
+                        <div className="daily-temps">
+                          <span className="temp-max">{Math.round(weatherData.daily.temperatureMax[idx])}°</span>
+                          <span className="temp-min">{Math.round(weatherData.daily.temperatureMin[idx])}°</span>
+                        </div>
+                        {weatherData.daily.precipitationSum[idx] > 0 && (
+                          <span className="precip-prob"><Droplets size={12} /> {weatherData.daily.precipitationSum[idx]} mm</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )
+        )
       )}
 
       {/* --- TAB: RUTAS Y PASOS --- */}
@@ -318,7 +417,7 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
           <div className="routes-status-header">
             <div>
               <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'white', margin: 0 }}>Estado Oficial de la Red Vial</h2>
-              <p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, fontSize: '0.9rem' }}>Fuente: Dirección Provincial de Vialidad, Neuquén</p>
+              <p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, fontSize: '0.9rem' }}>Fuente: Dirección Provincial de Vialidad, NeuQuén</p>
             </div>
             {dpvData && (
               <div className="update-badge">
@@ -327,7 +426,12 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
             )}
           </div>
 
-          {dpvData ? (
+          {loadingData ? (
+            <div style={{ padding: '60px 20px', textAlign: 'center' }}>
+              <div className="spinner"></div>
+              <p style={{ marginTop: '16px', color: '#64748b', fontWeight: 500 }}>Cargando datos en tiempo real de DPV NeuQuén...</p>
+            </div>
+          ) : dpvData ? (
             <>
               {/* Pasos Internacionales */}
               <h3 className="section-title-sm"><MapPin size={20} /> Pasos Internacionales</h3>
@@ -337,10 +441,46 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
                   const statusColor = getRouteColor(safeStatus);
                   const isOpen = !safeStatus.toLowerCase().includes('cerrado') && !safeStatus.toLowerCase().includes('intransitable');
                   
+                  const pasoId = `paso-${paso.codTramo}`;
+                  const isFav = isFavorite(pasoId);
+                  
+                  const handleToggleFavorite = () => {
+                    if (isFav) {
+                      removeFavorite(pasoId);
+                    } else {
+                      addFavorite({
+                        id: pasoId,
+                        title: paso.descripcion,
+                        image: '/images/banner_rutas.png',
+                        url: `/mapa?tab=rutas&open=${paso.codTramo}`,
+                        type: 'paso'
+                      });
+                    }
+                  };
+
                   return (
                     <div key={paso.codTramo} className="paso-card glass-panel" style={{ borderTop: `4px solid ${statusColor}` }}>
                       <div className="paso-header">
-                        <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>{paso.descripcion}</h4>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>{paso.descripcion}</h4>
+                          <button
+                            onClick={handleToggleFavorite}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              padding: '4px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: isFav ? '#ef4444' : '#cbd5e1',
+                              transition: 'color 0.2s',
+                            }}
+                            title={isFav ? "Quitar de favoritos" : "Agregar a favoritos"}
+                          >
+                            <Heart size={18} fill={isFav ? '#ef4444' : 'none'} />
+                          </button>
+                        </div>
                         <div className="paso-badge" style={{ backgroundColor: `${statusColor}20`, color: statusColor }}>
                           {isOpen ? <CheckCircle size={14} /> : <XCircle size={14} />} {paso.status}
                         </div>
@@ -357,7 +497,7 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
 
               {/* Todas las Rutas */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '40px', marginBottom: '20px', flexWrap: 'wrap', gap: '16px' }}>
-                <h3 className="section-title-sm" style={{ margin: 0 }}><Route size={20} /> Estado de Rutas (Neuquén)</h3>
+                <h3 className="section-title-sm" style={{ margin: 0 }}><Route size={20} /> Estado de Rutas (NeuQuén)</h3>
                 <div className="search-box">
                   <Search size={18} color="#94a3b8" />
                   <input 
@@ -372,6 +512,23 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
               <div className="routes-list">
                 {filteredRoutes.map((ruta, i) => {
                   const color = getRouteColor(ruta.rutaEstado);
+                  const rutaId = `ruta-${ruta.codigoTramo}`;
+                  const isFav = isFavorite(rutaId);
+                  
+                  const handleToggleFavorite = () => {
+                    if (isFav) {
+                      removeFavorite(rutaId);
+                    } else {
+                      addFavorite({
+                        id: rutaId,
+                        title: `${ruta.rutaProvincial ? 'RP' : 'RN'} ${ruta.rutaNumero}: ${ruta.rutaTramo}`,
+                        image: '/images/banner_rutas.png',
+                        url: `/mapa?tab=rutas&open=${ruta.codigoTramo}`,
+                        type: 'ruta'
+                      });
+                    }
+                  };
+
                   return (
                     <div key={i} className="route-item glass-panel">
                       <div className="route-number" style={{ backgroundColor: ruta.rutaProvincial ? '#0284c7' : '#16a34a' }}>
@@ -379,7 +536,26 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
                       </div>
                       <div className="route-info">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-                          <h5 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#1e293b' }}>{ruta.rutaTramo}</h5>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <h5 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: '#1e293b' }}>{ruta.rutaTramo}</h5>
+                            <button
+                              onClick={handleToggleFavorite}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: isFav ? '#ef4444' : '#cbd5e1',
+                                transition: 'color 0.2s',
+                              }}
+                              title={isFav ? "Quitar de favoritos" : "Agregar a favoritos"}
+                            >
+                              <Heart size={18} fill={isFav ? '#ef4444' : 'none'} />
+                            </button>
+                          </div>
                           <span style={{ fontSize: '0.75rem', fontWeight: 800, padding: '4px 10px', borderRadius: '20px', backgroundColor: `${color}15`, color: color }}>
                             {formatEstadoDPV(ruta.rutaEstado)}
                           </span>
@@ -393,20 +569,25 @@ export default function MapaClient({ initialMarkers, dpvData, weatherData }: Map
                   )
                 })}
                 {filteredRoutes.length === 0 && (
-                  <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No se encontraron rutas con esa búsqueda.</div>
+                  <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No se encontraron rutas con esa bÁºsqueda.</div>
                 )}
               </div>
             </>
           ) : (
-            <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-              <div className="spinner"></div>
-              <p style={{ marginTop: '16px', color: '#64748b', fontWeight: 500 }}>Cargando datos en tiempo real de DPV Neuquén...</p>
+            <div style={{ padding: '40px 20px', textAlign: 'center', backgroundColor: '#fef2f2', borderRadius: '12px', border: '1px solid #fee2e2', color: '#991b1b', margin: '20px 0' }}>
+              <AlertTriangle size={36} style={{ margin: '0 auto 12px', color: '#dc2626' }} />
+              <h4 style={{ margin: '0 0 8px', fontWeight: 800, fontSize: '1.2rem' }}>Servicio de Rutas no Disponible</h4>
+              <p style={{ margin: 0, fontSize: '0.95rem', color: '#7f1d1d', lineHeight: 1.5 }}>
+                El servidor oficial de la Dirección Provincial de Vialidad de NeuQuén (DPV) no está respondiendo en este momento o se encuentra temporalmente fuera de servicio.
+                <br />
+                Por favor, intenta de nuevo más tarde o consulta los partes oficiales de DPV NeuQuén directamente.
+              </p>
             </div>
           )}
         </div>
       )}
 
-      <PublicityBanner delay="4s" />
+      <PublicityBanner page="GuiaLocal" section={2} delay="4s" />
     </div>
   );
 }
@@ -418,3 +599,5 @@ function formatEstadoDPV(estado: string) {
   if (estado === 'I' || estado === 'C') return 'Cerrado / Intransitable';
   return estado;
 }
+
+

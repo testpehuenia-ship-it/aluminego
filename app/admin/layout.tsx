@@ -16,7 +16,11 @@ import {
   MapPin,
   Map,
   CreditCard,
-  DollarSign
+  DollarSign,
+  Bell,
+  BookOpen,
+  MessageSquare,
+  Utensils
 } from 'lucide-react';
 
 export default function AdminLayout({
@@ -27,17 +31,21 @@ export default function AdminLayout({
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
 
-  // No mostramos el sidebar en la página de login
+  // No mostramos el sidebar en la Página de login
   const isLoginPage = pathname === '/admin/login' || pathname === '/admin';
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
     { icon: Tags, label: 'Categorías', href: '/admin/categories' },
-    { icon: Store, label: 'Comercios', href: '/admin/businesses' },
+    { icon: Utensils, label: 'gastronomía', href: '/admin/businesses' },
+    { icon: Store, label: 'Comercios', href: '/admin/commerces' },
     { icon: Home, label: 'Alojamientos', href: '/admin/accommodations' },
     { icon: Mountain, label: 'Aventuras', href: '/admin/adventures' },
     { icon: MapPin, label: 'Guía Local', href: '/admin/local-services' },
     { icon: Map, label: 'Mapas y Rutas', href: '/admin/map' },
+    { icon: BookOpen, label: 'Novedades / Blog', href: '/admin/blog' },
+    { icon: Bell, label: 'Notificaciones', href: '/admin/notifications' },
+    { icon: MessageSquare, label: 'Reseñas', href: '/admin/reviews' },
     { icon: Store, label: 'Publicidad', href: '/admin/publicity' },
     { icon: CreditCard, label: 'Pagos', href: '/admin/billing' },
     { icon: DollarSign, label: 'Tarifario', href: '/admin/pricing' },
@@ -112,7 +120,7 @@ export default function AdminLayout({
           </div>
           <div className="header-user">
             <div className="user-info">
-              <span className="user-name">Súper Admin</span>
+              <span className="user-name">SÁºper Admin</span>
               <span className="user-role">Administrador Principal</span>
             </div>
             <div className="user-avatar">AD</div>
@@ -367,3 +375,5 @@ export default function AdminLayout({
     </div>
   );
 }
+
+

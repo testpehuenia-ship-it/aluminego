@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Store } from 'lucide-react';
 
@@ -6,7 +6,7 @@ export default function AdhereBanner() {
   return (
     <section className="container" style={{ padding: '40px 20px' }}>
       <a 
-        href="https://wa.me/5492942661000?text=Hola!%20Quiero%20sumar%20mi%20comercio%20a%20AlumineGo" 
+        href="https://wa.me/5492942524300?text=Hola!%20Quiero%20sumar%20mi%20comercio%20a%20AluminéGO" 
         target="_blank" 
         rel="noopener noreferrer"
         style={{
@@ -46,7 +46,7 @@ export default function AdhereBanner() {
           marginBottom: '12px',
           fontFamily: 'var(--font-oswald), sans-serif'
         }}>
-          ¿TU COMERCIO AÚN NO ESTÁ AQUÍ?
+          Â¿TU COMERCIO AÁšN NO ESTÁ AQUÁ?
         </h2>
         
         <p style={{ 
@@ -70,7 +70,7 @@ export default function AdhereBanner() {
           alignItems: 'center',
           gap: '10px'
         }}>
-          ADHERITE: 02942 661000
+          ADHERITE: 02942 524300
         </div>
       </a>
 
@@ -82,3 +82,5 @@ export default function AdhereBanner() {
     </section>
   );
 }
+
+

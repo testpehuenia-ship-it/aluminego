@@ -24,7 +24,8 @@ export default function CategoriesAdminPage() {
   const [editingCategory, setEditingCategory] = React.useState<any>(null);
   const [formData, setFormData] = React.useState({
     title: '',
-    link: '',
+    basePath: '/comer',
+    linkSuffix: '',
     image: ''
   });
   
@@ -50,14 +51,34 @@ export default function CategoriesAdminPage() {
   const openModal = (category: any = null) => {
     if (category) {
       setEditingCategory(category);
+      let basePath = '/comer';
+      let linkSuffix = '';
+      if (category.link) {
+        if (category.link.startsWith('/comercios')) {
+          basePath = '/comercios';
+          linkSuffix = category.link.substring(10);
+        } else if (category.link.startsWith('/comer')) {
+          basePath = '/comer';
+          linkSuffix = category.link.substring(6);
+        } else if (category.link.startsWith('/alojarse')) {
+          basePath = '/alojarse';
+          linkSuffix = category.link.substring(9);
+        } else if (category.link.startsWith('/aventuras')) {
+          basePath = '/aventuras';
+          linkSuffix = category.link.substring(10);
+        } else {
+          linkSuffix = category.link;
+        }
+      }
       setFormData({
         title: category.title,
-        link: category.link || '',
+        basePath,
+        linkSuffix,
         image: category.image || ''
       });
     } else {
       setEditingCategory(null);
-      setFormData({ title: '', link: '', image: '' });
+      setFormData({ title: '', basePath: '/comer', linkSuffix: '', image: '' });
     }
     setIsModalOpen(true);
   };
@@ -97,6 +118,12 @@ export default function CategoriesAdminPage() {
     e.preventDefault();
     setSaving(true);
 
+    const payload = {
+      title: formData.title,
+      link: formData.basePath + formData.linkSuffix,
+      image: formData.image
+    };
+
     try {
       const url = editingCategory 
         ? `/api/categories/${editingCategory.id}` 
@@ -107,7 +134,7 @@ export default function CategoriesAdminPage() {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
@@ -244,14 +271,33 @@ export default function CategoriesAdminPage() {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label>Enlace (URL relativa)</label>
-                <input 
-                  type="text" 
-                  value={formData.link} 
-                  onChange={(e) => setFormData({...formData, link: e.target.value})}
-                  placeholder="Ej: /comer#pizzería"
-                />
+              <div className="form-row-2">
+                <div className="form-group">
+                  <label>Sección de Enlace</label>
+                  <select 
+                    value={formData.basePath} 
+                    onChange={(e) => setFormData({...formData, basePath: e.target.value})}
+                    className="admin-select"
+                  >
+                    <option value="/comer">Qué Comer (/comer)</option>
+                    <option value="/alojarse">Dormir (/alojarse)</option>
+                    <option value="/aventuras">Aventuras (/aventuras)</option>
+                    <option value="/comercios">Comercios (/comercios)</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Identificador / Sufijo</label>
+                  <input 
+                    type="text" 
+                    value={formData.linkSuffix} 
+                    onChange={(e) => setFormData({...formData, linkSuffix: e.target.value})}
+                    placeholder="Ej: #pizzería o #cabañas"
+                    required
+                  />
+                </div>
+              </div>
+              <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '-12px', paddingLeft: '4px', fontFamily: 'monospace' }}>
+                Vista previa: <strong>{formData.basePath + formData.linkSuffix}</strong>
               </div>
               <div className="form-group">
                 <label>Imagen de la Categoría <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: '#64748b', marginLeft: '6px' }}>(Recomendado: 400x400px o 800x600px, Máx: 2MB)</span></label>
@@ -327,6 +373,9 @@ export default function CategoriesAdminPage() {
         .form-group label { font-size: 0.85rem; font-weight: 600; color: #475569; }
         .form-group input { width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem; transition: all 0.2s; outline: none; }
         .form-group input:focus { border-color: #0d9488; box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1); }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .admin-select { width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem; transition: all 0.2s; outline: none; background: white; }
+        .admin-select:focus { border-color: #0d9488; box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1); }
         
         .file-upload-wrapper { display: flex; flex-direction: column; gap: 8px; }
         .file-upload-label { border: 2px dashed #e2e8f0; padding: 20px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 10px; color: #64748b; font-weight: 600; cursor: pointer; transition: all 0.2s; }

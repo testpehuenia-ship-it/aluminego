@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { verifySession, hashPassword } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,9 +36,14 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     const { id } = await params;
     const body = await request.json();
-    const { name, image, whatsapp, categoryId, menu, selectedPricingKeys } = body;
+    const { name, image, whatsapp, categoryId, menu, selectedPricingKeys, description, details, latitude, longitude, openingHours } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'ID del comercio no proporcionado' }, { status: 400 });
@@ -44,6 +51,7 @@ export async function PUT(
 
     // Usamos una transacción para asegurar que todo se actualice o nada
     const result = await prisma.$transaction(async (tx: any) => {
+      let generatedCredentials = null;
       // 1. Actualizar el comercio
       const updatedBusiness = await tx.business.update({
         where: { id },
@@ -52,6 +60,11 @@ export async function PUT(
           image,
           whatsapp,
           categoryId,
+          description: description || null,
+          details: details || null,
+          latitude: latitude ? parseFloat(String(latitude)) : null,
+          longitude: longitude ? parseFloat(String(longitude)) : null,
+          openingHours: openingHours || null,
         }
       });
 
@@ -140,9 +153,47 @@ export async function PUT(
             });
           }
         }
+
+        // 4. Auto-generate PortalUser if they are upgraded and don't have one
+        if (selectedPricingKeys.includes('plan_comercio_completo') || selectedPricingKeys.includes('plan_basico_destacado')) {
+          const businessCheck = await tx.business.findUnique({ 
+            where: { id }, 
+            select: { portalUserId: true, portalUser: true } 
+          });
+          if (!businessCheck?.portalUserId) {
+            const safeName = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            let email = `${safeName}@aluminego.ar`;
+            const today = new Date();
+            const password = `aluminego${String(today.getDate()).padStart(2, '0')}${String(today.getMonth() + 1).padStart(2, '0')}${today.getFullYear()}`;
+            
+            let portalUser = await tx.portalUser.findUnique({ where: { email } });
+            let counter = 1;
+            while (portalUser) {
+              email = `${safeName}${counter}@aluminego.ar`;
+              portalUser = await tx.portalUser.findUnique({ where: { email } });
+              counter++;
+            }
+            
+            const newUser = await tx.portalUser.create({
+              data: { name, email, password: hashPassword(password) }
+            });
+            
+            await tx.business.update({
+              where: { id },
+              data: { portalUserId: newUser.id }
+            });
+            
+            generatedCredentials = { email, password };
+          } else if (businessCheck.portalUser) {
+            generatedCredentials = {
+              email: businessCheck.portalUser.email,
+              password: "Tu contraseña ya fue creada anteriormente. Si la olvidaste, contactanos."
+            };
+          }
+        }
       }
 
-      return updatedBusiness;
+      return { business: updatedBusiness, generatedCredentials };
     });
 
     return NextResponse.json(result);
@@ -161,6 +212,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     const { id } = await params;
     await prisma.$transaction(async (tx: any) => {
       await tx.menuItem.deleteMany({

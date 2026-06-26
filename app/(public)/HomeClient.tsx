@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -8,7 +8,8 @@ import {
   Rocket, Home, Compass, Store, 
   Clock, ShieldCheck, Heart, HeartHandshake,
   ChevronRight, ChevronLeft, Wind, Droplets,
-  Sun, CloudSun, Cloud, CloudRain, CloudSnow, CloudLightning
+  Sun, CloudSun, Cloud, CloudRain, CloudSnow, CloudLightning,
+  PhoneCall, Newspaper, Map
 } from 'lucide-react';
 import PublicityBanner from '@/components/PublicityBanner';
 import type { WeatherData } from '@/lib/services/weather';
@@ -104,9 +105,9 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
 
         <div style={{ position: 'relative', zIndex: 2, width: '100%', maxWidth: '600px' }}>
           <div style={{ marginBottom: '0px' }}>
-            <h1 style={{ fontFamily: 'var(--font-oswald), sans-serif', fontSize: '4.5rem', fontWeight: 700, lineHeight: 0.9, marginBottom: '0px', textTransform: 'uppercase', letterSpacing: '1px', textShadow: '2px 4px 10px rgba(0,0,0,0.5)', textAlign: 'center' }}>
+            <h1 style={{ fontFamily: 'var(--font-oswald), sans-serif', fontSize: '4.5rem', fontWeight: 700, lineHeight: 0.9, marginBottom: '0px', textTransform: 'uppercase', letterSpacing: '1px', textShadow: '2px 4px 10px rgba(0,0,0,0.5)' }}>
               <span className="swap-green">TO</span><span className="swap-orange">DO</span>{' '}
-              <span style={{ color: 'white' }}>ALUMI</span><span className="swap-green">N</span><span className="swap-orange">É</span>
+              <span style={{ color: 'white' }}>ALUM</span><span className="swap-green">IN</span><span className="swap-orange">É</span>
             </h1>
           </div>
           <h2 style={{ fontFamily: 'var(--font-caveat), cursive', fontSize: '3.5rem', color: '#f1c40f', lineHeight: 0.8, marginBottom: '24px', transform: 'rotate(-2deg)', textShadow: '1px 2px 4px rgba(0,0,0,0.5)' }}>
@@ -141,7 +142,11 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
           { title: "PEDÍ COMIDA AHORA", sub: "Delivery a tu cabaña", icon: Rocket, color: "var(--color-orange)", link: "/comer" },
           { title: "ENCONTRÁ TU ALOJAMIENTO", sub: "Las mejores opciones", icon: Home, color: "var(--color-green)", link: "/alojarse" },
           { title: "VER AVENTURAS", sub: "Reservá tu experiencia", icon: Compass, color: "var(--color-dark-green)", link: "/aventuras" },
-          { title: "VER COMERCIOS", sub: "Tiendas y servicios locales", icon: ShoppingBag, color: "var(--color-purple)", link: "/comercios" },
+          { title: "VER COMERCIOS", sub: "Tiendas y mercados locales", icon: ShoppingBag, color: "var(--color-purple)", link: "/comercios" },
+          { title: "GUÍA LOCAL y SERVICIOS", sub: "Salud, transporte, emergencias", icon: PhoneCall, color: "var(--color-celeste)", link: "/guia" },
+          { title: "NOTICIAS Y NOVEDADES", sub: "Eventos, guías y turismo", icon: Newspaper, color: "#e74c3c", link: "/novedades" },
+          { title: "MIS FAVORITOS", sub: "Tus lugares preferidos guardados", icon: Heart, color: "#e84393", link: "/favoritos" },
+          { title: "MAPAS Y ESTADO DE RUTAS", sub: "Ubicaciones, clima y transitabilidad", icon: Map, color: "#0984e3", link: "/mapa" },
         ].map((btn, idx) => (
           <Link href={btn.link} key={idx} style={{ backgroundColor: btn.color, borderRadius: '16px', padding: '16px 20px', display: 'flex', alignItems: 'center', color: 'white', textDecoration: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.2)', transition: 'transform 0.2s' }}>
             <div style={{ marginRight: '16px' }}>
@@ -176,11 +181,11 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
                   {time.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' })}
                 </div>
                 <div style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'var(--font-oswald), sans-serif', letterSpacing: '0.5px', lineHeight: 1.2 }}>
-                  {Math.round(weatherData.current.temperature)}° • {currentMeta.text}
+                  {Math.round(weatherData.current.temperature)}° â€¢ {currentMeta.text}
                 </div>
                 <div style={{ fontSize: '0.9rem', color: '#9ca3af', display: 'flex', gap: '8px', alignItems: 'center', marginTop: '2px' }}>
                   <span style={{ color: currentMeta.bg, fontWeight: 700 }}>{time.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</span>
-                  <span>•</span>
+                  <span>â€¢</span>
                   <span>Viento {weatherData.current.windSpeed} km/h</span>
                 </div>
               </div>
@@ -198,7 +203,7 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
       <section style={{ backgroundColor: 'white', padding: '30px 20px', marginTop: '10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '600px', margin: '0 auto' }}>
           {[
-            { icon: Clock, title: "RÁPIDO", sub: "Entrega en\nminutos" },
+            { icon: Clock, title: "RÁPIDO", sub: "Entrega en\nminutos" },
             { icon: ShieldCheck, title: "SEGURO", sub: "Comercios\nverificados" },
             { icon: Heart, title: "LOCAL", sub: "Apoyá lo\nnuestro" },
             { icon: HeartHandshake, title: "SIEMPRE", sub: "Atención\ncercana" }
@@ -221,7 +226,7 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
       <section style={{ padding: '30px 20px', maxWidth: '600px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
-            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-dark-green)' }}>DESCUBRÍ Aluminé</h3>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-dark-green)' }}>DESCUBRÁ Aluminé</h3>
             <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Opciones para cada momento de tu viaje</p>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -281,3 +286,5 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
     </div>
   );
 }
+
+

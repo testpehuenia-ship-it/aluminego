@@ -24,7 +24,7 @@ export interface WeatherData {
 
 export async function getAluminéWeather(): Promise<WeatherData | null> {
   try {
-    // Coordenadas de Aluminé
+    // Coordenadas aproximadas de Aluminé
     const lat = -39.2372;
     const lon = -70.9314;
     const timezone = 'America/Argentina/Salta';
@@ -66,3 +66,4 @@ export async function getAluminéWeather(): Promise<WeatherData | null> {
     return null;
   }
 }
+

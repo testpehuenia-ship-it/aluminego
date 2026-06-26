@@ -4,21 +4,13 @@ import HomeClient from './HomeClient';
 import { getAluminéWeather } from '@/lib/services/weather';
 
 export const metadata: Metadata = {
-  title: 'Guía Local y Delivery en Aluminé | AlumineGo',
-  description: 'Descubre los mejores alojamientos, dónde comer rico y qué aventuras hacer en Aluminé y Moquehue. Pide comida por WhatsApp en minutos.',
-  keywords: ['Aluminé', 'delivery Aluminé', 'comer en Aluminé', 'cabañas Aluminé', 'turismo patagonia'],
+  title: 'AluminéGO | Guía turística y Delivery en Aluminé-Moquehue',
+  description: 'La Guía turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé -Moquehue .',
+  keywords: ['Aluminé', 'Guía turística Aluminé', 'delivery Aluminé', 'comer en Aluminé', 'cabañas Aluminé', 'turismo patagonia'],
   openGraph: {
-    title: 'AlumineGo | Guía Local y Delivery en Aluminé',
-    description: 'Encuentra alojamiento, gastronomía y aventuras en Aluminé. Tu guía local digital patagónica.',
+    title: 'AluminéGO | Guía turística y Delivery en Aluminé-Moquehue',
+    description: 'La Guía turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé -Moquehue .',
     url: '/',
-    images: [
-      {
-        url: 'https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=1200&h=630&q=80',
-        width: 1200,
-        height: 630,
-        alt: 'Aluminé Lago Aluminé'
-      }
-    ]
   }
 };
 
@@ -36,3 +28,5 @@ export default async function Page() {
     weatherData={weatherData} 
   />;
 }
+
+

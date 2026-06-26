@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -12,34 +12,41 @@ export default function InstallPrompt() {
   const [hasDismissed, setHasDismissed] = useState(false);
 
   useEffect(() => {
-    // 1. Verificar si ya está instalada
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
-    const hasInstalled = localStorage.getItem('installPromptAccepted') === 'true';
+    const dismissedAt = localStorage.getItem('installPromptDismissedAt');
+    const isIosDevice = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
 
-    if (isStandalone || hasInstalled) {
-      return; // Ya está instalada, no hacer nada nunca.
+    if (isStandalone) {
+      return; // Si está usando la app instalada, no mostrar
+    }
+
+    if (dismissedAt) {
+      const daysSinceDismiss = (Date.now() - parseInt(dismissedAt, 10)) / (1000 * 60 * 60 * 24);
+      if (daysSinceDismiss < 1) {
+        return; // No molestar por 1 día si dijo "En otro momento"
+      }
     }
 
     // 2. Detectar si es iOS (iPhone/iPad)
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
     setIsIOS(isIosDevice);
 
-    // 3. Capturar el evento nativo de instalación (Android/Chrome) y guardarlo
+    // 3. Capturar el evento nativo de instalación (Android/Chrome)
     const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault(); // Evita que Chrome muestre su mini-cartel nativo automático
+      e.preventDefault(); 
       (window as any).deferredPrompt = e;
+      // Mostrar el cartel 2 segundos después de detectar que SÁ se puede instalar
+      setTimeout(() => setShowPrompt(true), 2000);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('deferredPromptReady' as any, handleBeforeInstallPrompt);
 
-    // 4. Temporizador de 2 minutos (120,000 ms)
+    // En iOS no existe beforeinstallprompt, así que mostramos por tiempo (30 segundos)
     let timer: NodeJS.Timeout;
-    if (!hasDismissed) {
+    if (isIosDevice && !hasDismissed) {
       timer = setTimeout(() => {
         setShowPrompt(true);
-      }, 120000); // 2 minutos exactos
+      }, 30000);
     }
 
     return () => {
@@ -70,7 +77,7 @@ export default function InstallPrompt() {
     const { outcome } = await deferredPrompt.userChoice;
     
     if (outcome === 'accepted') {
-      localStorage.setItem('installPromptAccepted', 'true');
+      // Opcional: localStorage.setItem('installPromptAccepted', 'true');
       setShowPrompt(false);
     } else {
       setIsInstalling(false);
@@ -78,10 +85,9 @@ export default function InstallPrompt() {
   };
 
   const handleDismiss = () => {
-    // Guardar en el estado del componente para que no moleste en esta navegación, 
-    // pero si vuelve a ingresar (se recarga o abre una nueva pestaña) aparecerá nuevamente tras 2 minutos.
     setHasDismissed(true);
     setShowPrompt(false);
+    localStorage.setItem('installPromptDismissedAt', Date.now().toString());
   };
 
   // Exponer una función global para el botón del Footer
@@ -131,7 +137,7 @@ export default function InstallPrompt() {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <div style={{ position: 'relative', width: '70px', height: '70px', marginBottom: '16px' }}>
               {/* Imagen base en blanco y negro o tenue (usamos el ícono subido con la araucaria) */}
-              <img src="/icon-192x192.png" alt="AlumineGo Icon" width="70" height="70" style={{ borderRadius: '16px', filter: isInstalling ? 'grayscale(100%) opacity(0.3)' : 'none', transition: 'filter 0.3s', objectFit: 'contain' }} />
+              <img src="/icon-192x192.png" alt="AluminéGO Icon" width="70" height="70" style={{ borderRadius: '16px', filter: isInstalling ? 'grayscale(100%) opacity(0.3)' : 'none', transition: 'filter 0.3s', objectFit: 'contain' }} />
               
               {/* Imagen a color que se "llena" de abajo hacia arriba */}
               {isInstalling && (
@@ -145,12 +151,12 @@ export default function InstallPrompt() {
                   animation: 'fillUp 3s ease-in-out forwards',
                   borderRadius: '16px',
                 }}>
-                  <img src="/icon-192x192.png" alt="AlumineGo Icon" width="70" height="70" style={{ position: 'absolute', bottom: 0, left: 0, objectFit: 'contain' }} />
+                  <img src="/icon-192x192.png" alt="AluminéGO Icon" width="70" height="70" style={{ position: 'absolute', bottom: 0, left: 0, objectFit: 'contain' }} />
                 </div>
               )}
             </div>
             
-            {/* Corregido a Aluminé (solo P mayúscula) */}
+            {/* Corregido a Aluminé (solo P mayÁºscula) */}
             <h2 style={{ fontFamily: 'var(--font-oswald), sans-serif', fontSize: '1.8rem', margin: '0 0 8px 0' }}>
               <span style={{ color: 'var(--color-green)', fontWeight: 700 }}>Aluminé</span>
               <span style={{ color: 'var(--color-orange)', fontWeight: 700 }}>GO</span>
@@ -159,7 +165,7 @@ export default function InstallPrompt() {
             <p style={{ color: '#444', fontSize: '1.1rem', margin: '0 0 24px 0', lineHeight: 1.4 }}>
               {isInstalling 
                 ? 'Preparando tu app... ¡Ya casi listo!' 
-                : <>¡Lleva AluminéGO siempre con vos!<br/>Instala la aplicación para disfrutar de Aluminé estés donde estés.</>}
+                : <>¡Lleva AluminéGO siempre con vos!<br/>Instalá la aplicación y disfrutarás de Aluminé estés donde estés.</>}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
@@ -205,7 +211,7 @@ export default function InstallPrompt() {
             <div style={{ background: '#f8f9fa', borderRadius: '16px', padding: '20px', marginBottom: '20px', width: '100%' }}>
               <h3 style={{ margin: '0 0 12px 0', color: 'var(--color-green)' }}>Para instalar en iPhone:</h3>
               <ol style={{ textAlign: 'left', margin: 0, paddingLeft: '20px', color: '#444', lineHeight: 1.6 }}>
-                <li>Toca el botón <b>Compartir</b> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'text-bottom'}}><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> en la barra inferior.</li>
+                <li>Tocá el botón <b>Compartir</b> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'text-bottom'}}><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> en la barra inferior.</li>
                 <li>Desliza hacia abajo y selecciona <b>"Agregar a Inicio"</b>.</li>
                 <li>Toca <b>"Agregar"</b> en la esquina superior derecha.</li>
               </ol>
@@ -237,3 +243,5 @@ export default function InstallPrompt() {
     </div>
   );
 }
+
+

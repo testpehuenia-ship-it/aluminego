@@ -1,7 +1,7 @@
 import { createClient } from '@libsql/client';
 
 const client = createClient({
-  url: "libsql://aluminego-testalumine.aws-ap-south-1.turso.io",
+  url: "libsql://pehueniago-testpehuenia.aws-ap-south-1.turso.io",
   authToken: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3Nzg4ODAyNzcsImlkIjoiMDE5ZTJkODYtNTEwMS03OGU4LWJjYjUtN2QxMDcwYmZlMTAxIiwicmlkIjoiOGRhOTcxODMtMTU0Mi00Mzc0LThkNTktMGFhNWQzNjNhYjBkIn0.NHzG9vtw8ZSfnIi2q1bd_3_TxnMoaKfnLgsA5R0fS47skOd5kKSoW6rm99aZIlLVdsu71GnC-XoHHda9d8mhDA",
 });
 
@@ -59,6 +59,31 @@ async function main() {
           "paymentDate" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
           "periodPaid" DATETIME NOT NULL,
           CONSTRAINT "Payment_subscriptionId_fkey" FOREIGN KEY ("subscriptionId") REFERENCES "Subscription" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+      );
+    `);
+
+    console.log("Creating PushSubscription...");
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS "PushSubscription" (
+          "id" TEXT NOT NULL PRIMARY KEY,
+          "endpoint" TEXT NOT NULL,
+          "p256dh" TEXT NOT NULL,
+          "auth" TEXT NOT NULL,
+          "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    await client.execute(`CREATE UNIQUE INDEX IF NOT EXISTS "PushSubscription_endpoint_key" ON "PushSubscription"("endpoint");`);
+
+    console.log("Creating PushHistory...");
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS "PushHistory" (
+          "id" TEXT NOT NULL PRIMARY KEY,
+          "title" TEXT NOT NULL,
+          "message" TEXT NOT NULL,
+          "url" TEXT,
+          "sentCount" INTEGER NOT NULL DEFAULT 0,
+          "errorCount" INTEGER NOT NULL DEFAULT 0,
+          "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     `);
 

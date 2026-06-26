@@ -14,7 +14,7 @@ export default function NotFound() {
       <h1 style={{ fontSize: '4rem', color: 'var(--color-primary-winter)', margin: 0 }}>404</h1>
       <h2 style={{ fontSize: '2rem', margin: 0 }}>Página no encontrada</h2>
       <p style={{ color: 'var(--color-text-muted)', fontSize: '1.2rem' }}>
-        Lo sentimos, no pudimos encontrar la página que estás buscando en AlumineGo.
+        Lo sentimos, no pudimos encontrar la Página que estás buscando en AluminéGO.
       </p>
       <Link href="/" className="btn-primary" style={{ marginTop: '16px' }}>
         Volver al Inicio
@@ -22,3 +22,5 @@ export default function NotFound() {
     </div>
   );
 }
+
+

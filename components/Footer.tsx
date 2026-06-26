@@ -1,5 +1,4 @@
 'use client';
-import { Smartphone } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -14,7 +13,7 @@ export default function Footer() {
           <span style={{ color: 'var(--color-green)' }}>Aluminé</span>
           <span style={{ color: 'var(--color-orange)' }}>GO</span>
         </h3>
-        <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1rem' }}>La guía Oficial de Aluminé - Patagonia Argentina</p>
+        <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1rem' }}>La Guía Oficial de Aluminé - Patagonia Argentina</p>
         
         <div style={{ margin: '16px 0' }}>
           <button 
@@ -38,14 +37,19 @@ export default function Footer() {
               gap: '6px'
             }}
           >
-            <Smartphone size={18} color="var(--color-dark-green)" /> Descargar App
+            📱 Descargar App
           </button>
         </div>
+        <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '16px', fontSize: '0.95rem' }}>
+          <a href="/novedades" style={{ color: 'rgba(255,255,255,0.9)', textDecoration: 'none' }}>Novedades y Blog</a>
+          <a href="/mapa" style={{ color: 'rgba(255,255,255,0.9)', textDecoration: 'none' }}>Mapa</a>
+        </div>
 
-        <div style={{ marginTop: '8px', fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
-          © {new Date().getFullYear()} AlumineGo. Todos los derechos reservados.
+        <div style={{ marginTop: '16px', fontSize: '0.9rem', color: 'rgba(255,255,255,0.6)' }}>
+          © {new Date().getFullYear()} AluminéGO. Todos los derechos reservados.
         </div>
       </div>
     </footer>
   );
 }
+

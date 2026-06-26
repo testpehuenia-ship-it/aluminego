@@ -17,6 +17,13 @@
 /.next/
 /.next_old/
 /out/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Backups
+*.zip
 
 # production
 /build

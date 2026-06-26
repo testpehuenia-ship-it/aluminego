@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { verifySession, hashPassword } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,8 +28,14 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
     const body = await request.json();
-    const { name, image, whatsapp, categoryId, menu, selectedPricingKeys } = body;
+    const { name, image, whatsapp, categoryId, menu, selectedPricingKeys, description, details, latitude, longitude, openingHours } = body;
 
     // Use a transaction if we are also creating subscriptions
     const result = await prisma.$transaction(async (tx) => {
@@ -38,6 +46,11 @@ export async function POST(request: Request) {
           image,
           whatsapp,
           categoryId,
+          description: description || null,
+          details: details || null,
+          latitude: latitude ? parseFloat(String(latitude)) : null,
+          longitude: longitude ? parseFloat(String(longitude)) : null,
+          openingHours: openingHours || null,
           menu: {
             create: menu 
               ? menu
@@ -58,6 +71,7 @@ export async function POST(request: Request) {
       });
 
       // 2. Check if we have selected pricing keys
+      let generatedCredentials = null;
       if (selectedPricingKeys && Array.isArray(selectedPricingKeys) && selectedPricingKeys.length > 0) {
         // Fetch pricing
         const configs = await tx.pricingConfig.findMany({
@@ -95,9 +109,41 @@ export async function POST(request: Request) {
             }
           });
         }
-      }
+          // 3. Auto-generate PortalUser if applicable
+          if (selectedPricingKeys.includes('plan_comercio_completo') || selectedPricingKeys.includes('plan_basico_destacado')) {
+            const safeName = business.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const email = `${safeName}@AluminéGO.ar`;
+            
+            const today = new Date();
+            const d = String(today.getDate()).padStart(2, '0');
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const y = today.getFullYear();
+            const password = `AluminéGO${d}${m}${y}`;
 
-      return business;
+            // Check if user exists (to prevent unique constraint error)
+            let portalUser = await tx.portalUser.findUnique({ where: { email } });
+            if (!portalUser) {
+              portalUser = await tx.portalUser.create({
+                data: {
+                  name: business.name,
+                  email,
+                  password: hashPassword(password),
+                }
+              });
+              generatedCredentials = { email, password };
+            } else {
+              generatedCredentials = { email, password: "Tu contraseña ya fue creada anteriormente. Si la olvidaste, contactanos." };
+            }
+
+            // Connect Business to PortalUser
+            await tx.business.update({
+              where: { id: business.id },
+              data: { portalUserId: portalUser.id }
+            });
+          }
+        }
+
+      return { business, generatedCredentials };
     });
 
     return NextResponse.json(result);
@@ -110,3 +156,5 @@ export async function POST(request: Request) {
     }, { status: 500 });
   }
 }
+
+

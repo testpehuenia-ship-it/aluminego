@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Plus, Trash2, Edit, Save, X, Image as ImageIcon, Calendar, Power, PowerOff } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
-const PAGES = ['Inicio', 'QueComer', 'Dormir', 'GuiaLocal', 'Aventuras'];
+const PAGES = ['Inicio', 'QueComer', 'Dormir', 'GuiaLocal', 'Aventuras', 'Comercios', 'Novedades'];
 const SIZES = ['grande', 'chico'];
 const SECTIONS = [1, 2, 3, 4];
 const ORDERS = [1, 2, 3];
@@ -13,6 +13,13 @@ const ORDERS = [1, 2, 3];
 function PublicityAdminContent() {
   const searchParams = useSearchParams();
   const prefillName = searchParams.get('businessName');
+  const prefillPage = searchParams.get('page');
+  const prefillSection = searchParams.get('section');
+  const contractedPagesParam = searchParams.get('contractedPages');
+  const contractedBannersParam = searchParams.get('contractedBanners');
+  
+  const contractedPages = contractedPagesParam ? contractedPagesParam.split(',') : [];
+  const contractedBanners = contractedBannersParam ? contractedBannersParam.split(',') : [];
 
   const [banners, setBanners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,6 +28,40 @@ function PublicityAdminContent() {
   const [linkType, setLinkType] = useState<'none' | 'web' | 'whatsapp'>('none');
   const [whatsappPhone, setWhatsappPhone] = useState('');
   
+  const expectedBanners: any[] = [];
+  if (prefillName) {
+    let inheritedSection = 1;
+    if (contractedBanners.includes('banner_top')) inheritedSection = 1;
+    else if (contractedBanners.includes('banner_middle')) inheritedSection = 2;
+    else if (contractedBanners.includes('banner_bottom')) inheritedSection = 3;
+
+    const labelMap: Record<string, string> = {
+      QueComer: 'gastronomía',
+      Dormir: 'Alojamiento',
+      Aventuras: 'Aventuras',
+      Comercios: 'Comercios',
+      GuiaLocal: 'Guía Local',
+      Novedades: 'Novedades'
+    };
+
+    contractedPages.forEach(p => {
+      if (p === 'Inicio') {
+        expectedBanners.push({ page: 'Inicio', section: inheritedSection, label: `Portada Principal (Inicio) - Posición ${inheritedSection}` });
+      } else {
+        const pageLabel = labelMap[p] || p;
+        if (contractedBanners.includes('banner_top')) {
+          expectedBanners.push({ page: p, section: 1, label: `${pageLabel} - Superior` });
+        }
+        if (contractedBanners.includes('banner_middle')) {
+          expectedBanners.push({ page: p, section: 2, label: `${pageLabel} - Medio` });
+        }
+        if (contractedBanners.includes('banner_bottom')) {
+          expectedBanners.push({ page: p, section: 3, label: `${pageLabel} - Inferior` });
+        }
+      }
+    });
+  }
+
   const [formData, setFormData] = useState<any>({
     title: '',
     page: 'Inicio',
@@ -49,11 +90,16 @@ function PublicityAdminContent() {
 
   useEffect(() => {
     fetchBanners();
-    if (prefillName) {
-      setFormData((prev: any) => ({ ...prev, title: prefillName }));
+    if (prefillName || prefillPage || prefillSection) {
+      setFormData((prev: any) => ({ 
+        ...prev, 
+        ...(prefillName ? { title: prefillName } : {}),
+        ...(prefillPage ? { page: prefillPage } : {}),
+        ...(prefillSection ? { section: parseInt(prefillSection) } : {})
+      }));
       setIsEditing(true);
     }
-  }, [prefillName]);
+  }, [prefillName, prefillPage, prefillSection]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -96,7 +142,7 @@ function PublicityAdminContent() {
     let finalLink = formData.link;
     if (linkType === 'whatsapp' && whatsappPhone) {
       const cleanPhone = whatsappPhone.replace(/\D/g, '');
-      finalLink = `https://wa.me/${cleanPhone}?text=Hola,%20los%20vi%20en%20la%20App%20AlumineGo%20y%20quiero%20hacer%20una%20consulta.`;
+      finalLink = `https://wa.me/${cleanPhone}?text=Hola,%20los%20vi%20en%20la%20App%20AluminéGO%20y%20quiero%20hacer%20una%20consulta.`;
     } else if (linkType === 'none') {
       finalLink = '';
     }
@@ -119,16 +165,28 @@ function PublicityAdminContent() {
       }
 
       alert('Banner guardado correctamente');
-      setIsEditing(false);
-      resetForm();
       fetchBanners();
+      if (prefillName) {
+        setLinkType('none');
+        setWhatsappPhone('');
+        setFormData((prev: any) => ({
+          ...prev,
+          id: undefined,
+          image: '',
+          link: '',
+          size: 'grande'
+        }));
+      } else {
+        setIsEditing(false);
+        resetForm();
+      }
     } catch (error: any) {
       alert(error.message);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Estás seguro de eliminar este banner?')) return;
+    if (!confirm('Â¿Estás seguro de eliminar este banner?')) return;
     
     try {
       await fetch(`/api/publicity/${id}`, { method: 'DELETE' });
@@ -139,6 +197,20 @@ function PublicityAdminContent() {
   };
 
   const toggleActive = async (banner: any) => {
+    if (!banner.isActive) {
+      const isOccupied = banners.some(
+        b => b.page === banner.page && 
+             b.section === banner.section && 
+             b.order === banner.order && 
+             b.id !== banner.id &&
+             b.isActive
+      );
+      if (isOccupied) {
+        alert(`No se puede activar: El espacio (Página: ${banner.page}, Sección: ${banner.section}, Orden: ${banner.order}) ya está ocupado por otro banner activo.`);
+        return;
+      }
+    }
+
     try {
       const res = await fetch(`/api/publicity/${banner.id}`, {
         method: 'PUT',
@@ -274,6 +346,56 @@ function PublicityAdminContent() {
             </button>
           </div>
 
+          {expectedBanners.length > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+              <h3 className="text-sm font-bold text-blue-800 mb-2 flex items-center gap-2">
+                <Calendar size={16} /> Banners contratados para este cliente:
+              </h3>
+              <div className="flex flex-wrap gap-3">
+                {expectedBanners.map((exp, idx) => {
+                  const isCreated = banners.some(b => 
+                    b.title?.toUpperCase() === prefillName.toUpperCase() && 
+                    b.page === exp.page && 
+                    b.section === exp.section
+                  );
+
+                  return (
+                    <div 
+                      key={idx} 
+                      onClick={() => {
+                        if (!isCreated) {
+                          setFormData(prev => ({
+                            ...prev,
+                            page: exp.page,
+                            section: exp.section,
+                            title: prefillName
+                          }));
+                        }
+                      }}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all ${
+                        isCreated 
+                          ? 'bg-green-50 border-green-200 text-green-700 font-medium' 
+                          : 'bg-white border-blue-200 text-blue-700 hover:bg-blue-50 cursor-pointer hover:scale-[1.02] font-medium'
+                      }`}
+                      style={{ userSelect: 'none' }}
+                    >
+                      <span className={`w-2 h-2 rounded-full ${isCreated ? 'bg-green-500' : 'bg-blue-500 animate-pulse'}`} />
+                      <span>{exp.label}</span>
+                      {isCreated ? (
+                        <span className="text-xs font-bold bg-green-100 text-green-800 px-1.5 py-0.5 rounded">Listo</span>
+                      ) : (
+                        <span className="text-xs font-bold bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded hover:bg-blue-200">Configurar</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-blue-600 mt-2">
+                * Haz clic en "Configurar" para cargar automáticamente los datos de esa sección en el formulario, subir su banner y guardarlo.
+              </p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             <div className="space-y-4">
@@ -309,7 +431,7 @@ function PublicityAdminContent() {
                   >
                     {SECTIONS.map(s => <option key={s} value={s}>Sección {s}</option>)}
                   </select>
-                  <p className="text-xs text-gray-500 mt-1">Ubicación en la página (1=Arriba)</p>
+                  <p className="text-xs text-gray-500 mt-1">Ubicación en la Página (1=Arriba)</p>
                 </div>
                 
                 <div>
@@ -333,7 +455,11 @@ function PublicityAdminContent() {
                     value={formData.size}
                     onChange={(e) => setFormData({...formData, size: e.target.value})}
                   >
-                    {SIZES.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+                    {SIZES.map(s => (
+                      <option key={s} value={s}>
+                        {s === 'grande' ? 'Grande (Ancho)' : 'Chico (Angosto)'}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
@@ -393,7 +519,7 @@ function PublicityAdminContent() {
                       onChange={(e) => setWhatsappPhone(e.target.value)}
                       required
                     />
-                    <p className="text-xs text-green-600 mt-1 font-medium">El usuario enviará: "Hola, los vi en la App AlumineGo y quiero hacer una consulta."</p>
+                    <p className="text-xs text-green-600 mt-1 font-medium">El usuario enviará: "Hola, los vi en la App AluminéGO y quiero hacer una consulta."</p>
                   </div>
                 )}
               </div>
@@ -490,7 +616,7 @@ function PublicityAdminContent() {
                             </span>
                           )}
                           <span className={`text-xs font-bold px-2 py-1 rounded ${banner.size === 'grande' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>
-                            {banner.size.toUpperCase()}
+                            {banner.size === 'grande' ? 'GRANDE (ANCHO)' : 'CHICO (ANGOSTO)'}
                           </span>
                         </div>
                       </div>
@@ -565,3 +691,5 @@ export default function PublicityAdmin() {
     </Suspense>
   );
 }
+
+

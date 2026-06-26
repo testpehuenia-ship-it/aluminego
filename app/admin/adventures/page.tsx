@@ -13,14 +13,19 @@ import {
   Upload,
   Mountain,
   CheckCircle2,
-  DollarSign
+  DollarSign,
+  MapPin
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import OpeningHoursEditor, { DEFAULT_SCHEDULE_STRING } from '@/components/admin/OpeningHoursEditor';
+
+const baseCategories = ["Trekking", "A. Acuaticas", "Cabalgatas", "Nieve", "Pesca", "Agencia de turismo"];
 
 export default function AdventuresAdminPage() {
   const [adventures, setAdventures] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [searchTerm, setSearchTerm] = React.useState('');
+  const [categories, setCategories] = React.useState<any[]>([]);
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -33,14 +38,15 @@ export default function AdventuresAdminPage() {
     category: '',
     description: '',
     details: '',
-    selectedPricingKeys: [] as string[]
+    selectedPricingKeys: [] as string[],
+    latitude: '-38.87942114574949',
+    longitude: '-71.18375154775678',
+    openingHours: DEFAULT_SCHEDULE_STRING
   });
   
   const [uploading, setUploading] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
   const [pricingOptions, setPricingOptions] = React.useState<any[]>([]);
-
-  const categories = ["Trekking", "A. Acuaticas", "Cabalgatas", "Nieve", "Pesca", "Agencia de turismo"];
 
   // Effect for Auto-checking plan when typing WhatsApp
   React.useEffect(() => {
@@ -56,9 +62,14 @@ export default function AdventuresAdminPage() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch('/api/adventures');
-      const data = await res.json();
-      setAdventures(data);
+      const [advRes, catRes] = await Promise.all([
+        fetch('/api/adventures'),
+        fetch('/api/categories')
+      ]);
+      const advData = await advRes.json();
+      const catData = await catRes.json();
+      setAdventures(advData);
+      setCategories(catData);
 
       const { getPricingConfigs } = await import('@/app/admin/pricing/actions');
       const pricingData = await getPricingConfigs();
@@ -84,11 +95,14 @@ export default function AdventuresAdminPage() {
         category: adventure.category || '',
         description: adventure.description || '',
         details: adventure.details || '',
-        selectedPricingKeys: adventure.subscription ? adventure.subscription.planType.split(', ').filter(Boolean) : []
+        selectedPricingKeys: adventure.subscription ? adventure.subscription.planType.split(', ').filter(Boolean) : [],
+        latitude: adventure.latitude ? adventure.latitude.toString() : '',
+        longitude: adventure.longitude ? adventure.longitude.toString() : '',
+        openingHours: adventure.openingHours || ''
       });
     } else {
       setEditingAdventure(null);
-      setFormData({ name: '', image: '', whatsapp: '', category: '', description: '', details: '', selectedPricingKeys: [] });
+      setFormData({ name: '', image: '', whatsapp: '', category: '', description: '', details: '', selectedPricingKeys: [], latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING });
     }
     setIsModalOpen(true);
   };
@@ -186,9 +200,6 @@ export default function AdventuresAdminPage() {
           <h1>Aventuras</h1>
           <p>Gestiona las actividades al aire libre y excursiones</p>
         </div>
-        <button className="add-btn" onClick={() => openModal()}>
-          <Plus size={20} /> Nueva Aventura
-        </button>
       </div>
 
       <div className="content-card">
@@ -298,9 +309,15 @@ export default function AdventuresAdminPage() {
                       className="admin-select"
                     >
                       <option value="">Seleccionar Categoría</option>
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
+                      {categories
+                        .filter(cat => cat.link?.startsWith('/aventuras'))
+                        .map(cat => (
+                          <option key={cat.id} value={cat.title}>{cat.title}</option>
+                        ))
+                      }
+                      {formData.category && !categories.some(cat => cat.link?.startsWith('/aventuras') && cat.title === formData.category) && (
+                        <option value={formData.category}>{formData.category} (Categoría desactualizada)</option>
+                      )}
                     </select>
                   </div>
                   <div className="form-group">
@@ -353,50 +370,46 @@ export default function AdventuresAdminPage() {
                       placeholder="Ej: Equipamiento incluido, Guía bilingüe, Seguro..."
                       rows={4}
                     />
-                    <div className="details-preview">
+                    <div className="details-preview" style={{ marginBottom: '16px' }}>
                       {formData.details.split(',').filter(d => d.trim()).map((d, i) => (
                         <span key={i} className="detail-tag"><CheckCircle2 size={12} /> {d.trim()}</span>
                       ))}
                     </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Sección Facturación */}
-              <div className="modal-section" style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginTop: '16px' }}>
-                <h3 className="section-title" style={{ borderBottom: 'none', paddingBottom: 0, marginTop: 0 }}><DollarSign size={18} /> Facturación y Publicidad</h3>
-                <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '16px' }}>Si escribes un teléfono, se marcará automáticamente el Plan Básico. Si deseas que sea gratis sin datos de contacto, puedes desmarcarlo.</p>
-                  
-                <div className="pricing-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
-                  {pricingOptions.map(option => (
-                    <label key={option.key} className="pricing-option" style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'white', padding: '12px', borderRadius: '12px', border: formData.selectedPricingKeys.includes(option.key) ? '2px solid #0d9488' : '1px solid #cbd5e1', cursor: 'pointer', transition: 'all 0.2s' }}>
-                      <input 
-                        type="checkbox" 
-                        checked={formData.selectedPricingKeys.includes(option.key)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData(prev => ({ ...prev, selectedPricingKeys: [...prev.selectedPricingKeys, option.key] }));
-                          } else {
-                            setFormData(prev => ({ ...prev, selectedPricingKeys: prev.selectedPricingKeys.filter(k => k !== option.key) }));
-                          }
-                        }}
-                        style={{ width: '18px', height: '18px', accentColor: '#0d9488', cursor: 'pointer' }}
-                      />
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.85rem' }}>{option.name}</div>
-                        <div style={{ color: '#0d9488', fontWeight: 700, fontSize: '0.85rem' }}>${new Intl.NumberFormat('es-AR').format(option.price)}/mes</div>
-                      </div>
+                  <div className="form-group">
+                    <label>Horario de Atención</label>
+                    <OpeningHoursEditor 
+                      value={formData.openingHours} 
+                      onChange={(val) => setFormData({...formData, openingHours: val})}
+                    />
+                  </div>
+
+                  <div style={{ borderTop: '1px solid #cbd5e1', paddingTop: '16px', marginTop: '10px' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                      <MapPin size={16} /> Geolocalización (Mapa)
                     </label>
-                  ))}
-                </div>
-
-                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '16px', padding: '12px 16px', background: 'white', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
-                  <span style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 600 }}>Total Mensual:</span>
-                  <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f766e' }}>
-                    ${new Intl.NumberFormat('es-AR').format(
-                      formData.selectedPricingKeys.reduce((sum, key) => sum + (pricingOptions.find(p => p.key === key)?.price || 0), 0)
-                    )}
-                  </span>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label style={{ fontSize: '0.75rem', color: '#64748b' }}>Latitud</label>
+                        <input 
+                          type="text" 
+                          value={formData.latitude} 
+                          onChange={(e) => setFormData({...formData, latitude: e.target.value})}
+                          placeholder="-38.8833"
+                        />
+                      </div>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label style={{ fontSize: '0.75rem', color: '#64748b' }}>Longitud</label>
+                        <input 
+                          type="text" 
+                          value={formData.longitude} 
+                          onChange={(e) => setFormData({...formData, longitude: e.target.value})}
+                          placeholder="-71.1667"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 

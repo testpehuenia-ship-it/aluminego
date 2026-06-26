@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { verifySession, hashPassword } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     const admins = await prisma.admin.findMany({
       select: { id: true, username: true } // No enviamos la contraseña
     });
@@ -16,6 +23,11 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     const body = await request.json();
     const { username, password } = body;
 
@@ -29,7 +41,7 @@ export async function POST(request: Request) {
     }
 
     const admin = await prisma.admin.create({
-      data: { username, password }
+      data: { username, password: hashPassword(password) }
     });
 
     return NextResponse.json({ success: true, admin: { id: admin.id, username: admin.username } });
@@ -40,6 +52,11 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     const body = await request.json();
     const { id, password } = body;
 
@@ -49,7 +66,7 @@ export async function PUT(request: Request) {
 
     const admin = await prisma.admin.update({
       where: { id },
-      data: { password }
+      data: { password: hashPassword(password) }
     });
 
     return NextResponse.json({ success: true });
@@ -60,6 +77,11 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

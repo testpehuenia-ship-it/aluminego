@@ -1,4 +1,4 @@
-import 'dotenv/config';
+﻿import 'dotenv/config';
 import { createClient } from '@libsql/client';
 
 const client = createClient({
@@ -86,18 +86,58 @@ const statements = [
     "password" TEXT NOT NULL
   )`,
   `CREATE UNIQUE INDEX IF NOT EXISTS "Admin_username_key" ON "Admin"("username")`,
+
+  `ALTER TABLE "LocalService" ADD COLUMN "subcategory" TEXT`,
+  `ALTER TABLE "LocalService" ADD COLUMN "description" TEXT`,
+  `ALTER TABLE "LocalService" ADD COLUMN "details" TEXT`,
+
+  `CREATE TABLE IF NOT EXISTS "Article" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "title" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "image" TEXT,
+    "author" TEXT DEFAULT 'AluminéGO',
+    "published" BOOLEAN NOT NULL DEFAULT 1,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS "Article_slug_key" ON "Article"("slug")`,
+
+  `CREATE TABLE IF NOT EXISTS "EventTracking" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "entityId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
+
+  `CREATE TABLE IF NOT EXISTS "PortalUser" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "name" TEXT,
+    "phone" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS "PortalUser_email_key" ON "PortalUser"("email")`,
+
+  `ALTER TABLE "Business" ADD COLUMN "portalUserId" TEXT REFERENCES "PortalUser"("id") ON DELETE SET NULL ON UPDATE CASCADE`,
+  `ALTER TABLE "Accommodation" ADD COLUMN "portalUserId" TEXT REFERENCES "PortalUser"("id") ON DELETE SET NULL ON UPDATE CASCADE`,
+  `ALTER TABLE "Adventure" ADD COLUMN "portalUserId" TEXT REFERENCES "PortalUser"("id") ON DELETE SET NULL ON UPDATE CASCADE`,
+  `ALTER TABLE "LocalService" ADD COLUMN "portalUserId" TEXT REFERENCES "PortalUser"("id") ON DELETE SET NULL ON UPDATE CASCADE`
 ];
 
 async function migrate() {
-  console.log('🚀 Creando tablas en Turso...\n');
+  console.log('ðŸš€ Creando tablas en Turso...\n');
 
   for (const sql of statements) {
     const tableName = sql.match(/"(\w+)"/)?.[1] || 'index';
     try {
       await client.execute(sql);
-      console.log(`  ✅ ${tableName}`);
+      console.log(`  âœ… ${tableName}`);
     } catch (err: any) {
-      console.log(`  ⚠️  ${tableName}: ${err.message}`);
+      console.log(`  âš ï¸  ${tableName}: ${err.message}`);
     }
   }
 
@@ -107,13 +147,14 @@ async function migrate() {
       sql: `INSERT OR IGNORE INTO "Admin" ("id", "username", "password") VALUES (?, ?, ?)`,
       args: ['admin-1', 'admin', 'admin123'],
     });
-    console.log('\n  ✅ Admin por defecto creado (admin / admin123)');
+    console.log('\n  âœ… Admin por defecto creado (admin / admin123)');
   } catch (err: any) {
-    console.log('\n  ⚠️  Admin ya existe');
+    console.log('\n  âš ï¸  Admin ya existe');
   }
 
-  console.log('\n✅ Migración completa!');
+  console.log('\nâœ… MigraciÃ³n completa!');
   client.close();
 }
 
 migrate();
+

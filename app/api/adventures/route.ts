@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { verifySession } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,12 +19,27 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     const body = await request.json();
-    const { name, description, image, whatsapp, category, details, selectedPricingKeys } = body;
+    const { name, description, image, whatsapp, category, details, selectedPricingKeys, latitude, longitude, openingHours } = body;
 
     const result = await prisma.$transaction(async (tx: any) => {
       const adventure = await tx.adventure.create({
-        data: { name, description, image, whatsapp, category, details: details || '' }
+        data: {
+          name,
+          description,
+          image,
+          whatsapp,
+          category,
+          details: details || '',
+          latitude: latitude ? parseFloat(String(latitude)) : null,
+          longitude: longitude ? parseFloat(String(longitude)) : null,
+          openingHours: openingHours || null
+        }
       });
 
       if (selectedPricingKeys && Array.isArray(selectedPricingKeys) && selectedPricingKeys.length > 0) {

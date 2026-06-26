@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { verifySession, hashPassword } from '@/lib/auth';
+import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,11 +34,17 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     const { id } = await params;
     const body = await request.json();
-    const { name, type, image, whatsapp, description, features, selectedPricingKeys } = body;
+    const { name, type, image, whatsapp, description, features, selectedPricingKeys, latitude, longitude, openingHours } = body;
 
     const result = await prisma.$transaction(async (tx: any) => {
+      let generatedCredentials = null;
       await tx.feature.deleteMany({
         where: { accommodationId: id }
       });
@@ -49,6 +57,9 @@ export async function PUT(
           image,
           whatsapp,
           description,
+          latitude: latitude ? parseFloat(String(latitude)) : null,
+          longitude: longitude ? parseFloat(String(longitude)) : null,
+          openingHours: openingHours || null,
           features: {
             create: features.map((f: string) => ({ name: f }))
           }
@@ -114,9 +125,47 @@ export async function PUT(
             });
           }
         }
+
+        // 4. Auto-generate PortalUser if they are upgraded and don't have one
+        if (selectedPricingKeys.includes('plan_comercio_completo') || selectedPricingKeys.includes('plan_basico_destacado')) {
+          const accCheck = await tx.accommodation.findUnique({ 
+            where: { id }, 
+            select: { portalUserId: true, name: true, portalUser: true } 
+          });
+          if (!accCheck?.portalUserId) {
+            const safeName = accCheck.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            let email = `${safeName}@aluminego.ar`;
+            const today = new Date();
+            const password = `aluminego${String(today.getDate()).padStart(2, '0')}${String(today.getMonth() + 1).padStart(2, '0')}${today.getFullYear()}`;
+            
+            let portalUser = await tx.portalUser.findUnique({ where: { email } });
+            let counter = 1;
+            while (portalUser) {
+              email = `${safeName}${counter}@aluminego.ar`;
+              portalUser = await tx.portalUser.findUnique({ where: { email } });
+              counter++;
+            }
+            
+            const newUser = await tx.portalUser.create({
+              data: { name: accCheck.name, email, password: hashPassword(password) }
+            });
+            
+            await tx.accommodation.update({
+              where: { id },
+              data: { portalUserId: newUser.id }
+            });
+            
+            generatedCredentials = { email, password };
+          } else if (accCheck.portalUser) {
+            generatedCredentials = {
+              email: accCheck.portalUser.email,
+              password: "Tu contraseña ya fue creada anteriormente. Si la olvidaste, contactanos."
+            };
+          }
+        }
       }
 
-      return accommodation;
+      return { accommodation, generatedCredentials };
     });
 
     return NextResponse.json(result);
@@ -131,6 +180,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     const { id } = await params;
     // Primero eliminamos las características relacionadas
     await prisma.feature.deleteMany({

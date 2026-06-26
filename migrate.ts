@@ -1,54 +1,85 @@
-import { createClient } from '@libsql/client';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-const url = process.env.TURSO_DATABASE_URL;
-const authToken = process.env.TURSO_AUTH_TOKEN;
-
-if (!url || !authToken) {
-  console.error("Faltan credenciales de Turso en .env");
-  process.exit(1);
-}
-
-const client = createClient({
-  url: url.replace('libsql://', 'https://'), // usar https para más seguridad
-  authToken
-});
+import { prisma } from './lib/db';
 
 async function main() {
-  try {
-    console.log("Conectando a Turso...");
-    
-    // 1. Crear tabla PageVisit
-    console.log("Asegurando que la tabla PageVisit existe...");
-    await client.execute(`
-      CREATE TABLE IF NOT EXISTS "PageVisit" (
-          "id" TEXT NOT NULL PRIMARY KEY,
-          "path" TEXT NOT NULL,
-          "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    // 2. Agregar columna isHeavy a Publicity
-    console.log("Agregando isHeavy a Publicity...");
+  const tables = ['Business', 'Accommodation', 'Adventure', 'LocalService', 'Commerce'];
+  
+  for (const table of tables) {
     try {
-      await client.execute(`
-        ALTER TABLE "Publicity" ADD COLUMN "isHeavy" BOOLEAN NOT NULL DEFAULT 0;
-      `);
-      console.log("Columna agregada.");
-    } catch (e: any) {
-      if (e.message.includes('duplicate column name')) {
-        console.log("La columna isHeavy ya existe.");
-      } else {
-        throw e;
-      }
+      await prisma.$executeRawUnsafe(`ALTER TABLE ${table} ADD COLUMN latitude REAL`);
+      console.log(`Added latitude to ${table}`);
+    } catch (e) {
+      console.log(`Failed to add latitude to ${table} (maybe already exists)`);
     }
-
-    console.log("✅ Migración completada en Turso exitosamente.");
-  } catch (error) {
-    console.error("❌ Error al migrar:", error);
+    
+    try {
+      await prisma.$executeRawUnsafe(`ALTER TABLE ${table} ADD COLUMN longitude REAL`);
+      console.log(`Added longitude to ${table}`);
+    } catch (e) {
+      console.log(`Failed to add longitude to ${table} (maybe already exists)`);
+    }
   }
+
+  // Also try to create tables that might be completely new in this version
+  const newTables = [
+    `CREATE TABLE IF NOT EXISTS "CommerceDetail" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "name" TEXT NOT NULL,
+      "commerceId" TEXT NOT NULL,
+      CONSTRAINT "CommerceDetail_commerceId_fkey" FOREIGN KEY ("commerceId") REFERENCES "Commerce" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    )`,
+    `CREATE TABLE IF NOT EXISTS "EventTracking" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "entityId" TEXT NOT NULL,
+      "type" TEXT NOT NULL,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS "PushSubscription" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "endpoint" TEXT NOT NULL,
+      "p256dh" TEXT NOT NULL,
+      "auth" TEXT NOT NULL,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS "PushHistory" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "title" TEXT NOT NULL,
+      "message" TEXT NOT NULL,
+      "url" TEXT,
+      "sentCount" INTEGER NOT NULL DEFAULT 0,
+      "errorCount" INTEGER NOT NULL DEFAULT 0,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS "Review" (
+      "id" TEXT NOT NULL PRIMARY KEY,
+      "rating" INTEGER NOT NULL,
+      "comment" TEXT NOT NULL,
+      "author" TEXT NOT NULL,
+      "email" TEXT,
+      "approved" BOOLEAN NOT NULL DEFAULT true,
+      "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "businessId" TEXT,
+      "accommodationId" TEXT,
+      "adventureId" TEXT,
+      "localServiceId" TEXT,
+      "commerceId" TEXT,
+      CONSTRAINT "Review_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      CONSTRAINT "Review_accommodationId_fkey" FOREIGN KEY ("accommodationId") REFERENCES "Accommodation" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      CONSTRAINT "Review_adventureId_fkey" FOREIGN KEY ("adventureId") REFERENCES "Adventure" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      CONSTRAINT "Review_localServiceId_fkey" FOREIGN KEY ("localServiceId") REFERENCES "LocalService" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+      CONSTRAINT "Review_commerceId_fkey" FOREIGN KEY ("commerceId") REFERENCES "Commerce" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    )`
+  ];
+
+  for (const q of newTables) {
+    try {
+      await prisma.$executeRawUnsafe(q);
+      console.log('Created a new table successfully.');
+    } catch (e) {
+      console.log('Failed to create new table', e);
+    }
+  }
+
+  console.log('Migration complete.');
 }
 
-main();
+main().catch(console.error);

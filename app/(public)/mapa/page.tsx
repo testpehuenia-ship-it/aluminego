@@ -1,43 +1,82 @@
 ﻿import { Metadata } from 'next';
 import { prisma } from '@/lib/db';
-import { getDPVStatus } from '@/lib/services/dpv';
-import { getAluminéWeather } from '@/lib/services/weather';
 import MapaClient from './MapaClient';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Mapa Interactivo 3D y Estado de Rutas de Aluminé',
-  description: 'Explora Aluminé y Moquehue con nuestro mapa 3D interactivo. Conoce las principales rutas de acceso desde Neuquén y Aluminé.',
+  description: 'Explora Aluminé con nuestro mapa 3D interactivo. Conoce las principales rutas de acceso desde NeuQuén y Aluminé.',
   keywords: ['mapa Aluminé', 'rutas a Aluminé', 'moquehue mapa 3d', 'como llegar a Aluminé', 'estado de rutas Aluminé'],
   openGraph: {
-    title: 'Mapa Interactivo 3D y Rutas de Acceso a Aluminé | AlumineGo',
+    title: 'Mapa Interactivo 3D y Rutas de Acceso a Aluminé | AluminéGO',
     description: 'Navega en 3D por la villa, localiza atractivos turísticos y planifica tu ruta de llegada de forma segura.',
     url: '/mapa',
-    images: [
-      {
-        url: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&h=630&q=80',
-        width: 1200,
-        height: 630,
-        alt: 'Mapa de Aluminé'
-      }
-    ]
   }
 };
 
 export default async function Page() {
-  const markers = await prisma.mapMarker.findMany({
+  const baseMarkers = await prisma.mapMarker.findMany({
     orderBy: { createdAt: 'desc' }
   });
 
-  const [dpvData, weatherData] = await Promise.all([
-    getDPVStatus(),
-    getAluminéWeather()
-  ]);
+  const businesses = await prisma.business.findMany({
+    where: { 
+      latitude: { not: null }, 
+      longitude: { not: null },
+      subscription: {
+        is: {
+          planType: {
+            contains: 'plan_comercio_completo'
+          }
+        }
+      }
+    },
+    include: { category: true }
+  });
+
+  const accommodations = await prisma.accommodation.findMany({
+    where: { 
+      latitude: { not: null }, 
+      longitude: { not: null },
+      subscription: {
+        is: {
+          planType: {
+            contains: 'plan_comercio_completo'
+          }
+        }
+      }
+    }
+  });
+
+  // Map into marker format
+  const mappedBusinesses = businesses.map(b => ({
+    id: b.id,
+    title: b.name,
+    description: b.category?.title || 'gastronomía',
+    latitude: b.latitude!,
+    longitude: b.longitude!,
+    color: '#ea580c', // Naranja
+    createdAt: b.createdAt,
+    updatedAt: b.updatedAt
+  }));
+
+  const mappedAccommodations = accommodations.map(a => ({
+    id: a.id,
+    title: a.name,
+    description: a.type || 'Alojamiento',
+    latitude: a.latitude!,
+    longitude: a.longitude!,
+    color: '#3b82f6', // Azul
+    createdAt: a.createdAt,
+    updatedAt: a.updatedAt
+  }));
+
+  const markers = [...baseMarkers, ...mappedBusinesses, ...mappedAccommodations];
 
   return <MapaClient 
     initialMarkers={JSON.parse(JSON.stringify(markers))} 
-    dpvData={dpvData} 
-    weatherData={weatherData} 
   />;
 }
+
+

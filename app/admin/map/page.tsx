@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { 
@@ -124,7 +124,7 @@ export default function MapAdminPage() {
   };
 
   const handleRouteDelete = async (id: string) => {
-    if (!confirm('¿Estás seguro de eliminar esta ruta?')) return;
+    if (!confirm('Â¿Estás seguro de eliminar esta ruta?')) return;
     try {
       const res = await fetch(`/api/routes/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -192,7 +192,7 @@ export default function MapAdminPage() {
   };
 
   const handleMarkerDelete = async (id: string) => {
-    if (!confirm('¿Estás seguro de eliminar este marcador?')) return;
+    if (!confirm('Â¿Estás seguro de eliminar este marcador?')) return;
     try {
       const res = await fetch(`/api/map-markers/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -450,7 +450,7 @@ export default function MapAdminPage() {
                   className="admin-select"
                 >
                   <option value="Transitable">🟢 Transitable</option>
-                  <option value="Transitable con precaución">🟠 Transitable con precaución</option>
+                  <option value="Transitable con precaución">ðŸŸ  Transitable con precaución</option>
                   <option value="Cerrado">🔴 Cerrado / Intransitable</option>
                 </select>
               </div>
@@ -530,7 +530,7 @@ export default function MapAdminPage() {
                   type="text" 
                   value={markerFormData.description} 
                   onChange={(e) => setMarkerFormData({...markerFormData, description: e.target.value})}
-                  placeholder="Ej: Muelle público y paseos lacustres"
+                  placeholder="Ej: Muelle pÁºblico y paseos lacustres"
                 />
               </div>
 
@@ -618,3 +618,5 @@ export default function MapAdminPage() {
     </div>
   );
 }
+
+

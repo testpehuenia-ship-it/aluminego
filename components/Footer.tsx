@@ -9,10 +9,29 @@ export default function Footer() {
       marginTop: 'auto'
     }}>
       <div className="container" style={{ textAlign: 'center' }}>
-        <h3 style={{ fontSize: '1.5rem', marginBottom: '8px', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
-          <span style={{ color: 'var(--color-green)' }}>Aluminé</span>
-          <span style={{ color: 'var(--color-orange)' }}>GO</span>
-        </h3>
+        <div style={{
+          display: 'inline-flex',
+          backgroundColor: 'white',
+          borderRadius: '24px',
+          padding: '6px 20px',
+          marginBottom: '12px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <h3 style={{ 
+            fontSize: '1.4rem', 
+            margin: 0, 
+            fontWeight: 900, 
+            fontFamily: 'var(--font-oswald), sans-serif',
+            letterSpacing: '-0.5px',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <span style={{ color: 'var(--color-green)' }}>Aluminé</span>
+            <span style={{ color: 'var(--color-orange)' }}>GO</span>
+          </h3>
+        </div>
         <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1rem' }}>La Guía Oficial de Aluminé - Patagonia Argentina</p>
         
         <div style={{ margin: '16px 0' }}>

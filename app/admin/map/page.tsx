@@ -450,7 +450,7 @@ export default function MapAdminPage() {
                   className="admin-select"
                 >
                   <option value="Transitable">🟢 Transitable</option>
-                  <option value="Transitable con precaución">ðŸŸ  Transitable con precaución</option>
+                  <option value="Transitable con precaución">🟠 Transitable con precaución</option>
                   <option value="Cerrado">🔴 Cerrado / Intransitable</option>
                 </select>
               </div>

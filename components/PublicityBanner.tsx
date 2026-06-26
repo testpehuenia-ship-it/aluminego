@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -91,7 +91,7 @@ export default function PublicityBanner({
           style={{ textDecoration: 'none', animationDelay: delay }}
         >
           <h2 style={{ fontSize: height === '100px' ? '1.5rem' : '1.8rem', margin: 0, color: 'white', fontFamily: 'var(--font-oswald), sans-serif', textTransform: 'uppercase', textShadow: '1px 1px 2px rgba(0,0,0,0.2)' }}>
-            PROMOCIÁ“N LANZAMIENTO
+            PROMOCIÓN LANZAMIENTO
           </h2>
           <p style={{ color: '#fffbeb', fontSize: height === '100px' ? '1.2rem' : '1.5rem', marginTop: '4px', fontWeight: 900, background: 'var(--color-green)', padding: '4px 12px', borderRadius: '8px', display: 'inline-block' }}>
             50% DESCUENTO

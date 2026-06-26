@@ -690,8 +690,8 @@ export default function LocalServicesAdminPage() {
                         { id: 'alojamiento', label: 'ðŸ›ï¸ Alojamiento' },
                         { id: 'aventuras', label: 'â›°ï¸ Aventuras' },
                         { id: 'comercios', label: 'ðŸ›ï¸ Comercios' },
-                        { id: 'guia-local', label: 'ðŸ“– Guía Local' },
-                        { id: 'novedades', label: 'ðŸ“° Novedades' }
+                        { id: 'guia-local', label: '📖 Guía Local' },
+                        { id: 'novedades', label: '📰 Novedades' }
                       ].map(section => (
                         <label key={section.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'white', padding: '8px 12px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
                           <input 

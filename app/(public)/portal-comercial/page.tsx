@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { usePortal } from '@/components/PortalContext';
@@ -81,7 +81,7 @@ export default function PortalDashboard() {
         </Link>
         {data?.businesses && data.businesses.length > 0 && (
           <Link href="/portal-comercial/menu" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: '#f8fafc', borderRadius: '8px', textDecoration: 'none', color: '#1e293b', fontWeight: 600, border: '1px solid #e2e8f0' }}>
-            <span>ðŸ”</span> Gestionar MenÁº
+            <span>🍔</span> Gestionar Menú
           </Link>
         )}
       </div>

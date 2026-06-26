@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
@@ -371,7 +371,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                     alignItems: 'center',
                     gap: '12px'
                   }}>
-                    <span style={{ fontSize: '2rem' }}>ðŸ½ï¸</span>
+                    <span style={{ fontSize: '2rem' }}>🍽️</span>
                     <span>Próximamente más locales en la categoría {cat.title}</span>
                   </div>
                 ) : (
@@ -485,7 +485,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                     }}
                   >
                     <div style={{ width: '60px', height: '60px', borderRadius: '12px', flexShrink: 0, backgroundColor: 'var(--color-orange)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '1.5rem' }}>
-                      ðŸ“–
+                      📖
                     </div>
                     <div style={{ flex: 1 }}>
                       <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '4px', color: 'var(--color-text-main)' }}>¿Quieres ver más opciones?</h4>

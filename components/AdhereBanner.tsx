@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { Store } from 'lucide-react';
 
@@ -46,7 +46,7 @@ export default function AdhereBanner() {
           marginBottom: '12px',
           fontFamily: 'var(--font-oswald), sans-serif'
         }}>
-          ¿TU COMERCIO AÚN NO ESTÁ AQUÍ?
+          ¿TU COMERCIO AÚN NO ESTÁ AQUÍ?
         </h2>
         
         <p style={{ 

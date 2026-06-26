@@ -277,7 +277,7 @@ export default function LocalServicesAdminPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Â¿Estás seguro de eliminar este registro?')) return;
+    if (!confirm('¿Estás seguro de eliminar este registro?')) return;
 
     try {
       const res = await fetch(`/api/local-services/${id}`, { method: 'DELETE' });

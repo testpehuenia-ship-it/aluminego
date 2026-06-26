@@ -323,7 +323,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
         </section>
       )}
       
-      <h1 className="section-title">Â¿Qué pedimos hoy?</h1>
+      <h1 className="section-title">¿Qué pedimos hoy?</h1>
 
       {displayableCats.map((cat, index, arr) => {
         const catBusinesses = nonBannerBusinesses.filter(b => b.categoryId === cat.id && hasPlan(b));
@@ -488,7 +488,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                       ðŸ“–
                     </div>
                     <div style={{ flex: 1 }}>
-                      <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '4px', color: 'var(--color-text-main)' }}>Â¿Quieres ver más opciones?</h4>
+                      <h4 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '4px', color: 'var(--color-text-main)' }}>¿Quieres ver más opciones?</h4>
                       <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '0', lineHeight: '1.3' }}>Toca aquí para pedirnos la carta completa por WhatsApp.</p>
                     </div>
                   </div>

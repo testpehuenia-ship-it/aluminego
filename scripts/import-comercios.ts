@@ -9,7 +9,7 @@ const client = createClient({
 const urls = [
   { url: 'https://villaAluminé.gob.ar/alojamientos-en-villa-Aluminé-3', category: 'Alojarse' },
   { url: 'https://villaAluminé.gob.ar/servicios-y-comercios-2', category: 'Comercios' },
-  { url: 'https://villaAluminé.gob.ar/gastronomia-en-villa-Aluminé-moquehue', category: 'GastronomÃ­a' }
+  { url: 'https://villaAluminé.gob.ar/gastronomia-en-villa-Aluminé-moquehue', category: 'Gastronomía' }
 ];
 
 async function run() {

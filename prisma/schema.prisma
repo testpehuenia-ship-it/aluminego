@@ -129,7 +129,7 @@ model Commerce {
   description  String?
   latitude     Float?
   longitude    Float?
-  locality     String?          @default("Villa Pehuenia")
+  locality     String?          @default("Aluminé")
   details      CommerceDetail[]
   subscription Subscription?
   portalUserId String?
@@ -234,7 +234,7 @@ model Article {
   slug        String   @unique
   content     String   // Puede ser markdown o HTML
   image       String?
-  author      String?  @default("PehueniaGO")
+  author      String?  @default("AluminéGO")
   published   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

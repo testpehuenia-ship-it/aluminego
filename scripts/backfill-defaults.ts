@@ -9,10 +9,10 @@ const client = createClient({
 const DEFAULT_SCHEDULE = [
   { day: 1, dayName: 'Lunes', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
   { day: 2, dayName: 'Martes', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
-  { day: 3, dayName: 'MiÃ©rcoles', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
+  { day: 3, dayName: 'Miércoles', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
   { day: 4, dayName: 'Jueves', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
   { day: 5, dayName: 'Viernes', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
-  { day: 6, dayName: 'SÃ¡bado', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
+  { day: 6, dayName: 'Sábado', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
   { day: 0, dayName: 'Domingo', closed: true, periods: [] }
 ];
 
@@ -39,13 +39,13 @@ async function main() {
       sql: 'UPDATE "LocalService" SET "openingHours" = ? WHERE "openingHours" IS NULL OR "openingHours" = \'\'',
       args: [DEFAULT_SCHEDULE_STRING]
     });
-    // DirecciÃ³n
+    // Dirección
     const r4 = await client.execute({
       sql: 'UPDATE "LocalService" SET "address" = \'Aluminé\' WHERE "address" IS NULL OR TRIM("address") = \'\'',
       args: []
     });
 
-    console.log(`LocalService actualizado: Latitud (${r1.rowsAffected}), Longitud (${r2.rowsAffected}), Horarios (${r3.rowsAffected}), DirecciÃ³n (${r4.rowsAffected})`);
+    console.log(`LocalService actualizado: Latitud (${r1.rowsAffected}), Longitud (${r2.rowsAffected}), Horarios (${r3.rowsAffected}), Dirección (${r4.rowsAffected})`);
   } catch (e: any) {
     console.error('Error actualizando LocalService:', e.message);
   }

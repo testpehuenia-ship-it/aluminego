@@ -233,7 +233,7 @@ export default function AccommodationsAdminPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Â¿Estás seguro de eliminar este alojamiento?')) return;
+    if (!confirm('¿Estás seguro de eliminar este alojamiento?')) return;
 
     try {
       const res = await fetch(`/api/accommodations/${id}`, {

@@ -10,11 +10,11 @@ const client = createClient({
 const urls = [
   { url: 'https://villaAluminé.gob.ar/alojamientos-en-villa-Aluminé-3', category: 'Alojamiento' },
   { url: 'https://villaAluminé.gob.ar/servicios-y-comercios-2', category: 'Comercios' },
-  { url: 'https://villaAluminé.gob.ar/gastronomia-en-villa-Aluminé-moquehue', category: 'GastronomÃ­a' }
+  { url: 'https://villaAluminé.gob.ar/gastronomia-en-villa-Aluminé-moquehue', category: 'Gastronomía' }
 ];
 
 async function run() {
-  console.log('>>> Iniciando reclasificaciÃ³n de servicios importados desde las pÃ¡ginas oficiales...');
+  console.log('>>> Iniciando reclasificación de servicios importados desde las páginas oficiales...');
 
   for (const { url, category } of urls) {
     console.log('Fetching', url);
@@ -32,7 +32,7 @@ async function run() {
         namesToUpdate.push(name.trim().toUpperCase());
       });
 
-      console.log(`Encontrados ${namesToUpdate.length} nombres para la categorÃ­a "${category}". Actualizando en Turso...`);
+      console.log(`Encontrados ${namesToUpdate.length} nombres para la categoría "${category}". Actualizando en Turso...`);
 
       for (const name of namesToUpdate) {
         let finalCategory = category;
@@ -49,14 +49,14 @@ async function run() {
         }
       }
 
-      console.log(`Actualizados ${count} registros a la categorÃ­a "${category}" (o derivados).`);
+      console.log(`Actualizados ${count} registros a la categoría "${category}" (o derivados).`);
     } catch (e: any) {
       console.error(`Error al procesar ${url}:`, e.message);
     }
   }
 
-  // Por Ãºltimo, para las aventuras reales, restaurar "Aventuras"
-  console.log('>>> Seteando categorÃ­a "Aventuras" para las aventuras reales...');
+  // Por último, para las aventuras reales, restaurar "Aventuras"
+  console.log('>>> Seteando categoría "Aventuras" para las aventuras reales...');
   const tursoServices = await client.execute(`
     SELECT ls.id, ls.name FROM "LocalService" ls
     JOIN "Subscription" s ON s.localServiceId = ls.id
@@ -76,7 +76,7 @@ async function run() {
   console.log(`>>> Se marcaron ${advCount} aventuras reales como "Aventuras".`);
 
   client.close();
-  console.log('>>> ReclasificaciÃ³n completa.');
+  console.log('>>> Reclasificación completa.');
 }
 
 run().catch(console.error);

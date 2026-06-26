@@ -1,4 +1,4 @@
-﻿import crypto from 'crypto';
+import crypto from 'crypto';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'AluminéGO-super-secret-key-2026-safe-123456';
 
@@ -51,7 +51,7 @@ export function hashPassword(password: string): string {
 
 export function verifyPassword(password: string, storedHash: string): boolean {
   if (!storedHash) return false;
-  // Compatibilidad hacia atrÃ¡s: si no contiene dos puntos, verificar directamente (texto plano)
+  // Compatibilidad hacia atrás: si no contiene dos puntos, verificar directamente (texto plano)
   if (!storedHash.includes(':')) {
     return password === storedHash;
   }
@@ -64,7 +64,7 @@ export function verifyPassword(password: string, storedHash: string): boolean {
 export function signPortalSession(sessionData: { id: string; email: string; name: string | null }): string {
   const payload = {
     ...sessionData,
-    exp: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 dÃ­as
+    exp: Date.now() + 7 * 24 * 60 * 60 * 1000 // 7 días
   };
   const payloadStr = Buffer.from(JSON.stringify(payload)).toString('base64url');
   const signature = crypto

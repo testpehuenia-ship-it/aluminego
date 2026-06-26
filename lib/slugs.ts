@@ -1,16 +1,16 @@
-﻿import { prisma } from './db';
+import { prisma } from './db';
 
 /**
- * Genera un slug Ãºnico para un comercio en base a su nombre y su localidad.
- * Si el slug resultante ya estÃ¡ registrado en la base de datos para otro comercio,
- * aÃ±ade un nÃºmero correlativo (ej. pizzeria-Aluminé-1, pizzeria-Aluminé-2).
+ * Genera un slug único para un comercio en base a su nombre y su localidad.
+ * Si el slug resultante ya está registrado en la base de datos para otro comercio,
+ * añade un número correlativo (ej. pizzeria-Aluminé-1, pizzeria-Aluminé-2).
  */
 export async function generateUniqueSlug(name: string, locality: string, excludeId?: string): Promise<string> {
   const cleanName = name
     .toLowerCase()
-    .normalize('NFD') // Quitar tildes y diÃ©resis
+    .normalize('NFD') // Quitar tildes y diéresis
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-') // Reemplazar caracteres no alfanumÃ©ricos por guiones
+    .replace(/[^a-z0-9]+/g, '-') // Reemplazar caracteres no alfanuméricos por guiones
     .replace(/(^-|-$)+/g, ''); // Quitar guiones iniciales o finales
 
   const cleanLocality = locality

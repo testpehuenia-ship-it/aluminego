@@ -37,7 +37,7 @@ self.addEventListener('notificationclick', (event: any) => {
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients: any) => {
-      // Si ya hay una pestaÃ±a abierta con esa URL, enfocarla
+      // Si ya hay una pestaña abierta con esa URL, enfocarla
       for (let i = 0; i < windowClients.length; i++) {
         const client = windowClients[i];
         if (client.url === urlToOpen && 'focus' in client) {

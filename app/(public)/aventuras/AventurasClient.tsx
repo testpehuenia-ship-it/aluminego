@@ -235,7 +235,7 @@ export default function AventurasClient({ initialAdventures, initialCategories }
         )}
       </div>
 
-      <h1 className="section-title">Â¿Qué aventura elegimos hoy?</h1>
+      <h1 className="section-title">¿Qué aventura elegimos hoy?</h1>
 
       {/* SECCIÁ“N DE DESTACADOS (CON BANNER) */}
       {bannerAdventures.length > 0 && (

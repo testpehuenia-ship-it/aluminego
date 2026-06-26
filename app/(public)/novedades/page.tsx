@@ -1,4 +1,4 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import { prisma } from '@/lib/db';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -7,8 +7,8 @@ import PublicityBanner from '@/components/PublicityBanner';
 
 export const metadata: Metadata = {
   title: 'Blog y Novedades | AluminéGO',
-  description: 'Descubre Guías, recomendaciones y las Áºltimas noticias sobre turismo en Aluminé.',
-  keywords: ['novedades Aluminé', 'blog turismo Aluminé', 'noticias moquehue', 'Guías viaje Aluminé'],
+  description: 'Descubre guías, recomendaciones y las últimas noticias sobre turismo en Aluminé.',
+  keywords: ['novedades Aluminé', 'blog turismo Aluminé', 'noticias Aluminé', 'guías viaje Aluminé'],
   openGraph: {
     title: 'Blog y Novedades | AluminéGO',
     description: 'Guías, recomendaciones y noticias sobre turismo en Aluminé.',

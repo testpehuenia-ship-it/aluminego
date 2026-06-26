@@ -245,7 +245,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
         )}
       </div>
 
-      <h1 className="section-title">Â¿Dónde vas a dormir?</h1>
+      <h1 className="section-title">¿Dónde vas a dormir?</h1>
 
       {/* SECCIÁ“N DE DESTACADOS (CON BANNER) */}
       {bannerAccommodations.length > 0 && (

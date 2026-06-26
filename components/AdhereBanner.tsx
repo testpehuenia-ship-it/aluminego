@@ -46,7 +46,7 @@ export default function AdhereBanner() {
           marginBottom: '12px',
           fontFamily: 'var(--font-oswald), sans-serif'
         }}>
-          Â¿TU COMERCIO AÁšN NO ESTÁ AQUÁ?
+          ¿TU COMERCIO AÚN NO ESTÁ AQUÍ?
         </h2>
         
         <p style={{ 

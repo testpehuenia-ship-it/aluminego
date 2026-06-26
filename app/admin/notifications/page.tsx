@@ -52,7 +52,7 @@ export default function NotificationsAdminPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Â¿Estás seguro de que quieres eliminar esta notificación del historial?')) {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta notificación del historial?')) {
       return;
     }
 
@@ -89,7 +89,7 @@ export default function NotificationsAdminPage() {
       'old': 'Usuarios ANTIGUOS (más de 14 días)'
     };
 
-    if (!confirm(`Â¿Estás seguro de enviar esta notificación a ${segmentNames[segment]}?`)) {
+    if (!confirm(`¿Estás seguro de enviar esta notificación a ${segmentNames[segment]}?`)) {
       return;
     }
 

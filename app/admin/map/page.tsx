@@ -124,7 +124,7 @@ export default function MapAdminPage() {
   };
 
   const handleRouteDelete = async (id: string) => {
-    if (!confirm('Â¿Estás seguro de eliminar esta ruta?')) return;
+    if (!confirm('¿Estás seguro de eliminar esta ruta?')) return;
     try {
       const res = await fetch(`/api/routes/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -192,7 +192,7 @@ export default function MapAdminPage() {
   };
 
   const handleMarkerDelete = async (id: string) => {
-    if (!confirm('Â¿Estás seguro de eliminar este marcador?')) return;
+    if (!confirm('¿Estás seguro de eliminar este marcador?')) return;
     try {
       const res = await fetch(`/api/map-markers/${id}`, { method: 'DELETE' });
       if (res.ok) {

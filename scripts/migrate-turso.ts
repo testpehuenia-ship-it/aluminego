@@ -135,7 +135,7 @@ async function migrate() {
     const tableName = sql.match(/"(\w+)"/)?.[1] || 'index';
     try {
       await client.execute(sql);
-      console.log(`  âœ… ${tableName}`);
+      console.log(`  ✅ ${tableName}`);
     } catch (err: any) {
       console.log(`  âš ï¸  ${tableName}: ${err.message}`);
     }
@@ -147,12 +147,12 @@ async function migrate() {
       sql: `INSERT OR IGNORE INTO "Admin" ("id", "username", "password") VALUES (?, ?, ?)`,
       args: ['admin-1', 'admin', 'admin123'],
     });
-    console.log('\n  âœ… Admin por defecto creado (admin / admin123)');
+    console.log('\n  ✅ Admin por defecto creado (admin / admin123)');
   } catch (err: any) {
     console.log('\n  âš ï¸  Admin ya existe');
   }
 
-  console.log('\nâœ… MigraciÃ³n completa!');
+  console.log('\n✅ Migración completa!');
   client.close();
 }
 

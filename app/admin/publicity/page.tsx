@@ -186,7 +186,7 @@ function PublicityAdminContent() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Â¿Estás seguro de eliminar este banner?')) return;
+    if (!confirm('¿Estás seguro de eliminar este banner?')) return;
     
     try {
       await fetch(`/api/publicity/${id}`, { method: 'DELETE' });

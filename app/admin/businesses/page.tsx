@@ -275,7 +275,7 @@ export default function BusinessesAdminPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Â¿Estás seguro de eliminar este comercio?')) return;
+    if (!confirm('¿Estás seguro de eliminar este comercio?')) return;
 
     try {
       const res = await fetch(`/api/businesses/${id}`, {

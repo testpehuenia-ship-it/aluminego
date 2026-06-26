@@ -20,7 +20,7 @@ function calculateScore(record: any) {
 
 function normalizeName(name: string) {
   return name.toLowerCase()
-    .replace(/[^\w\sÃ±Ã¡Ã©Ã­Ã³Ãº]/gi, '') // remove special chars but keep letters/numbers/spaces/accents
+    .replace(/[^\w\sñáéíóú]/gi, '') // remove special chars but keep letters/numbers/spaces/accents
     .replace(/\s+/g, ' ') // collapse multiple spaces
     .trim();
 }

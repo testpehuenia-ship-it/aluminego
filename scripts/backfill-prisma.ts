@@ -4,21 +4,21 @@ import { prisma } from '../lib/db';
 const DEFAULT_SCHEDULE = [
   { day: 1, dayName: 'Lunes', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
   { day: 2, dayName: 'Martes', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
-  { day: 3, dayName: 'MiÃ©rcoles', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
+  { day: 3, dayName: 'Miércoles', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
   { day: 4, dayName: 'Jueves', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
   { day: 5, dayName: 'Viernes', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
-  { day: 6, dayName: 'SÃ¡bado', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
+  { day: 6, dayName: 'Sábado', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
   { day: 0, dayName: 'Domingo', closed: true, periods: [] }
 ];
 const DEFAULT_SCHEDULE_STRING = JSON.stringify(DEFAULT_SCHEDULE);
 
 async function main() {
-  console.log('>>> Iniciando backfill con Prisma para rellenar campos nulos/vacÃ­os...');
+  console.log('>>> Iniciando backfill con Prisma para rellenar campos nulos/vacíos...');
 
   // 1. Backfill LocalService
   console.log('Actualizando LocalService...');
   
-  // Rellenar direcciÃ³n nula o vacÃ­a
+  // Rellenar dirección nula o vacía
   const servicesToUpdateAddress = await prisma.localService.findMany({
     where: {
       OR: [
@@ -27,7 +27,7 @@ async function main() {
       ]
     }
   });
-  console.log(`Encontrados ${servicesToUpdateAddress.length} LocalService con direcciÃ³n vacÃ­a.`);
+  console.log(`Encontrados ${servicesToUpdateAddress.length} LocalService con dirección vacía.`);
   if (servicesToUpdateAddress.length > 0) {
     const ids = servicesToUpdateAddress.map(s => s.id);
     await prisma.localService.updateMany({
@@ -37,7 +37,7 @@ async function main() {
     console.log('✓ Direcciones de LocalService actualizadas.');
   }
 
-  // Rellenar horarios nulos o vacÃ­os en LocalService
+  // Rellenar horarios nulos o vacíos en LocalService
   const servicesToUpdateHours = await prisma.localService.findMany({
     where: {
       OR: [
@@ -46,7 +46,7 @@ async function main() {
       ]
     }
   });
-  console.log(`Encontrados ${servicesToUpdateHours.length} LocalService con horarios vacÃ­os.`);
+  console.log(`Encontrados ${servicesToUpdateHours.length} LocalService con horarios vacíos.`);
   if (servicesToUpdateHours.length > 0) {
     const ids = servicesToUpdateHours.map(s => s.id);
     await prisma.localService.updateMany({
@@ -67,7 +67,7 @@ async function main() {
       ]
     }
   });
-  console.log(`Encontrados ${servicesToUpdateCoords.length} LocalService con coordenadas vacÃ­as/cero.`);
+  console.log(`Encontrados ${servicesToUpdateCoords.length} LocalService con coordenadas vacías/cero.`);
   for (const s of servicesToUpdateCoords) {
     await prisma.localService.update({
       where: { id: s.id },
@@ -80,7 +80,7 @@ async function main() {
   console.log('✓ Coordenadas de LocalService actualizadas.');
 
   // 2. Backfill para otras entidades (Business, Accommodation, Adventure, Commerce)
-  // GastronomÃ­a (Business)
+  // Gastronomía (Business)
   const businesses = await prisma.business.findMany({
     where: {
       OR: [
@@ -175,7 +175,7 @@ async function main() {
     });
   }
 
-  console.log('>>> Backfill completado con Ã©xito.');
+  console.log('>>> Backfill completado con éxito.');
 }
 
 main()

@@ -1,4 +1,4 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import { prisma } from '@/lib/db';
 import MapaClient from './MapaClient';
 
@@ -7,10 +7,10 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Mapa Interactivo 3D y Estado de Rutas de Aluminé',
   description: 'Explora Aluminé con nuestro mapa 3D interactivo. Conoce las principales rutas de acceso desde NeuQuén y Aluminé.',
-  keywords: ['mapa Aluminé', 'rutas a Aluminé', 'moquehue mapa 3d', 'como llegar a Aluminé', 'estado de rutas Aluminé'],
+  keywords: ['mapa Aluminé', 'rutas a Aluminé', 'mapa 3d Aluminé', 'como llegar a Aluminé', 'estado de rutas Aluminé'],
   openGraph: {
     title: 'Mapa Interactivo 3D y Rutas de Acceso a Aluminé | AluminéGO',
-    description: 'Navega en 3D por la villa, localiza atractivos turísticos y planifica tu ruta de llegada de forma segura.',
+    description: 'Navega en 3D por Aluminé, localiza atractivos turísticos y planifica tu ruta de llegada de forma segura.',
     url: '/mapa',
   }
 };

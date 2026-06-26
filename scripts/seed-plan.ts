@@ -12,9 +12,9 @@ async function main() {
     await client.execute({
       sql: `INSERT OR IGNORE INTO "PricingConfig" ("id", "key", "name", "price", "createdAt", "updatedAt") 
             VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-      args: ['plan-comercio-completo', 'plan_comercio_completo', 'Plan Comercio Completo (GuÃ­a Local)', 4000],
+      args: ['plan-comercio-completo', 'plan_comercio_completo', 'Plan Comercio Completo (Guía Local)', 4000],
     });
-    console.log('âœ… Plan insertado con Ã©xito en Turso.');
+    console.log('✅ Plan insertado con éxito en Turso.');
   } catch (error) {
     console.error('Error insertando plan:', error);
   }

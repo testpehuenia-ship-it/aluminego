@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${commerce.name} en ${locality} | Tiendas y Mercados`,
-    description: `Conoce los detalles, contacto y ubicación de ${commerce.name} en ${locality} y Moquehue. Rubro: ${commerce.type}.`,
+    description: `Conoce los detalles, contacto y ubicación de ${commerce.name} en ${locality}. Rubro: ${commerce.type}.`,
     alternates: {
       canonical: `https://www.aluminego.ar/comercios/${commerce.slug || commerce.id}`,
     },

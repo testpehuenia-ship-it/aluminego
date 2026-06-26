@@ -31,12 +31,12 @@ const caveat = Caveat({
 });
 
 export const viewport: Viewport = {
-  themeColor: '#27ae60',
+  themeColor: '#0013C5',
 };
 
 export const metadata: Metadata = {
   manifest: '/manifest.json',
-  metadataBase: new URL('https://www.AluminéGO.ar'),
+  metadataBase: new URL('https://www.aluminego.ar'),
   title: {
     default: 'AluminéGO | Guía Turística y Delivery en Aluminé',
     template: '%s | AluminéGO'
@@ -60,13 +60,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'AluminéGO | Guía Turística y Delivery en Aluminé',
     description: 'La Guía Turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé.',
-    url: 'https://www.AluminéGO.ar',
+    url: 'https://www.aluminego.ar',
     siteName: 'AluminéGO',
     locale: 'es_AR',
     type: 'website',
     images: [
       {
-        url: 'https://AluminéGO.ar/og-muelle.jpg',
+        url: 'https://aluminego.ar/og-muelle.jpg',
         width: 1200,
         height: 630,
         alt: 'Paisaje en Aluminé',
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'AluminéGO | Guía Turística y Delivery en Aluminé',
     description: 'La Guía Turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé.',
-    images: ['https://AluminéGO.ar/og-muelle.jpg'],
+    images: ['https://aluminego.ar/og-muelle.jpg'],
   }
 };
 

@@ -422,7 +422,7 @@ export default function PortalPerfilPage() {
           <div style={{ marginTop: '16px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
             <h3 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: '#1e293b' }}>Ubicación en el Mapa</h3>
             <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '16px' }}>
-              Los comercios con <strong>Plan Comercio Completo</strong> aparecerán automáticamente en el mapa interactivo. Para obtener tus coordenadas, busca tu local en Google Maps, haz clic derecho sobre el punto rojo y copia los números que aparecen (ej: -38.8951, -71.1824).
+              Los comercios con <strong>Plan Comercio Completo</strong> aparecerán automáticamente en el mapa interactivo. Para obtener tus coordenadas, busca tu local en Google Maps, haz clic derecho sobre el punto rojo y copia los números que aparecen (ej: -39.2372, -70.9314).
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
@@ -443,7 +443,7 @@ export default function PortalPerfilPage() {
                   autoComplete="off"
                   value={formData.longitude} 
                   onChange={e => setFormData({ ...formData, longitude: e.target.value })}
-                  placeholder="Ej: -71.1824"
+                  placeholder="Ej: -70.9314"
                   style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '1rem' }}
                 />
               </div>

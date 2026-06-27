@@ -40,8 +40,8 @@ export default function AccommodationsAdminPage() {
     description: '',
     features: [] as string[],
     selectedPricingKeys: [] as string[],
-    latitude: '-38.87942114574949',
-    longitude: '-71.18375154775678',
+    latitude: '-39.237200',
+    longitude: '-70.931400',
     openingHours: DEFAULT_SCHEDULE_STRING
   });
   
@@ -105,7 +105,7 @@ export default function AccommodationsAdminPage() {
       });
     } else {
       setEditingAcc(null);
-      setFormData({ name: '', type: '', image: '', whatsapp: '', description: '', features: [], selectedPricingKeys: [], latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING });
+      setFormData({ name: '', type: '', image: '', whatsapp: '', description: '', features: [], selectedPricingKeys: [], latitude: '-39.237200', longitude: '-70.931400', openingHours: DEFAULT_SCHEDULE_STRING });
     }
     setIsModalOpen(true);
   };
@@ -501,7 +501,7 @@ export default function AccommodationsAdminPage() {
                 </p>
                 <div className="form-row-2">
                   <div className="form-group">
-                    <label>Latitud (Ej: -38.8833)</label>
+                    <label>Latitud (Ej: -39.2372)</label>
                     <input 
                       type="text" 
                       value={formData.latitude} 
@@ -510,7 +510,7 @@ export default function AccommodationsAdminPage() {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Longitud (Ej: -71.1667)</label>
+                    <label>Longitud (Ej: -70.9314)</label>
                     <input 
                       type="text" 
                       value={formData.longitude} 

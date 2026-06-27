@@ -42,8 +42,8 @@ export default function BusinessesAdminPage() {
     selectedPricingKeys: [] as string[],
     description: '',
     details: '',
-    latitude: '-38.87942114574949',
-    longitude: '-71.18375154775678',
+    latitude: '-39.237200',
+    longitude: '-70.931400',
     openingHours: DEFAULT_SCHEDULE_STRING
   });
   
@@ -100,7 +100,7 @@ export default function BusinessesAdminPage() {
       });
     } else {
       setEditingBusiness(null);
-      setFormData({ name: '', image: '', whatsapp: '', categoryId: '', menu: [], selectedPricingKeys: [], description: '', details: '', latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING });
+      setFormData({ name: '', image: '', whatsapp: '', categoryId: '', menu: [], selectedPricingKeys: [], description: '', details: '', latitude: '-39.237200', longitude: '-70.931400', openingHours: DEFAULT_SCHEDULE_STRING });
     }
     setNewMenuItem({ name: '', description: '', price: '', image: '' });
     setEditingMenuItemId(null);
@@ -487,7 +487,7 @@ export default function BusinessesAdminPage() {
                           type="text" 
                           value={formData.latitude} 
                           onChange={(e) => setFormData({...formData, latitude: e.target.value})}
-                          placeholder="-38.8833"
+                          placeholder="-39.2372"
                         />
                       </div>
                       <div className="form-group" style={{ marginBottom: 0 }}>
@@ -496,7 +496,7 @@ export default function BusinessesAdminPage() {
                           type="text" 
                           value={formData.longitude} 
                           onChange={(e) => setFormData({...formData, longitude: e.target.value})}
-                          placeholder="-71.1667"
+                          placeholder="-70.9314"
                         />
                       </div>
                     </div>

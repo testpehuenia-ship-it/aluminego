@@ -39,8 +39,8 @@ export default function AdventuresAdminPage() {
     description: '',
     details: '',
     selectedPricingKeys: [] as string[],
-    latitude: '-38.87942114574949',
-    longitude: '-71.18375154775678',
+    latitude: '-39.237200',
+    longitude: '-70.931400',
     openingHours: DEFAULT_SCHEDULE_STRING
   });
   
@@ -102,7 +102,7 @@ export default function AdventuresAdminPage() {
       });
     } else {
       setEditingAdventure(null);
-      setFormData({ name: '', image: '', whatsapp: '', category: '', description: '', details: '', selectedPricingKeys: [], latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING });
+      setFormData({ name: '', image: '', whatsapp: '', category: '', description: '', details: '', selectedPricingKeys: [], latitude: '-39.237200', longitude: '-70.931400', openingHours: DEFAULT_SCHEDULE_STRING });
     }
     setIsModalOpen(true);
   };
@@ -396,7 +396,7 @@ export default function AdventuresAdminPage() {
                           type="text" 
                           value={formData.latitude} 
                           onChange={(e) => setFormData({...formData, latitude: e.target.value})}
-                          placeholder="-38.8833"
+                          placeholder="-39.2372"
                         />
                       </div>
                       <div className="form-group" style={{ marginBottom: 0 }}>
@@ -405,7 +405,7 @@ export default function AdventuresAdminPage() {
                           type="text" 
                           value={formData.longitude} 
                           onChange={(e) => setFormData({...formData, longitude: e.target.value})}
-                          placeholder="-71.1667"
+                          placeholder="-70.9314"
                         />
                       </div>
                     </div>

@@ -43,8 +43,8 @@ export default function LocalServicesAdminPage() {
     bonifiedKeys: [] as string[],
     discountAmount: 0,
     linkedSections: [] as string[],
-    latitude: '-38.87942114574949',
-    longitude: '-71.18375154775678',
+    latitude: '-39.237200',
+    longitude: '-70.931400',
     openingHours: DEFAULT_SCHEDULE_STRING
   });
   
@@ -126,7 +126,7 @@ export default function LocalServicesAdminPage() {
       });
     } else {
       setEditingService(null);
-      setFormData({ name: '', category: '', subcategory: '', address: '', whatsapp: '', image: '', description: '', details: '', selectedPricingKeys: [], bonifiedKeys: [], discountAmount: 0, linkedSections: [], latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING });
+      setFormData({ name: '', category: '', subcategory: '', address: '', whatsapp: '', image: '', description: '', details: '', selectedPricingKeys: [], bonifiedKeys: [], discountAmount: 0, linkedSections: [], latitude: '-39.237200', longitude: '-70.931400', openingHours: DEFAULT_SCHEDULE_STRING });
     }
     setIsModalOpen(true);
   };
@@ -470,7 +470,7 @@ export default function LocalServicesAdminPage() {
                       type="text" 
                       value={formData.latitude} 
                       onChange={(e) => setFormData({...formData, latitude: e.target.value})}
-                      placeholder="-38.8833"
+                      placeholder="-39.2372"
                     />
                   </div>
                   <div className="form-group" style={{ marginBottom: 0 }}>
@@ -479,7 +479,7 @@ export default function LocalServicesAdminPage() {
                       type="text" 
                       value={formData.longitude} 
                       onChange={(e) => setFormData({...formData, longitude: e.target.value})}
-                      placeholder="-71.1667"
+                      placeholder="-70.9314"
                     />
                   </div>
                 </div>

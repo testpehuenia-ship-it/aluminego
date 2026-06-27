@@ -507,7 +507,7 @@ export default function MapAdminPage() {
                     step="any"
                     value={markerFormData.latitude} 
                     onChange={(e) => setMarkerFormData({...markerFormData, latitude: e.target.value})}
-                    placeholder="Ej: -38.8833"
+                    placeholder="Ej: -39.2372"
                     required
                   />
                 </div>
@@ -518,7 +518,7 @@ export default function MapAdminPage() {
                     step="any"
                     value={markerFormData.longitude} 
                     onChange={(e) => setMarkerFormData({...markerFormData, longitude: e.target.value})}
-                    placeholder="Ej: -71.1667"
+                    placeholder="Ej: -70.9314"
                     required
                   />
                 </div>

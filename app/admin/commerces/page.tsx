@@ -38,8 +38,8 @@ export default function CommercesAdminPage() {
     image: '',
     whatsapp: '',
     description: '',
-    latitude: '-38.87942114574949',
-    longitude: '-71.18375154775678',
+    latitude: '-39.237200',
+    longitude: '-70.931400',
     locality: 'Aluminé',
     details: '',
     selectedPricingKeys: [] as string[],
@@ -112,8 +112,8 @@ export default function CommercesAdminPage() {
         image: '', 
         whatsapp: '', 
         description: '', 
-        latitude: '-38.87942114574949',
-        longitude: '-71.18375154775678',
+        latitude: '-39.237200',
+        longitude: '-70.931400',
         locality: 'Aluminé',
         details: '', 
         selectedPricingKeys: [],
@@ -504,7 +504,7 @@ export default function CommercesAdminPage() {
                           type="text" 
                           value={formData.latitude} 
                           onChange={(e) => setFormData({...formData, latitude: e.target.value})}
-                          placeholder="-38.8833"
+                          placeholder="-39.2372"
                         />
                       </div>
                       <div className="form-group" style={{ marginBottom: 0 }}>
@@ -513,7 +513,7 @@ export default function CommercesAdminPage() {
                           type="text" 
                           value={formData.longitude} 
                           onChange={(e) => setFormData({...formData, longitude: e.target.value})}
-                          placeholder="-71.1667"
+                          placeholder="-70.9314"
                         />
                       </div>
                     </div>

@@ -72,8 +72,8 @@ async function main() {
     await prisma.localService.update({
       where: { id: s.id },
       data: {
-        latitude: s.latitude ? s.latitude : -38.87942114574949,
-        longitude: s.longitude ? s.longitude : -71.18375154775678
+        latitude: s.latitude ? s.latitude : -39.237200,
+        longitude: s.longitude ? s.longitude : -70.931400
       }
     });
   }
@@ -96,8 +96,8 @@ async function main() {
     await prisma.business.update({
       where: { id: b.id },
       data: {
-        latitude: b.latitude || -38.87942114574949,
-        longitude: b.longitude || -71.18375154775678,
+        latitude: b.latitude || -39.237200,
+        longitude: b.longitude || -70.931400,
         openingHours: b.openingHours || DEFAULT_SCHEDULE_STRING
       }
     });
@@ -119,8 +119,8 @@ async function main() {
     await prisma.accommodation.update({
       where: { id: a.id },
       data: {
-        latitude: a.latitude || -38.87942114574949,
-        longitude: a.longitude || -71.18375154775678,
+        latitude: a.latitude || -39.237200,
+        longitude: a.longitude || -70.931400,
         openingHours: a.openingHours || DEFAULT_SCHEDULE_STRING
       }
     });
@@ -142,8 +142,8 @@ async function main() {
     await prisma.adventure.update({
       where: { id: adv.id },
       data: {
-        latitude: adv.latitude || -38.87942114574949,
-        longitude: adv.longitude || -71.18375154775678,
+        latitude: adv.latitude || -39.237200,
+        longitude: adv.longitude || -70.931400,
         openingHours: adv.openingHours || DEFAULT_SCHEDULE_STRING
       }
     });
@@ -167,8 +167,8 @@ async function main() {
     await prisma.commerce.update({
       where: { id: c.id },
       data: {
-        latitude: c.latitude || -38.87942114574949,
-        longitude: c.longitude || -71.18375154775678,
+        latitude: c.latitude || -39.237200,
+        longitude: c.longitude || -70.931400,
         openingHours: c.openingHours || DEFAULT_SCHEDULE_STRING,
         locality: c.locality || 'Aluminé'
       }

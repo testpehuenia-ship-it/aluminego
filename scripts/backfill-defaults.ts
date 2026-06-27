@@ -26,12 +26,12 @@ async function main() {
     console.log('Actualizando LocalService...');
     // Latitud
     const r1 = await client.execute({
-      sql: 'UPDATE "LocalService" SET "latitude" = -38.87942114574949 WHERE "latitude" IS NULL OR "latitude" = 0',
+      sql: 'UPDATE "LocalService" SET "latitude" = -39.237200 WHERE "latitude" IS NULL OR "latitude" = 0',
       args: []
     });
     // Longitud
     const r2 = await client.execute({
-      sql: 'UPDATE "LocalService" SET "longitude" = -71.18375154775678 WHERE "longitude" IS NULL OR "longitude" = 0',
+      sql: 'UPDATE "LocalService" SET "longitude" = -70.931400 WHERE "longitude" IS NULL OR "longitude" = 0',
       args: []
     });
     // Horarios
@@ -57,11 +57,11 @@ async function main() {
     try {
       console.log(`Actualizando tabla ${table}...`);
       const r1 = await client.execute({
-        sql: `UPDATE "${table}" SET "latitude" = -38.87942114574949 WHERE "latitude" IS NULL OR "latitude" = 0`,
+        sql: `UPDATE "${table}" SET "latitude" = -39.237200 WHERE "latitude" IS NULL OR "latitude" = 0`,
         args: []
       });
       const r2 = await client.execute({
-        sql: `UPDATE "${table}" SET "longitude" = -71.18375154775678 WHERE "longitude" IS NULL OR "longitude" = 0`,
+        sql: `UPDATE "${table}" SET "longitude" = -70.931400 WHERE "longitude" IS NULL OR "longitude" = 0`,
         args: []
       });
       const r3 = await client.execute({

@@ -161,7 +161,7 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
                 ]
               }
             : 'https://tiles.openfreemap.org/styles/liberty',
-          center: isLocal ? [-71.1667, -38.8833] : [-70.3, -38.8], 
+          center: isLocal ? [-70.9314, -39.2372] : [-70.3, -38.8], 
           zoom: isLocal ? 12 : 6,
           pitch: 0, 
           bearing: 0
@@ -172,7 +172,7 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
         if (isLocal) {
           // Draw Aluminé Local Markers
           let markersToRender = initialMarkers && initialMarkers.length > 0 ? initialMarkers : [
-            { id: '1', title: 'Aluminé', longitude: -71.1667, latitude: -38.8833, color: '#ea580c' }
+            { id: '1', title: 'Aluminé', longitude: -70.9314, latitude: -39.2372, color: '#ea580c' }
           ];
 
           if (categoryFilter !== 'all') {

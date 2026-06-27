@@ -1,11 +1,11 @@
 {
   "name": "AluminéGO",
   "short_name": "AluminéGO",
-  "description": "Descubre dónde comer, alojarte y qué hacer en Aluminé y Moquehue.",
+  "description": "Descubre dónde comer, alojarte y qué hacer en Aluminé.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#27ae60",
+  "theme_color": "#0013C5",
   "icons": [
     {
       "src": "/icon-192x192.png",

@@ -217,7 +217,7 @@ export default function NotificationsAdminPage() {
             <div className="preview-phone">
               <div className="preview-header">
                 <img src="/icon.png" alt="icon" className="preview-icon" />
-                <span>AluminéGO â€¢ Ahora</span>
+                <span>AluminéGO • Ahora</span>
               </div>
               <div className="preview-body">
                 <strong>{title || 'Título de ejemplo'}</strong>

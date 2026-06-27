@@ -181,11 +181,11 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
                   {time.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' })}
                 </div>
                 <div style={{ fontSize: '1.2rem', fontWeight: 800, fontFamily: 'var(--font-oswald), sans-serif', letterSpacing: '0.5px', lineHeight: 1.2 }}>
-                  {Math.round(weatherData.current.temperature)}° â€¢ {currentMeta.text}
+                  {Math.round(weatherData.current.temperature)}° • {currentMeta.text}
                 </div>
                 <div style={{ fontSize: '0.9rem', color: '#9ca3af', display: 'flex', gap: '8px', alignItems: 'center', marginTop: '2px' }}>
                   <span style={{ color: currentMeta.bg, fontWeight: 700 }}>{time.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}</span>
-                  <span>â€¢</span>
+                  <span>•</span>
                   <span>Viento {weatherData.current.windSpeed} km/h</span>
                 </div>
               </div>
@@ -226,7 +226,7 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
       <section style={{ padding: '30px 20px', maxWidth: '600px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
-            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-dark-green)' }}>DESCUBRÁ Aluminé</h3>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-dark-green)' }}>DESCUBRÍ Aluminé</h3>
             <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Opciones para cada momento de tu viaje</p>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>

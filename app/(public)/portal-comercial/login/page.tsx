@@ -75,7 +75,7 @@ export default function PortalLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '1rem' }}
-              placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+              placeholder="••••••••"
             />
           </div>
           <button 

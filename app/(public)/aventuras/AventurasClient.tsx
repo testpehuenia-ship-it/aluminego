@@ -520,7 +520,7 @@ export default function AventurasClient({ initialAdventures, initialCategories }
                     display: 'flex',
                     alignItems: 'center',
                   }}>
-                    <span style={{ color: 'var(--color-green)', marginRight: '8px', fontSize: '1.2rem' }}>â€¢</span>
+                    <span style={{ color: 'var(--color-green)', marginRight: '8px', fontSize: '1.2rem' }}>•</span>
                     {detail.trim()}
                   </div>
                 ))}

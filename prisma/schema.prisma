@@ -21,24 +21,26 @@ model Category {
 }
 
 model Business {
-  id         String     @id @default(cuid())
-  name       String
-  description String?
-  details    String?
-  image      String
-  whatsapp   String
-  latitude   Float?
-  longitude  Float?
-  category   Category   @relation(fields: [categoryId], references: [id])
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  details      String?
+  image        String
+  whatsapp     String
+  latitude     Float?
+  longitude    Float?
+  category     Category      @relation(fields: [categoryId], references: [id])
   categoryId   String
   menu         MenuItem[]
   subscription Subscription?
   portalUserId String?
-  portalUser   PortalUser? @relation(fields: [portalUserId], references: [id])
+  portalUser   PortalUser?   @relation(fields: [portalUserId], references: [id])
   reviews      Review[]
   openingHours String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  isVerified   Boolean       @default(false)
+  showSchedule Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model MenuItem {
@@ -54,22 +56,24 @@ model MenuItem {
 }
 
 model Accommodation {
-  id          String    @id @default(cuid())
-  name        String
-  type        String    // e.g., "Cabaña", "Hotel"
-  image       String
-  whatsapp    String
+  id           String        @id @default(cuid())
+  name         String
+  type         String        // e.g., "Cabaña", "Hotel"
+  image        String
+  whatsapp     String
   description  String?
   latitude     Float?
   longitude    Float?
   features     Feature[]
   subscription Subscription?
   portalUserId String?
-  portalUser   PortalUser? @relation(fields: [portalUserId], references: [id])
+  portalUser   PortalUser?   @relation(fields: [portalUserId], references: [id])
   reviews      Review[]
   openingHours String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  isVerified   Boolean       @default(false)
+  showSchedule Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model Feature {
@@ -80,43 +84,47 @@ model Feature {
 }
 
 model Adventure {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  image       String
-  whatsapp    String
-  category     String   // e.g., "Trekking", "Pesca"
-  details      String   // Guardaremos como JSON string o separado por comas
+  id           String        @id @default(cuid())
+  name         String
+  description  String?
+  image        String
+  whatsapp     String
+  category     String        // e.g., "Trekking", "Pesca"
+  details      String        // Guardaremos como JSON string o separado por comas
   latitude     Float?
   longitude    Float?
   subscription Subscription?
   portalUserId String?
-  portalUser   PortalUser? @relation(fields: [portalUserId], references: [id])
+  portalUser   PortalUser?   @relation(fields: [portalUserId], references: [id])
   reviews      Review[]
   openingHours String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isVerified   Boolean       @default(false)
+  showSchedule Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model LocalService {
-  id          String   @id @default(cuid())
-  name        String
-  category    String   // e.g., "Salud", "Seguridad", "Comercios"
-  subcategory String?  // e.g., "Poda", "Raleo"
-  address     String?
-  whatsapp    String?
-  image       String?  // Ahora guardará múltiple separadas por coma
-  description String?  // Texto descriptivo para Plan Completo
-  details     String?  // Características/Servicios (JSON o separadas por coma)
-  latitude    Float?
-  longitude   Float?
+  id           String        @id @default(cuid())
+  name         String
+  category     String        // e.g., "Salud", "Seguridad", "Comercios"
+  subcategory  String?       // e.g., "Poda", "Raleo"
+  address      String?
+  whatsapp     String?
+  image        String?       // Ahora guardará múltiple separadas por coma
+  description  String?       // Texto descriptivo para Plan Completo
+  details      String?       // Características/Servicios (JSON o separadas por coma)
+  latitude     Float?
+  longitude    Float?
   subscription Subscription?
   portalUserId String?
-  portalUser   PortalUser? @relation(fields: [portalUserId], references: [id])
+  portalUser   PortalUser?   @relation(fields: [portalUserId], references: [id])
   reviews      Review[]
   openingHours String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isVerified   Boolean       @default(false)
+  showSchedule Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model Commerce {
@@ -136,6 +144,8 @@ model Commerce {
   portalUser   PortalUser?      @relation(fields: [portalUserId], references: [id])
   reviews      Review[]
   openingHours String?
+  isVerified   Boolean          @default(false)
+  showSchedule Boolean          @default(false)
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 }

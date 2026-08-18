@@ -82,6 +82,8 @@ export async function PUT(
           longitude: lngFloat,
           locality: finalLocality,
           openingHours: finalOpeningHours,
+          isVerified: Boolean(isVerified),
+          showSchedule: Boolean(showSchedule),
           details: {
             create: details ? details.map((d: string) => ({ name: d })) : []
           }

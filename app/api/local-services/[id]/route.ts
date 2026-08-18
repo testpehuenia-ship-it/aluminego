@@ -86,7 +86,21 @@ export async function PUT(
       const upperName = name ? name.toUpperCase() : '';
       const updatedService = await tx.localService.update({
         where: { id },
-        data: { name: upperName, category, subcategory, address: finalAddress, whatsapp, image, description, details, latitude: latFloat, longitude: lngFloat, openingHours: finalOpeningHours }
+        data: {
+          name: upperName,
+          category,
+          subcategory,
+          address: finalAddress,
+          whatsapp,
+          image,
+          description,
+          details,
+          latitude: latFloat,
+          longitude: lngFloat,
+          openingHours: finalOpeningHours,
+          isVerified: Boolean(isVerified),
+          showSchedule: Boolean(showSchedule)
+        }
       });
 
       if (selectedPricingKeys && Array.isArray(selectedPricingKeys)) {

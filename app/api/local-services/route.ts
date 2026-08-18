@@ -54,7 +54,21 @@ export async function POST(request: Request) {
       let generatedCredentials = null;
       const upperName = name ? name.toUpperCase() : '';
       const service = await tx.localService.create({
-        data: { name: upperName, category, subcategory, address: finalAddress, whatsapp, image, description, details, latitude: latFloat, longitude: lngFloat, openingHours: finalOpeningHours }
+        data: {
+          name: upperName,
+          category,
+          subcategory,
+          address: finalAddress,
+          whatsapp,
+          image,
+          description,
+          details,
+          latitude: latFloat,
+          longitude: lngFloat,
+          openingHours: finalOpeningHours,
+          isVerified: Boolean(isVerified),
+          showSchedule: Boolean(showSchedule)
+        }
       });
 
       if (selectedPricingKeys && Array.isArray(selectedPricingKeys) && selectedPricingKeys.length > 0) {

@@ -1,17 +1,17 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import { prisma, getActiveSubscriptionWhere } from '@/lib/db';
 import GuiaClient from './GuiaClient';
 
 export const metadata: Metadata = {
   title: 'Guía Local de Aluminé | Servicios',
-  description: 'Directorio completo de servicios pÁºblicos, emergencias, profesionales, instituciones y comercios en Aluminé. Dirección y contacto directo.',
-  keywords: ['guia local Aluminé', 'servicios Aluminé', 'farmacias en Aluminé', 'emergencias Aluminé', 'telefonos utiles Aluminé'],
+  description: 'Directorio completo de servicios públicos, emergencias, profesionales, instituciones y comercios en Aluminé. Dirección y contacto directo.',
+  keywords: ['guia local villa alumine', 'servicios alumine', 'farmacias en villa alumine', 'emergencias villa alumine', 'telefonos utiles alumine'],
   alternates: {
-    canonical: 'https://www.AluminéGO.ar/guia',
+    canonical: 'https://www.aluminego.ar/guia',
   },
   openGraph: {
     title: 'Guía Local y Servicios en Aluminé | AluminéGO',
-    description: 'Encuentra instituciones pÁºblicas, nÁºmeros de emergencia, profesionales, servicios y más en el directorio definitivo de la villa.',
+    description: 'Encuentra instituciones públicas, números de emergencia, profesionales, servicios y más en el directorio definitivo de la villa.',
     url: '/guia',
   }
 };
@@ -118,7 +118,7 @@ export default async function Page() {
     '@type': 'ItemList',
     'name': 'Guía Local y Servicios en Aluminé',
     'description': 'Directorio local de servicios de emergencia, salud, fuerzas de seguridad, profesionales, instituciones y comercios de Aluminé.',
-    'url': 'https://www.AluminéGO.ar/guia',
+    'url': 'https://www.aluminego.ar/guia',
     'itemListElement': mappedServices.map((service, index) => ({
       '@type': 'ListItem',
       'position': index + 1,
@@ -127,12 +127,12 @@ export default async function Page() {
         'name': service.name,
         'image': service.image ? service.image.split(',').filter(Boolean) : [],
         'description': service.description || undefined,
-        'url': `https://www.AluminéGO.ar${service.targetUrl}`,
+        'url': `https://www.aluminego.ar${service.targetUrl}`,
         'telephone': service.whatsapp && service.subscription ? `+549${service.whatsapp}` : undefined,
         'address': {
           '@type': 'PostalAddress',
           'addressLocality': 'Aluminé',
-          'addressRegion': 'NeuQuén',
+          'addressRegion': 'Neuquén',
           'addressCountry': 'AR',
           'streetAddress': service.address || undefined
         }
@@ -150,5 +150,3 @@ export default async function Page() {
     </>
   );
 }
-
-

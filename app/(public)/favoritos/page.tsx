@@ -1,4 +1,4 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import FavoritosClient from './FavoritosClient';
 
 export const metadata: Metadata = {
@@ -13,4 +13,3 @@ export default function FavoritosPage() {
     </main>
   );
 }
-

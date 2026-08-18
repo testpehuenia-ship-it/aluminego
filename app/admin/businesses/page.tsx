@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -42,9 +42,11 @@ export default function BusinessesAdminPage() {
     selectedPricingKeys: [] as string[],
     description: '',
     details: '',
-    latitude: '-39.237200',
-    longitude: '-70.931400',
-    openingHours: DEFAULT_SCHEDULE_STRING
+    latitude: '-38.87942114574949',
+    longitude: '-71.18375154775678',
+    openingHours: DEFAULT_SCHEDULE_STRING,
+    isVerified: false,
+    showSchedule: false
   });
   
   const [uploading, setUploading] = React.useState(false);
@@ -96,11 +98,13 @@ export default function BusinessesAdminPage() {
         details: business.details || '',
         latitude: business.latitude ? business.latitude.toString() : '',
         longitude: business.longitude ? business.longitude.toString() : '',
-        openingHours: business.openingHours || ''
+        openingHours: business.openingHours || '',
+        isVerified: business.isVerified || false,
+        showSchedule: business.showSchedule || false
       });
     } else {
       setEditingBusiness(null);
-      setFormData({ name: '', image: '', whatsapp: '', categoryId: '', menu: [], selectedPricingKeys: [], description: '', details: '', latitude: '-39.237200', longitude: '-70.931400', openingHours: DEFAULT_SCHEDULE_STRING });
+      setFormData({ name: '', image: '', whatsapp: '', categoryId: '', menu: [], selectedPricingKeys: [], description: '', details: '', latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING, isVerified: false, showSchedule: false });
     }
     setNewMenuItem({ name: '', description: '', price: '', image: '' });
     setEditingMenuItemId(null);
@@ -253,7 +257,7 @@ export default function BusinessesAdminPage() {
           
           // Abrir WhatsApp automáticamente
           const cleanPhone = (creds.whatsapp || '').replace(/\D/g, '');
-          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://AluminéGO.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
+          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
           window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMsg)}`, '_blank');
         } else {
           // Check if any banner plans were selected
@@ -334,7 +338,7 @@ export default function BusinessesAdminPage() {
                   <th>Categoría</th>
                   <th>WhatsApp/Tel</th>
                   <th>Plan Actual</th>
-                  <th>MenÁº</th>
+                  <th>Menú</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -476,6 +480,26 @@ export default function BusinessesAdminPage() {
                       onChange={(val) => setFormData({...formData, openingHours: val})}
                     />
                   </div>
+                  <div style={{ display: 'flex', gap: '20px', marginTop: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.isVerified} 
+                        onChange={(e) => setFormData({...formData, isVerified: e.target.checked})}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <b>Comercio Verificado (Sello Seguro)</b>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.showSchedule} 
+                        onChange={(e) => setFormData({...formData, showSchedule: e.target.checked})}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <b>Mostrar Horarios Públicamente</b>
+                    </label>
+                  </div>
                   <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px', marginTop: '16px' }}>
                     <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                       <MapPin size={16} /> Geolocalización (Mapa)
@@ -487,7 +511,7 @@ export default function BusinessesAdminPage() {
                           type="text" 
                           value={formData.latitude} 
                           onChange={(e) => setFormData({...formData, latitude: e.target.value})}
-                          placeholder="-39.2372"
+                          placeholder="-38.8833"
                         />
                       </div>
                       <div className="form-group" style={{ marginBottom: 0 }}>
@@ -496,16 +520,16 @@ export default function BusinessesAdminPage() {
                           type="text" 
                           value={formData.longitude} 
                           onChange={(e) => setFormData({...formData, longitude: e.target.value})}
-                          placeholder="-70.9314"
+                          placeholder="-71.1667"
                         />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Sección MenÁº */}
+                {/* Sección Menú */}
                 <div className="modal-section">
-                  <h3 className="section-title"><UtensilsCrossed size={18} /> Gestión del MenÁº</h3>
+                  <h3 className="section-title"><UtensilsCrossed size={18} /> Gestión del Menú</h3>
                   
                   <div 
                     className="menu-form" 
@@ -590,10 +614,10 @@ export default function BusinessesAdminPage() {
                   </div>
 
                   <div className="menu-list-container">
-                    <label>Items en MenÁº ({formData.menu.length})</label>
+                    <label>Items en Menú ({formData.menu.length})</label>
                     <div className="menu-scroll-list">
                       {formData.menu.length === 0 ? (
-                        <div className="empty-menu">AÁºn no hay platos en el menÁº</div>
+                        <div className="empty-menu">Aún no hay platos en el menú</div>
                       ) : (
                         formData.menu.map((item, idx) => (
                           <div key={item.id || idx} className="menu-item-card-full">
@@ -660,7 +684,7 @@ export default function BusinessesAdminPage() {
             </div>
 
             <a 
-              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://AluminéGO.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
+              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"
@@ -773,5 +797,3 @@ export default function BusinessesAdminPage() {
     </div>
   );
 }
-
-

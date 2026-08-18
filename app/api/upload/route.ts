@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 import { v2 as cloudinary } from 'cloudinary';
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const file: File | null = data.get('file') as unknown as File;
 
     if (!file) {
-      return NextResponse.json({ success: false, error: 'No se subió ningÁºn archivo' });
+      return NextResponse.json({ success: false, error: 'No se subió ningún archivo' });
     }
 
     const isBanner = data.get('isBanner') === 'true';
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
       const dataUri = `data:${mimeType};base64,${base64}`;
 
       const result = await cloudinary.uploader.upload(dataUri, {
-        folder: 'AluminéGO',
+        folder: 'aluminego',
         resource_type: 'auto',
         format: finalExtension === 'jpeg' ? 'jpg' : finalExtension,
       });
@@ -133,5 +133,3 @@ export async function POST(request: Request) {
     });
   }
 }
-
-

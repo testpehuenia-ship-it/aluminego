@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { 
@@ -507,7 +507,7 @@ export default function MapAdminPage() {
                     step="any"
                     value={markerFormData.latitude} 
                     onChange={(e) => setMarkerFormData({...markerFormData, latitude: e.target.value})}
-                    placeholder="Ej: -39.2372"
+                    placeholder="Ej: -38.8833"
                     required
                   />
                 </div>
@@ -518,7 +518,7 @@ export default function MapAdminPage() {
                     step="any"
                     value={markerFormData.longitude} 
                     onChange={(e) => setMarkerFormData({...markerFormData, longitude: e.target.value})}
-                    placeholder="Ej: -70.9314"
+                    placeholder="Ej: -71.1667"
                     required
                   />
                 </div>
@@ -530,7 +530,7 @@ export default function MapAdminPage() {
                   type="text" 
                   value={markerFormData.description} 
                   onChange={(e) => setMarkerFormData({...markerFormData, description: e.target.value})}
-                  placeholder="Ej: Muelle pÁºblico y paseos lacustres"
+                  placeholder="Ej: Muelle público y paseos lacustres"
                 />
               </div>
 
@@ -618,5 +618,3 @@ export default function MapAdminPage() {
     </div>
   );
 }
-
-

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { useFavorites } from '@/components/FavoritesContext';
@@ -57,7 +57,7 @@ export default function FavoritosClient() {
               </Link>
               <div style={{ padding: '16px', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: 'var(--color-orange)', fontWeight: 700, marginBottom: '4px' }}>
-                  {fav.type === 'gastronomia' ? 'gastronomía' :
+                  {fav.type === 'gastronomia' ? 'Gastronomía' :
                    fav.type === 'alojamiento' ? 'Alojamiento' :
                    fav.type === 'aventura' ? 'Aventura' :
                    fav.type === 'comercio' ? 'Comercio' :
@@ -69,7 +69,7 @@ export default function FavoritosClient() {
                 </Link>
                 <div style={{ marginTop: 'auto' }}>
                   <Link href={fav.url} style={{ fontSize: '0.9rem', color: 'var(--color-green)', fontWeight: 600, textDecoration: 'none' }}>
-                    Ver detalles â†’
+                    Ver detalles →
                   </Link>
                 </div>
               </div>
@@ -87,5 +87,3 @@ export default function FavoritosClient() {
     </div>
   );
 }
-
-

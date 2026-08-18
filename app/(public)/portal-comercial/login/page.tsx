@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from 'react';
 import { usePortal } from '@/components/PortalContext';
@@ -89,12 +89,10 @@ export default function PortalLoginPage() {
 
         <div style={{ marginTop: '24px', textAlign: 'center' }}>
           <Link href="/" style={{ color: 'var(--color-green)', fontSize: '0.9rem', textDecoration: 'none', fontWeight: 600 }}>
-            â† Volver a AluminéGO
+            ← Volver a AluminéGO
           </Link>
         </div>
       </div>
     </div>
   );
 }
-
-

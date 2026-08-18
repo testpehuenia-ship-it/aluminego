@@ -7,6 +7,8 @@ import Link from 'next/link';
 import ReviewSection from '@/components/ReviewSection';
 import EntityMap from '@/components/EntityMap';
 import OpeningStatusBadge from '@/components/OpeningStatusBadge';
+import VerifiedBadge from '@/components/VerifiedBadge';
+
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -129,7 +131,7 @@ export default async function AventuraDetallePage({ params }: PageProps) {
                 </div>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
-                <OpeningStatusBadge openingHours={aventura.openingHours} showWeeklySchedule={true} />
+                <OpeningStatusBadge openingHours={aventura.openingHours} showWeeklySchedule={true} isVisible={aventura.showSchedule} />
               </div>
             </div>
             

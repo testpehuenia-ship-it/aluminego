@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getDPVStatus } from '@/lib/services/dpv';
 import { getAluminéWeather } from '@/lib/services/weather';
 
@@ -20,4 +20,3 @@ export async function GET() {
     );
   }
 }
-

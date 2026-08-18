@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { Loader2, Search } from 'lucide-react';
 import FavoriteButton from '@/components/FavoriteButton';
 import OpeningStatusBadge from '@/components/OpeningStatusBadge';
+import VerifiedBadge from '@/components/VerifiedBadge';
+
 
 export default function AlojarseClient({ initialAccommodations, initialCategories }: { initialAccommodations?: any[], initialCategories?: any[] }) {
   const [selectedAlojamiento, setSelectedAlojamiento] = useState<any | null>(null);
@@ -163,21 +165,23 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
           </div>
           <div className="banner-subtitle">ENCUENTRA TU DESCANSO IDEAL</div>
         </div>
-        <div className="banner-categories" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gridAutoRows: '150px' }}>
-          {displayableCats.slice(0, 6).map((item) => {
-            const style = categoryStyles[item.title] || { color: '#0d9488', bgImage: item.image };
-            return (
-              <a 
-                href={`#${item.title.toLowerCase()}`} 
-                key={item.id} 
-                className="banner-item" 
-                style={{ backgroundImage: `url(${style.bgImage})` }}
-              >
-                <div className="banner-overlay" style={{ borderBottom: `4px solid ${style.color}` }}></div>
-                <span className="banner-text">{item.title.toUpperCase()}</span>
-              </a>
-            );
-          })}
+        <div className="banner-categories" style={{ gridTemplateColumns: 'repeat(2, 1fr)', gridTemplateRows: 'repeat(2, 150px)' }}>
+          {[
+            { cat: "Cabañas", color: "#e63946", bgImage: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80" },
+            { cat: "Hoteles", color: "#f4a261", bgImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" },
+            { cat: "Hostel", color: "#e9c46a", bgImage: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80" },
+            { cat: "Campings", color: "#2a9d8f", bgImage: "https://images.unsplash.com/photo-1508873696983-2dfd5898f08b?auto=format&fit=crop&w=800&q=80" }
+          ].map((item) => (
+            <a 
+              href={`#${item.cat.toLowerCase()}`} 
+              key={item.cat} 
+              className="banner-item" 
+              style={{ backgroundImage: `url(${item.bgImage})` }}
+            >
+              <div className="banner-overlay" style={{ borderBottom: `4px solid ${item.color}` }}></div>
+              <span className="banner-text">{item.cat.toUpperCase()}</span>
+            </a>
+          ))}
         </div>
       </div>
       
@@ -240,14 +244,14 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
               transition: 'background-color 0.2s'
             }}
           >
-            ✖
+            ✕
           </button>
         )}
       </div>
 
       <h1 className="section-title">¿Dónde vas a dormir?</h1>
 
-      {/* SECCIÁ“N DE DESTACADOS (CON BANNER) */}
+      {/* SECCIÓN DE DESTACADOS (CON BANNER) */}
       {bannerAccommodations.length > 0 && (
         <section style={{ marginBottom: '50px' }}>
           <h2 style={{ fontSize: '1.5rem', borderLeft: '5px solid var(--color-orange)', paddingLeft: '12px', marginBottom: '24px', color: 'var(--color-text-main)' }}>
@@ -258,7 +262,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
               return (
                 <button 
                   key={alojamiento.id} 
-                  style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: '2px solid var(--color-orange)' }}
+                  style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: '2px solid var(--color-orange)' , position: 'relative' }}
                   onClick={() => setSelectedAlojamiento(alojamiento)}
                   className="commerce-card"
                 >
@@ -278,7 +282,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                   </div>
                   <div style={{ padding: '16px' }}>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{alojamiento.name}</h3>
-                    <OpeningStatusBadge openingHours={alojamiento.openingHours} />
+                    <OpeningStatusBadge openingHours={alojamiento.openingHours} isVisible={alojamiento.showSchedule} />
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
                       {alojamiento.features?.slice(0, 3).map((f: any) => (
                         <span key={f.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
@@ -293,6 +297,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                     </div>
                     <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y reservar</p>
                   </div>
+                  <VerifiedBadge isVerified={alojamiento.isVerified} style={{ bottom: '8px', right: '8px' }} />
                 </button>
               );
             })}
@@ -315,7 +320,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                 {catAccs.sort(sortServices).map(alojamiento => {
                   const isDestacado = alojamiento.subscription?.planType?.includes('plan_basico_destacado') || alojamiento.subscription?.planType?.includes('plan_comercio_completo');
                   return (
-                  <button key={alojamiento.id} style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)' }}
+                  <button key={alojamiento.id} style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)' , position: 'relative' }}
                   onClick={() => setSelectedAlojamiento(alojamiento)}
                   className="commerce-card"
                   >
@@ -335,7 +340,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                     </div>
                     <div style={{ padding: '16px' }}>
                       <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{alojamiento.name}</h3>
-                      <OpeningStatusBadge openingHours={alojamiento.openingHours} />
+                      <OpeningStatusBadge openingHours={alojamiento.openingHours} isVisible={alojamiento.showSchedule} />
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
                         {alojamiento.features?.slice(0, 3).map((f: any) => (
                           <span key={f.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
@@ -350,7 +355,8 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                       </div>
                       <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y reservar</p>
                     </div>
-                  </button>
+                    <VerifiedBadge isVerified={alojamiento.isVerified} style={{ bottom: '8px', right: '8px' }} />
+                </button>
                   );
                 })}
               </div>
@@ -369,7 +375,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
             {unmatchedAccs.sort(sortServices).map(alojamiento => {
               const isDestacado = alojamiento.subscription?.planType?.includes('plan_basico_destacado') || alojamiento.subscription?.planType?.includes('plan_comercio_completo');
               return (
-                <button key={alojamiento.id} style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)' }}
+                <button key={alojamiento.id} style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)' , position: 'relative' }}
                 onClick={() => setSelectedAlojamiento(alojamiento)}
                 className="commerce-card"
                 >
@@ -389,7 +395,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                   </div>
                   <div style={{ padding: '16px' }}>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{alojamiento.name}</h3>
-                    <OpeningStatusBadge openingHours={alojamiento.openingHours} />
+                    <OpeningStatusBadge openingHours={alojamiento.openingHours} isVisible={alojamiento.showSchedule} />
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
                       {alojamiento.features?.slice(0, 3).map((f: any) => (
                         <span key={f.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
@@ -404,6 +410,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                     </div>
                     <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y reservar</p>
                   </div>
+                  <VerifiedBadge isVerified={alojamiento.isVerified} style={{ bottom: '8px', right: '8px' }} />
                 </button>
               );
             })}
@@ -422,7 +429,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
           <div style={{ backgroundColor: 'white', width: '100%', maxWidth: '600px', maxHeight: '90vh', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '24px', overflowY: 'auto', position: 'relative' }}
           onClick={e => e.stopPropagation()}
           >
-            <button onClick={closeModal} style={{ position: 'absolute', top: '16px', right: '16px', fontSize: '1.5rem', fontWeight: 'bold', zIndex: 10 }}>✖</button>
+            <button onClick={closeModal} style={{ position: 'absolute', top: '16px', right: '16px', fontSize: '1.5rem', fontWeight: 'bold', zIndex: 10 }}>✕</button>
             
             <div style={{ position: 'relative', height: '250px', borderRadius: '16px', overflow: 'hidden', marginBottom: '20px', marginTop: '10px' }}>
               {(() => {
@@ -443,7 +450,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                           }}
                           style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 12, fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'background-color 0.2s' }}
                         >
-                          â€¹
+                          ‹
                         </button>
                         {/* Right Arrow */}
                         <button 
@@ -453,7 +460,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                           }}
                           style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 12, fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'background-color 0.2s' }}
                         >
-                          â€º
+                          ›
                         </button>
                         {/* Dots */}
                         <div style={{ position: 'absolute', bottom: '10px', left: '0', right: '0', display: 'flex', justifyContent: 'center', gap: '6px', zIndex: 12 }}>
@@ -471,9 +478,12 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
               })()}
             </div>
 
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '8px' }}>{selectedAlojamiento.name}</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0 }}>{selectedAlojamiento.name}</h2>
+              <VerifiedBadge isVerified={selectedAlojamiento.isVerified} style={{ position: 'relative', bottom: 0, right: 0 }} />
+            </div>
             <p style={{ color: 'var(--color-orange)', fontWeight: 600, marginBottom: '8px', fontSize: '1.1rem' }}>{selectedAlojamiento.type}</p>
-            <OpeningStatusBadge openingHours={selectedAlojamiento.openingHours} showWeeklySchedule={true} />
+            <OpeningStatusBadge openingHours={selectedAlojamiento.openingHours} showWeeklySchedule={true} isVisible={selectedAlojamiento.showSchedule} />
             
             {selectedAlojamiento.description && (
               <p style={{ 
@@ -522,7 +532,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
             </div>
           </div>
         </div>
-      )}
+                    )}
 
       <style jsx global>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -535,5 +545,3 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
     </div>
   );
 }
-
-

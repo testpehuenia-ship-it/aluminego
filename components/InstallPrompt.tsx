@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -34,7 +34,7 @@ export default function InstallPrompt() {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault(); 
       (window as any).deferredPrompt = e;
-      // Mostrar el cartel 2 segundos después de detectar que SÁ se puede instalar
+      // Mostrar el cartel 2 segundos después de detectar que SÍ se puede instalar
       setTimeout(() => setShowPrompt(true), 2000);
     };
 
@@ -156,7 +156,7 @@ export default function InstallPrompt() {
               )}
             </div>
             
-            {/* Corregido a Aluminé (solo P mayÁºscula) */}
+            {/* Corregido a Aluminé (solo P mayúscula) */}
             <h2 style={{ fontFamily: 'var(--font-oswald), sans-serif', fontSize: '1.8rem', margin: '0 0 8px 0' }}>
               <span style={{ color: 'var(--color-green)', fontWeight: 700 }}>Aluminé</span>
               <span style={{ color: 'var(--color-orange)', fontWeight: 700 }}>GO</span>
@@ -165,7 +165,7 @@ export default function InstallPrompt() {
             <p style={{ color: '#444', fontSize: '1.1rem', margin: '0 0 24px 0', lineHeight: 1.4 }}>
               {isInstalling 
                 ? 'Preparando tu app... ¡Ya casi listo!' 
-                : <>¡Lleva AluminéGO siempre con vos!<br/>Instalá la aplicación y disfrutarás de Aluminé estés donde estés.</>}
+                : <>¡Lleva AluminéGO siempre contigo!<br/>Instala la aplicación para disfrutar de Aluminé estés donde estés.</>}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
@@ -211,7 +211,7 @@ export default function InstallPrompt() {
             <div style={{ background: '#f8f9fa', borderRadius: '16px', padding: '20px', marginBottom: '20px', width: '100%' }}>
               <h3 style={{ margin: '0 0 12px 0', color: 'var(--color-green)' }}>Para instalar en iPhone:</h3>
               <ol style={{ textAlign: 'left', margin: 0, paddingLeft: '20px', color: '#444', lineHeight: 1.6 }}>
-                <li>Tocá el botón <b>Compartir</b> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'text-bottom'}}><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> en la barra inferior.</li>
+                <li>Toca el botón <b>Compartir</b> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{verticalAlign: 'text-bottom'}}><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> en la barra inferior.</li>
                 <li>Desliza hacia abajo y selecciona <b>"Agregar a Inicio"</b>.</li>
                 <li>Toca <b>"Agregar"</b> en la esquina superior derecha.</li>
               </ol>
@@ -243,5 +243,3 @@ export default function InstallPrompt() {
     </div>
   );
 }
-
-

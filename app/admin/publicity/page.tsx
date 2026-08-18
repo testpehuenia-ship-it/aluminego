@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
@@ -36,7 +36,7 @@ function PublicityAdminContent() {
     else if (contractedBanners.includes('banner_bottom')) inheritedSection = 3;
 
     const labelMap: Record<string, string> = {
-      QueComer: 'gastronomía',
+      QueComer: 'Gastronomía',
       Dormir: 'Alojamiento',
       Aventuras: 'Aventuras',
       Comercios: 'Comercios',
@@ -431,7 +431,7 @@ function PublicityAdminContent() {
                   >
                     {SECTIONS.map(s => <option key={s} value={s}>Sección {s}</option>)}
                   </select>
-                  <p className="text-xs text-gray-500 mt-1">Ubicación en la Página (1=Arriba)</p>
+                  <p className="text-xs text-gray-500 mt-1">Ubicación en la página (1=Arriba)</p>
                 </div>
                 
                 <div>
@@ -481,7 +481,7 @@ function PublicityAdminContent() {
               
               {isLocationOccupied && (
                 <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm flex items-start gap-2">
-                  <span className="font-bold">âš ï¸ Atención:</span> 
+                  <span className="font-bold">⚠️ Atención:</span> 
                   <span>Esta ubicación ({formData.section}.{formData.order} en {formData.page}) ya está ocupada por otro banner. Si no cambias la ubicación, no podrás guardar.</span>
                 </div>
               )}
@@ -633,7 +633,7 @@ function PublicityAdminContent() {
                         )}
                         {banner.isHeavy && (
                           <div className="absolute top-1 right-1 bg-orange-100 text-orange-800 text-[10px] font-bold px-2 py-0.5 rounded shadow flex items-center gap-1 border border-orange-200">
-                            âš ï¸ Pesado
+                            ⚠️ Pesado
                           </div>
                         )}
                       </div>
@@ -691,5 +691,3 @@ export default function PublicityAdmin() {
     </Suspense>
   );
 }
-
-

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import maplibregl from 'maplibre-gl';
@@ -8,7 +8,7 @@ import PublicityBanner from '@/components/PublicityBanner';
 import { 
   Sun, CloudSun, Cloud, CloudRain, CloudSnow, CloudLightning, Wind, Droplets,
   MapPin, Map as MapIcon, Navigation, Route, AlertTriangle, CalendarDays,
-  Car, Info, ArrowRight, Search, CheckCircle, XCircle, Heart
+  Car, Info, ArrowRight, Search, CheckCircle, XCircle, Heart, X
 } from 'lucide-react';
 import type { DPVUnifiedData, DPVPaso, DPVRouteTramo } from '@/lib/services/dpv';
 import type { WeatherData } from '@/lib/services/weather';
@@ -67,6 +67,7 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
   const [mapLayer, setMapLayer] = useState<'satelite'|'calle'>('satelite');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [routeSearch, setRouteSearch] = useState('');
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
 
   const [dpvData, setDpvData] = useState<DPVUnifiedData | null>(null);
@@ -106,14 +107,25 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
       if (openParam && dpvData) {
         const openId = parseInt(openParam, 10);
         const matchedPaso = dpvData.pasos.find(p => p.codTramo === openId);
+        const matchedRuta = dpvData.rutas.find(r => r.codigoTramo === openId);
+        
+        let targetId = '';
         if (matchedPaso) {
+          targetId = `paso-${openId}`;
           setRouteSearch(matchedPaso.descripcion);
-          return;
+        } else if (matchedRuta) {
+          targetId = `ruta-${openId}`;
+          setRouteSearch(matchedRuta.rutaTramo);
         }
 
-        const matchedRuta = dpvData.rutas.find(r => r.codigoTramo === openId);
-        if (matchedRuta) {
-          setRouteSearch(matchedRuta.rutaTramo);
+        if (targetId) {
+          setHighlightedId(targetId);
+          setTimeout(() => {
+            const el = document.getElementById(targetId);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 300);
         }
       }
     }
@@ -161,8 +173,8 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
                 ]
               }
             : 'https://tiles.openfreemap.org/styles/liberty',
-          center: isLocal ? [-70.9314, -39.2372] : [-70.3, -38.8], 
-          zoom: isLocal ? 12 : 6,
+          center: isLocal ? [-70.9314, -39.2372] : [-70.6, -39.2], 
+          zoom: isLocal ? 13 : 7,
           pitch: 0, 
           bearing: 0
         });
@@ -252,7 +264,7 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
         <div className="hero-overlay"></div>
         <div className="hero-content">
           <h1>Info Hub Aluminé</h1>
-          <p>Tu centro de planificación: Clima en tiempo real, mapa interactivo y estado oficial de rutas de la DPV NeuQuén.</p>
+          <p>Tu centro de planificación: Clima en tiempo real, mapa interactivo y estado oficial de rutas de la DPV Neuquén.</p>
         </div>
       </div>
 
@@ -279,7 +291,7 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
               <MapPin size={18} /> Aluminé Local
             </button>
             <button className={mapView === 'provincial' ? 'btn-toggle active' : 'btn-toggle'} onClick={() => setMapView('provincial')}>
-              <Navigation size={18} /> NeuQuén y Fronteras
+              <Navigation size={18} /> Neuquén y Fronteras
             </button>
             <button className="btn-toggle" onClick={() => setMapLayer(prev => prev === 'satelite' ? 'calle' : 'satelite')} style={{ marginLeft: 'auto', background: '#f8fafc', color: '#0f172a', border: '1px solid #cbd5e1' }}>
               <MapIcon size={18} /> Capa: {mapLayer === 'satelite' ? 'Satélite' : 'Calles'}
@@ -417,7 +429,7 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
           <div className="routes-status-header">
             <div>
               <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'white', margin: 0 }}>Estado Oficial de la Red Vial</h2>
-              <p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, fontSize: '0.9rem' }}>Fuente: Dirección Provincial de Vialidad, NeuQuén</p>
+              <p style={{ color: 'rgba(255,255,255,0.8)', margin: 0, fontSize: '0.9rem' }}>Fuente: Dirección Provincial de Vialidad, Neuquén</p>
             </div>
             {dpvData && (
               <div className="update-badge">
@@ -429,7 +441,7 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
           {loadingData ? (
             <div style={{ padding: '60px 20px', textAlign: 'center' }}>
               <div className="spinner"></div>
-              <p style={{ marginTop: '16px', color: '#64748b', fontWeight: 500 }}>Cargando datos en tiempo real de DPV NeuQuén...</p>
+              <p style={{ marginTop: '16px', color: '#64748b', fontWeight: 500 }}>Cargando datos en tiempo real de DPV Neuquén...</p>
             </div>
           ) : dpvData ? (
             <>
@@ -459,7 +471,12 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
                   };
 
                   return (
-                    <div key={paso.codTramo} className="paso-card glass-panel" style={{ borderTop: `4px solid ${statusColor}` }}>
+                    <div 
+                      key={paso.codTramo} 
+                      id={`paso-${paso.codTramo}`}
+                      className={`paso-card glass-panel ${highlightedId === `paso-${paso.codTramo}` ? 'highlighted-route-card' : ''}`} 
+                      style={{ borderTop: `4px solid ${statusColor}` }}
+                    >
                       <div className="paso-header">
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>{paso.descripcion}</h4>
@@ -497,15 +514,57 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
 
               {/* Todas las Rutas */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '40px', marginBottom: '20px', flexWrap: 'wrap', gap: '16px' }}>
-                <h3 className="section-title-sm" style={{ margin: 0 }}><Route size={20} /> Estado de Rutas (NeuQuén)</h3>
-                <div className="search-box">
-                  <Search size={18} color="#94a3b8" />
+                <h3 className="section-title-sm" style={{ margin: 0 }}><Route size={20} /> Estado de Rutas (Neuquén)</h3>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  maxWidth: '500px',
+                  width: '100%',
+                  backgroundColor: 'white',
+                  borderRadius: '50px',
+                  border: '1.5px solid var(--color-border)',
+                  boxShadow: 'var(--shadow-sm)',
+                  padding: '4px 8px 4px 20px',
+                  transition: 'all 0.3s ease',
+                }}>
+                  <span style={{ color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', marginRight: '10px' }}>
+                    <Search size={20} />
+                  </span>
                   <input 
                     type="text" 
                     placeholder="Buscar ruta o tramo (ej: 13, Aluminé)..." 
                     value={routeSearch}
                     onChange={(e) => setRouteSearch(e.target.value)}
+                    style={{
+                      width: '100%',
+                      border: 'none',
+                      outline: 'none',
+                      fontSize: '1rem',
+                      padding: '12px 0',
+                      color: 'var(--color-text-main)',
+                      background: 'transparent'
+                    }}
                   />
+                  {routeSearch && (
+                    <button 
+                      type="button"
+                      onClick={() => setRouteSearch('')}
+                      style={{
+                        background: '#f1f5f9',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '32px',
+                        height: '32px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        color: '#64748b'
+                      }}
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -530,7 +589,11 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
                   };
 
                   return (
-                    <div key={i} className="route-item glass-panel">
+                    <div 
+                      key={i} 
+                      id={`ruta-${ruta.codigoTramo}`}
+                      className={`route-item glass-panel ${highlightedId === `ruta-${ruta.codigoTramo}` ? 'highlighted-route-card' : ''}`}
+                    >
                       <div className="route-number" style={{ backgroundColor: ruta.rutaProvincial ? '#0284c7' : '#16a34a' }}>
                         {ruta.rutaProvincial ? 'RP' : 'RN'} {ruta.rutaNumero}
                       </div>
@@ -569,7 +632,7 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
                   )
                 })}
                 {filteredRoutes.length === 0 && (
-                  <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No se encontraron rutas con esa bÁºsqueda.</div>
+                  <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No se encontraron rutas con esa búsqueda.</div>
                 )}
               </div>
             </>
@@ -578,9 +641,9 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
               <AlertTriangle size={36} style={{ margin: '0 auto 12px', color: '#dc2626' }} />
               <h4 style={{ margin: '0 0 8px', fontWeight: 800, fontSize: '1.2rem' }}>Servicio de Rutas no Disponible</h4>
               <p style={{ margin: 0, fontSize: '0.95rem', color: '#7f1d1d', lineHeight: 1.5 }}>
-                El servidor oficial de la Dirección Provincial de Vialidad de NeuQuén (DPV) no está respondiendo en este momento o se encuentra temporalmente fuera de servicio.
+                El servidor oficial de la Dirección Provincial de Vialidad de Neuquén (DPV) no está respondiendo en este momento o se encuentra temporalmente fuera de servicio.
                 <br />
-                Por favor, intenta de nuevo más tarde o consulta los partes oficiales de DPV NeuQuén directamente.
+                Por favor, intenta de nuevo más tarde o consulta los partes oficiales de DPV Neuquén directamente.
               </p>
             </div>
           )}
@@ -599,5 +662,3 @@ function formatEstadoDPV(estado: string) {
   if (estado === 'I' || estado === 'C') return 'Cerrado / Intransitable';
   return estado;
 }
-
-

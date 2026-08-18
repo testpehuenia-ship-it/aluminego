@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { 
@@ -40,9 +40,11 @@ export default function AccommodationsAdminPage() {
     description: '',
     features: [] as string[],
     selectedPricingKeys: [] as string[],
-    latitude: '-39.237200',
-    longitude: '-70.931400',
-    openingHours: DEFAULT_SCHEDULE_STRING
+    latitude: '-38.87942114574949',
+    longitude: '-71.18375154775678',
+    openingHours: DEFAULT_SCHEDULE_STRING,
+    isVerified: false,
+    showSchedule: false
   });
   
   const [uploading, setUploading] = React.useState(false);
@@ -101,11 +103,13 @@ export default function AccommodationsAdminPage() {
         selectedPricingKeys: acc.subscription ? acc.subscription.planType.split(', ').filter(Boolean) : [],
         latitude: acc.latitude ? acc.latitude.toString() : '',
         longitude: acc.longitude ? acc.longitude.toString() : '',
-        openingHours: acc.openingHours || ''
+        openingHours: acc.openingHours || '',
+        isVerified: acc.isVerified || false,
+        showSchedule: acc.showSchedule || false
       });
     } else {
       setEditingAcc(null);
-      setFormData({ name: '', type: '', image: '', whatsapp: '', description: '', features: [], selectedPricingKeys: [], latitude: '-39.237200', longitude: '-70.931400', openingHours: DEFAULT_SCHEDULE_STRING });
+      setFormData({ name: '', type: '', image: '', whatsapp: '', description: '', features: [], selectedPricingKeys: [], latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING, isVerified: false, showSchedule: false });
     }
     setIsModalOpen(true);
   };
@@ -213,7 +217,7 @@ export default function AccommodationsAdminPage() {
           
           // Abrir WhatsApp automáticamente
           const cleanPhone = (creds.whatsapp || '').replace(/\D/g, '');
-          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://AluminéGO.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
+          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
           window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMsg)}`, '_blank');
         } else {
           const hasBanner = formData.selectedPricingKeys.some(k => k.includes('banner') || k.includes('portada'));
@@ -491,6 +495,26 @@ export default function AccommodationsAdminPage() {
                   onChange={(val) => setFormData({...formData, openingHours: val})}
                 />
               </div>
+                  <div style={{ display: 'flex', gap: '20px', marginTop: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.isVerified} 
+                        onChange={(e) => setFormData({...formData, isVerified: e.target.checked})}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <b>Comercio Verificado (Sello Seguro)</b>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.showSchedule} 
+                        onChange={(e) => setFormData({...formData, showSchedule: e.target.checked})}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <b>Mostrar Horarios Públicamente</b>
+                    </label>
+                  </div>
 
               <div style={{ borderTop: '1px solid #cbd5e1', paddingTop: '20px', marginTop: '10px' }}>
                 <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1e293b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -501,7 +525,7 @@ export default function AccommodationsAdminPage() {
                 </p>
                 <div className="form-row-2">
                   <div className="form-group">
-                    <label>Latitud (Ej: -39.2372)</label>
+                    <label>Latitud (Ej: -38.8833)</label>
                     <input 
                       type="text" 
                       value={formData.latitude} 
@@ -510,7 +534,7 @@ export default function AccommodationsAdminPage() {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Longitud (Ej: -70.9314)</label>
+                    <label>Longitud (Ej: -71.1667)</label>
                     <input 
                       type="text" 
                       value={formData.longitude} 
@@ -556,7 +580,7 @@ export default function AccommodationsAdminPage() {
             </div>
 
             <a 
-              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://AluminéGO.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
+              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"
@@ -647,5 +671,3 @@ export default function AccommodationsAdminPage() {
     </div>
   );
 }
-
-

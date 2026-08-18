@@ -1,4 +1,4 @@
-﻿declare let self: any;
+declare let self: any;
 
 self.addEventListener('push', (event: any) => {
   if (!event.data) return;
@@ -51,4 +51,3 @@ self.addEventListener('notificationclick', (event: any) => {
     })
   );
 });
-

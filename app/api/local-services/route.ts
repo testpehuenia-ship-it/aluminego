@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { verifySession, hashPassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
@@ -34,10 +34,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
     const body = await request.json();
-    const { name, category, subcategory, address, whatsapp, image, description, details, selectedPricingKeys, bonifiedKeys, discountAmount, linkedSections, latitude, longitude, openingHours } = body;
+    const { name, category, subcategory, address, whatsapp, image, description, details, selectedPricingKeys, bonifiedKeys, discountAmount, linkedSections, latitude, longitude, openingHours, isVerified, showSchedule } = body;
     
-    const latFloat = (latitude !== undefined && latitude !== null && String(latitude).trim() !== '' && parseFloat(String(latitude)) !== 0) ? parseFloat(String(latitude)) : -39.237200;
-    const lngFloat = (longitude !== undefined && longitude !== null && String(longitude).trim() !== '' && parseFloat(String(longitude)) !== 0) ? parseFloat(String(longitude)) : -70.931400;
+    const latFloat = (latitude !== undefined && latitude !== null && String(latitude).trim() !== '' && parseFloat(String(latitude)) !== 0) ? parseFloat(String(latitude)) : -38.87942114574949;
+    const lngFloat = (longitude !== undefined && longitude !== null && String(longitude).trim() !== '' && parseFloat(String(longitude)) !== 0) ? parseFloat(String(longitude)) : -71.18375154775678;
     const finalAddress = (address && address.trim().length > 0) ? address.trim() : 'Aluminé';
     const DEFAULT_SCHEDULE_STRING = JSON.stringify([
       { day: 1, dayName: 'Lunes', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
@@ -126,6 +126,8 @@ export async function POST(request: Request) {
                   description: description || '',
                   details: details || '',
                   openingHours: openingHours || null,
+          isVerified: Boolean(isVerified),
+          showSchedule: Boolean(showSchedule),
                   subscription: { connect: { id: newSub.id } }
                 }
               });
@@ -142,6 +144,8 @@ export async function POST(request: Request) {
                   longitude: lngFloat,
                   description: description || '',
                   openingHours: openingHours || null,
+          isVerified: Boolean(isVerified),
+          showSchedule: Boolean(showSchedule),
                   subscription: { connect: { id: newSub.id } },
                   features: {
                     create: detailArray.map((featName: string) => ({ name: featName }))
@@ -161,6 +165,8 @@ export async function POST(request: Request) {
                   longitude: lngFloat,
                   description: description || '',
                   openingHours: openingHours || null,
+          isVerified: Boolean(isVerified),
+          showSchedule: Boolean(showSchedule),
                   subscription: { connect: { id: newSub.id } }
                 }
               });
@@ -177,6 +183,8 @@ export async function POST(request: Request) {
                   longitude: lngFloat,
                   description: description || '',
                   openingHours: openingHours || null,
+          isVerified: Boolean(isVerified),
+          showSchedule: Boolean(showSchedule),
                   subscription: { connect: { id: newSub.id } },
                   details: {
                     create: detailArray.map((detailName: string) => ({ name: detailName }))
@@ -189,14 +197,14 @@ export async function POST(request: Request) {
           // 4. Auto-generate PortalUser if they have portal plans
           if (selectedPricingKeys.includes('plan_comercio_completo') || selectedPricingKeys.includes('plan_basico_destacado')) {
             const safeName = service.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            let email = `${safeName}@AluminéGO.ar`;
+            let email = `${safeName}@aluminego.ar`;
             const today = new Date();
-            const password = `AluminéGO${String(today.getDate()).padStart(2, '0')}${String(today.getMonth() + 1).padStart(2, '0')}${today.getFullYear()}`;
+            const password = `aluminego${String(today.getDate()).padStart(2, '0')}${String(today.getMonth() + 1).padStart(2, '0')}${today.getFullYear()}`;
             
             let portalUser = await tx.portalUser.findUnique({ where: { email } });
             let counter = 1;
             while (portalUser) {
-              email = `${safeName}${counter}@AluminéGO.ar`;
+              email = `${safeName}${counter}@aluminego.ar`;
               portalUser = await tx.portalUser.findUnique({ where: { email } });
               counter++;
             }
@@ -238,5 +246,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Error creating service' }, { status: 500 });
   }
 }
-
-

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
@@ -6,6 +6,8 @@ import PublicityBanner from '@/components/PublicityBanner';
 import Link from 'next/link';
 import FavoriteButton from '@/components/FavoriteButton';
 import OpeningStatusBadge from '@/components/OpeningStatusBadge';
+import VerifiedBadge from '@/components/VerifiedBadge';
+
 import { Loader2, Search } from 'lucide-react';
 
 export default function AventurasClient({ initialAdventures, initialCategories }: { initialAdventures?: any[], initialCategories?: any[] }) {
@@ -230,14 +232,14 @@ export default function AventurasClient({ initialAdventures, initialCategories }
               transition: 'background-color 0.2s'
             }}
           >
-            ✖
+            ✕
           </button>
         )}
       </div>
 
       <h1 className="section-title">¿Qué aventura elegimos hoy?</h1>
 
-      {/* SECCIÁ“N DE DESTACADOS (CON BANNER) */}
+      {/* SECCIÓN DE DESTACADOS (CON BANNER) */}
       {bannerAdventures.length > 0 && (
         <section style={{ marginBottom: '50px' }}>
           <h2 style={{ fontSize: '1.5rem', borderLeft: '5px solid var(--color-orange)', paddingLeft: '12px', marginBottom: '24px', color: 'var(--color-text-main)' }}>
@@ -258,7 +260,8 @@ export default function AventurasClient({ initialAdventures, initialCategories }
                     display: 'block',
                     width: '100%',
                     textAlign: 'left',
-                    border: '2px solid var(--color-orange)'
+                    border: '2px solid var(--color-orange)',
+                    position: 'relative'
                   }}
                   onClick={() => setSelectedAventura(aventura)}
                   className="commerce-card"
@@ -279,7 +282,7 @@ export default function AventurasClient({ initialAdventures, initialCategories }
                   </div>
                   <div style={{ padding: '16px' }}>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{aventura.name}</h3>
-                    <OpeningStatusBadge openingHours={aventura.openingHours} />
+                    <OpeningStatusBadge openingHours={aventura.openingHours} isVisible={aventura.showSchedule} />
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
                       {aventura.details?.split(',').map((detail: string) => (
                         <span key={detail} style={{
@@ -295,6 +298,7 @@ export default function AventurasClient({ initialAdventures, initialCategories }
                     </div>
                     <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y reservar</p>
                   </div>
+                  <VerifiedBadge isVerified={aventura.isVerified} style={{ bottom: '8px', right: '8px' }} />
                 </button>
               );
             })}
@@ -337,7 +341,8 @@ export default function AventurasClient({ initialAdventures, initialCategories }
                     display: 'block',
                     width: '100%',
                     textAlign: 'left',
-                    border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)'
+                    border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)',
+                    position: 'relative'
                   }}
                   onClick={() => setSelectedAventura(aventura)}
                   className="commerce-card"
@@ -358,7 +363,7 @@ export default function AventurasClient({ initialAdventures, initialCategories }
                     </div>
                     <div style={{ padding: '16px' }}>
                       <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{aventura.name}</h3>
-                      <OpeningStatusBadge openingHours={aventura.openingHours} />
+                      <OpeningStatusBadge openingHours={aventura.openingHours} isVisible={aventura.showSchedule} />
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
                         {aventura.details?.split(',').map((detail: string) => (
                           <span key={detail} style={{
@@ -374,7 +379,8 @@ export default function AventurasClient({ initialAdventures, initialCategories }
                       </div>
                       <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y reservar</p>
                     </div>
-                  </button>
+                    <VerifiedBadge isVerified={aventura.isVerified} style={{ bottom: '8px', right: '8px' }} />
+                </button>
                   );
                 })}
               </div>
@@ -405,7 +411,8 @@ export default function AventurasClient({ initialAdventures, initialCategories }
                   display: 'block',
                   width: '100%',
                   textAlign: 'left',
-                  border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)'
+                  border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)',
+                  position: 'relative'
                 }}
                 onClick={() => setSelectedAventura(aventura)}
                 className="commerce-card"
@@ -426,7 +433,7 @@ export default function AventurasClient({ initialAdventures, initialCategories }
                   </div>
                   <div style={{ padding: '16px' }}>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{aventura.name}</h3>
-                    <OpeningStatusBadge openingHours={aventura.openingHours} />
+                    <OpeningStatusBadge openingHours={aventura.openingHours} isVisible={aventura.showSchedule} />
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
                       {aventura.details?.split(',').map((detail: string) => (
                         <span key={detail} style={{
@@ -442,6 +449,7 @@ export default function AventurasClient({ initialAdventures, initialCategories }
                     </div>
                     <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y reservar</p>
                   </div>
+                  <VerifiedBadge isVerified={aventura.isVerified} style={{ bottom: '8px', right: '8px' }} />
                 </button>
               );
             })}
@@ -492,14 +500,17 @@ export default function AventurasClient({ initialAdventures, initialCategories }
                 onClick={() => setSelectedAventura(null)}
                 style={{ position: 'absolute', top: '16px', right: '16px', width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.8)', border: 'none', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}
               >
-                ✖
+                ✕
               </button>
             </div>
             
             <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
-              <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '8px' }}>{selectedAventura.name}</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0 }}>{selectedAventura.name}</h2>
+                <VerifiedBadge isVerified={selectedAventura.isVerified} style={{ position: 'relative', bottom: 0, right: 0 }} />
+              </div>
               <p style={{ color: 'var(--color-orange)', fontWeight: 600, marginBottom: '8px', fontSize: '1.1rem' }}>{selectedAventura.category}</p>
-              <OpeningStatusBadge openingHours={selectedAventura.openingHours} showWeeklySchedule={true} />
+              <OpeningStatusBadge openingHours={selectedAventura.openingHours} showWeeklySchedule={true} isVisible={selectedAventura.showSchedule} />
               
               {selectedAventura.description && (
                 <p style={{ color: 'var(--color-text-main)', fontSize: '1.05rem', lineHeight: '1.6', marginBottom: '24px', marginTop: '12px', whiteSpace: 'pre-line' }}>
@@ -552,7 +563,7 @@ export default function AventurasClient({ initialAdventures, initialCategories }
             </div>
           </div>
         </div>
-      )}
+                    )}
 
       <style jsx global>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -565,5 +576,3 @@ export default function AventurasClient({ initialAdventures, initialCategories }
     </div>
   );
 }
-
-

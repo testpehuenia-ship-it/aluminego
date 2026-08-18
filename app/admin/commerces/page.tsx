@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { 
@@ -38,12 +38,14 @@ export default function CommercesAdminPage() {
     image: '',
     whatsapp: '',
     description: '',
-    latitude: '-39.237200',
-    longitude: '-70.931400',
+    latitude: '-38.87942114574949',
+    longitude: '-71.18375154775678',
     locality: 'Aluminé',
     details: '',
     selectedPricingKeys: [] as string[],
-    openingHours: DEFAULT_SCHEDULE_STRING
+    openingHours: DEFAULT_SCHEDULE_STRING,
+    isVerified: false,
+    showSchedule: false
   });
   
   const [uploading, setUploading] = React.useState(false);
@@ -102,7 +104,9 @@ export default function CommercesAdminPage() {
         locality: comm.locality || 'Aluminé',
         details: comm.details?.map((d: any) => d.name).join(', ') || '',
         selectedPricingKeys: comm.subscription ? comm.subscription.planType.split(', ').filter(Boolean) : [],
-        openingHours: comm.openingHours || ''
+        openingHours: comm.openingHours || '',
+        isVerified: comm.isVerified || false,
+        showSchedule: comm.showSchedule || false
       });
     } else {
       setEditingComm(null);
@@ -112,8 +116,8 @@ export default function CommercesAdminPage() {
         image: '', 
         whatsapp: '', 
         description: '', 
-        latitude: '-39.237200',
-        longitude: '-70.931400',
+        latitude: '-38.87942114574949',
+        longitude: '-71.18375154775678',
         locality: 'Aluminé',
         details: '', 
         selectedPricingKeys: [],
@@ -220,7 +224,7 @@ export default function CommercesAdminPage() {
           
           // Abrir WhatsApp automáticamente
           const cleanPhone = (creds.whatsapp || '').replace(/\D/g, '');
-          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://AluminéGO.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
+          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
           window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMsg)}`, '_blank');
         } else {
           const hasBanner = formData.selectedPricingKeys.some(k => k.includes('banner') || k.includes('portada'));
@@ -492,6 +496,26 @@ export default function CommercesAdminPage() {
                       onChange={(val) => setFormData({...formData, openingHours: val})}
                     />
                   </div>
+                  <div style={{ display: 'flex', gap: '20px', marginTop: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.isVerified} 
+                        onChange={(e) => setFormData({...formData, isVerified: e.target.checked})}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <b>Comercio Verificado (Sello Seguro)</b>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.showSchedule} 
+                        onChange={(e) => setFormData({...formData, showSchedule: e.target.checked})}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <b>Mostrar Horarios Públicamente</b>
+                    </label>
+                  </div>
 
                   <div style={{ borderTop: '1px solid #cbd5e1', paddingTop: '16px', marginTop: '10px' }}>
                     <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
@@ -504,7 +528,7 @@ export default function CommercesAdminPage() {
                           type="text" 
                           value={formData.latitude} 
                           onChange={(e) => setFormData({...formData, latitude: e.target.value})}
-                          placeholder="-39.2372"
+                          placeholder="-38.8833"
                         />
                       </div>
                       <div className="form-group" style={{ marginBottom: 0 }}>
@@ -513,7 +537,7 @@ export default function CommercesAdminPage() {
                           type="text" 
                           value={formData.longitude} 
                           onChange={(e) => setFormData({...formData, longitude: e.target.value})}
-                          placeholder="-70.9314"
+                          placeholder="-71.1667"
                         />
                       </div>
                     </div>
@@ -554,7 +578,7 @@ export default function CommercesAdminPage() {
             </div>
 
             <a 
-              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://AluminéGO.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
+              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"
@@ -627,5 +651,3 @@ export default function CommercesAdminPage() {
     </div>
   );
 }
-
-

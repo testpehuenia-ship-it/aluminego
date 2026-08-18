@@ -1,13 +1,13 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import { prisma, getActiveSubscriptionWhere } from '@/lib/db';
 import AventurasClient from './AventurasClient';
 
 export const metadata: Metadata = {
   title: 'Qué Hacer y Aventuras en Aluminé | Excursiones',
   description: 'Descubre increíbles actividades en Aluminé: trekking, paseos lacustres, cabalgatas, esquí en el Batea Mahuida y pesca con mosca. Reserva directo por WhatsApp.',
-  keywords: ['Qué hacer en Aluminé', 'actividades Aluminé', 'excursiones Aluminé', 'cabalgatas Aluminé', 'nieve batea mahuida', 'pesca en Aluminé'],
+  keywords: ['qué hacer en villa alumine', 'actividades alumine', 'excursiones villa alumine', 'cabalgatas alumine', 'nieve batea mahuida', 'pesca en alumine'],
   alternates: {
-    canonical: 'https://www.AluminéGO.ar/aventuras',
+    canonical: 'https://www.aluminego.ar/aventuras',
   },
   openGraph: {
     title: 'Qué Hacer y Actividades de Aventura en Aluminé',
@@ -38,7 +38,7 @@ export default async function Page() {
     '@type': 'ItemList',
     'name': 'Excursiones y Aventuras en Aluminé',
     'description': 'Directorio de actividades recreativas, excursiones guiadas, paseos lacustres y deportes de aventura en Aluminé.',
-    'url': 'https://www.AluminéGO.ar/aventuras',
+    'url': 'https://www.aluminego.ar/aventuras',
     'itemListElement': adventures.map((adv, index) => ({
       '@type': 'ListItem',
       'position': index + 1,
@@ -47,12 +47,12 @@ export default async function Page() {
         'name': adv.name,
         'image': adv.image ? adv.image.split(',').filter(Boolean) : [],
         'description': adv.description || undefined,
-        'url': `https://www.AluminéGO.ar/aventuras/${adv.id}`,
+        'url': `https://www.aluminego.ar/aventuras/${adv.id}`,
         'telephone': adv.whatsapp ? `+549${adv.whatsapp}` : undefined,
         'address': {
           '@type': 'PostalAddress',
           'addressLocality': 'Aluminé',
-          'addressRegion': 'NeuQuén',
+          'addressRegion': 'Neuquén',
           'addressCountry': 'AR'
         }
       }
@@ -72,5 +72,3 @@ export default async function Page() {
     </>
   );
 }
-
-

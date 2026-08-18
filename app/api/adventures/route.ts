@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
     const body = await request.json();
-    const { name, description, image, whatsapp, category, details, selectedPricingKeys, latitude, longitude, openingHours } = body;
+    const { name, description, image, whatsapp, category, details, selectedPricingKeys, latitude, longitude, openingHours, isVerified, showSchedule } = body;
 
     const result = await prisma.$transaction(async (tx: any) => {
       const adventure = await tx.adventure.create({
@@ -38,7 +38,9 @@ export async function POST(request: Request) {
           details: details || '',
           latitude: latitude ? parseFloat(String(latitude)) : null,
           longitude: longitude ? parseFloat(String(longitude)) : null,
-          openingHours: openingHours || null
+          openingHours: openingHours || null,
+          isVerified: Boolean(isVerified),
+          showSchedule: Boolean(showSchedule),
         }
       });
 

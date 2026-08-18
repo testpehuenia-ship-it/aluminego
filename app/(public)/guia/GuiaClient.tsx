@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -7,6 +7,8 @@ import PublicityBanner from '@/components/PublicityBanner';
 import { Loader2, MapPin, Phone } from 'lucide-react';
 import FavoriteButton from '@/components/FavoriteButton';
 import OpeningStatusBadge from '@/components/OpeningStatusBadge';
+import VerifiedBadge from '@/components/VerifiedBadge';
+
 
 export default function GuiaClient({ initialServices }: { initialServices?: any[] }) {
   const router = useRouter();
@@ -98,10 +100,10 @@ export default function GuiaClient({ initialServices }: { initialServices?: any[
             <span style={{ color: 'var(--color-green)', fontWeight: 800, fontSize: '1.4rem' }}>Aluminé</span>
             <span style={{ color: 'var(--color-orange)', fontWeight: 800, fontSize: '1.4rem' }}>GO</span>
             <span style={{ color: 'white', margin: '0 4px' }}>|</span>
-            <span style={{ color: 'white', fontWeight: 600, fontSize: '1.2rem', letterSpacing: '1px' }}>GUÁA LOCAL</span>
+            <span style={{ color: 'white', fontWeight: 600, fontSize: '1.2rem', letterSpacing: '1px' }}>GUÍA LOCAL</span>
           </div>
           <p style={{ color: 'white', fontSize: '1rem', opacity: 0.9 }}>
-            Servicios PÁºblicos, Instituciones, Emergencias y Comercios de Aluminé
+            Servicios Públicos, Instituciones, Emergencias y Comercios de Aluminé
           </p>
         </div>
       </div>
@@ -121,7 +123,7 @@ export default function GuiaClient({ initialServices }: { initialServices?: any[
         </div>
       </div>
 
-      {/* BANNER SUPERIOR DE LA GUÁA */}
+      {/* BANNER SUPERIOR DE LA GUÍA */}
       <div style={{ marginBottom: '30px' }}>
         <PublicityBanner page="GuiaLocal" section={1} height="150px" delay="0s" />
       </div>
@@ -146,7 +148,7 @@ export default function GuiaClient({ initialServices }: { initialServices?: any[
                   <div 
                     key={item.id} 
                     onClick={() => { router.push(targetUrl); }}
-                    style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', padding: '20px', boxShadow: 'var(--shadow-md)', border: '2px solid var(--color-orange)', display: 'flex', flexDirection: 'column', gap: '12px', cursor: 'pointer', transition: 'transform 0.2s', ...({ ':hover': { transform: 'translateY(-4px)' } } as any) }}
+                    style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', padding: '20px', boxShadow: 'var(--shadow-md)', border: '2px solid var(--color-orange)', display: 'flex', flexDirection: 'column', gap: '12px', cursor: 'pointer', transition: 'transform 0.2s', ...({ ':hover': { transform: 'translateY(-4px)' } } as any) , position: 'relative' }}
                   >
                     {/* Fila superior con miniatura */}
                     <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -165,7 +167,7 @@ export default function GuiaClient({ initialServices }: { initialServices?: any[
                       </div>
                     </div>
 
-                    <OpeningStatusBadge openingHours={item.openingHours} />
+                    <OpeningStatusBadge openingHours={item.openingHours} isVisible={item.showSchedule} />
                     
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
                       {item.address && (
@@ -198,6 +200,7 @@ export default function GuiaClient({ initialServices }: { initialServices?: any[
                         Ver perfil y mapa
                       </Link>
                     </div>
+                    <VerifiedBadge isVerified={item.isVerified} style={{ bottom: '8px', right: '8px' }} />
                   </div>
                 );
               }
@@ -222,7 +225,7 @@ export default function GuiaClient({ initialServices }: { initialServices?: any[
                       </span>
                     </div>
                   </div>
-                  <OpeningStatusBadge openingHours={item.openingHours} />
+                  <OpeningStatusBadge openingHours={item.openingHours} isVisible={item.showSchedule} />
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
                     {item.address && (
@@ -253,6 +256,7 @@ export default function GuiaClient({ initialServices }: { initialServices?: any[
                       </div>
                     )}
                   </div>
+                  <VerifiedBadge isVerified={item.isVerified} style={{ bottom: '8px', right: '8px' }} />
                 </div>
               );
             })}
@@ -260,7 +264,7 @@ export default function GuiaClient({ initialServices }: { initialServices?: any[
         </section>
       )}
 
-      {/* BANNER INTERMEDIO DE LA GUÁA */}
+      {/* BANNER INTERMEDIO DE LA GUÍA */}
       <div style={{ marginBottom: '40px' }}>
         <PublicityBanner page="GuiaLocal" section={2} height="120px" delay="1s" />
       </div>
@@ -302,7 +306,7 @@ export default function GuiaClient({ initialServices }: { initialServices?: any[
                           </span>
                         </div>
                       </div>
-                      <OpeningStatusBadge openingHours={item.openingHours} />
+                      <OpeningStatusBadge openingHours={item.openingHours} isVisible={item.showSchedule} />
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
                         {item.address && (
@@ -369,5 +373,3 @@ export default function GuiaClient({ initialServices }: { initialServices?: any[
     </div>
   );
 }
-
-

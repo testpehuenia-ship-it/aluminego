@@ -1,13 +1,13 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import { prisma } from '@/lib/db';
 import ComerciosClient from './ComerciosClient';
 
 export const metadata: Metadata = {
   title: 'Comercios de Aluminé | Tiendas y Mercados',
   description: 'Directorio de comercios, tiendas de regalos, supermercados, despensas, farmacias y más locales en Aluminé.',
-  keywords: ['comercios Aluminé', 'tiendas en Aluminé', 'supermercado Aluminé', 'farmacias Aluminé', 'compras Aluminé'],
+  keywords: ['comercios villa alumine', 'tiendas en villa alumine', 'supermercado villa alumine', 'farmacias villa alumine', 'compras alumine'],
   alternates: {
-    canonical: 'https://www.AluminéGO.ar/comercios',
+    canonical: 'https://www.aluminego.ar/comercios',
   },
   openGraph: {
     title: 'Comercios y Tiendas en Aluminé | AluminéGO',
@@ -38,7 +38,7 @@ export default async function Page() {
     '@type': 'ItemList',
     'name': 'Comercios y Tiendas en Aluminé',
     'description': 'Directorio comercial de supermercados, despensas, farmacias, fiambrerías y locales en Aluminé.',
-    'url': 'https://www.AluminéGO.ar/comercios',
+    'url': 'https://www.aluminego.ar/comercios',
     'itemListElement': commerces.map((comm, index) => ({
       '@type': 'ListItem',
       'position': index + 1,
@@ -47,12 +47,12 @@ export default async function Page() {
         'name': comm.name,
         'image': comm.image ? comm.image.split(',').filter(Boolean) : [],
         'description': comm.description || undefined,
-        'url': `https://www.AluminéGO.ar/comercios/${comm.slug || comm.id}`,
+        'url': `https://www.aluminego.ar/comercios/${comm.slug || comm.id}`,
         'telephone': comm.whatsapp ? `+549${comm.whatsapp}` : undefined,
         'address': {
           '@type': 'PostalAddress',
           'addressLocality': comm.locality || 'Aluminé',
-          'addressRegion': 'NeuQuén',
+          'addressRegion': 'Neuquén',
           'addressCountry': 'AR'
         }
       }
@@ -72,5 +72,3 @@ export default async function Page() {
     </>
   );
 }
-
-

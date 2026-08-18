@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { Loader2, Search } from 'lucide-react';
 import FavoriteButton from '@/components/FavoriteButton';
 import OpeningStatusBadge from '@/components/OpeningStatusBadge';
+import VerifiedBadge from '@/components/VerifiedBadge';
+
 
 export default function ComerciosClient({ initialCommerces, initialCategories }: { initialCommerces?: any[], initialCategories?: any[] }) {
   const [selectedCommerce, setSelectedCommerce] = useState<any | null>(null);
@@ -126,7 +128,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
     );
   }, [commerces, searchQuery]);
 
-  // Filtrar para mostrar Áºnicamente comercios de tipo 'Comercio Completo' o que tengan banner
+  // Filtrar para mostrar únicamente comercios de tipo 'Comercio Completo' o que tengan banner
   const activePremiumCommerces = useMemo(() => {
     return filteredCommerces.filter(c => getPriority(c) <= 3);
   }, [filteredCommerces]);
@@ -168,24 +170,27 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
           </div>
           <div className="banner-subtitle">TIENDAS Y MERCADOS</div>
         </div>
-        <div className="banner-categories" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gridAutoRows: '150px' }}>
-          {displayableCats.slice(0, 6).map((item) => {
-            const style = categoryStyles[item.title] || { color: '#0d9488', bgImage: item.image || "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" };
-            const anchorId = getCategoryAnchor(item.link);
-            return (
-              <a 
-                href={`#${anchorId}`} 
-                key={item.id} 
-                className="banner-item" 
-                style={{ backgroundImage: `url(${style.bgImage})` }}
-              >
-                <div className="banner-overlay" style={{ borderBottom: `4px solid ${style.color}` }}></div>
-                <span className="banner-text" style={{ fontSize: item.title.length > 15 ? "0.85rem" : "inherit" }}>
-                  {item.title.toUpperCase()}
-                </span>
-              </a>
-            );
-          })}
+        <div className="banner-categories">
+          {[
+            { cat: "Supermercados", id: "supermercados-y-almacenes", color: "#2a9d8f", bgImage: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" },
+            { cat: "Regalerías", id: "regalerías-y-regionales", color: "#f4a261", bgImage: "https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=800&q=80" },
+            { cat: "Fiambrerías", id: "fiambrerías-y-carnicerías", color: "#e76f51", bgImage: "/images/fiambreria_banner.jpg" },
+            { cat: "Farmacias", id: "farmacias", color: "#00b4d8", bgImage: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=800&q=80" },
+            { cat: "Indumentaria", id: "indumentaria-y-calzado", color: "#9c27b0", bgImage: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" },
+            { cat: "Mascotas y Viveros", id: "parques,-jardines,-mascotas", color: "#4caf50", bgImage: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80" }
+          ].map((item) => (
+            <a 
+              href={`#${item.id}`} 
+              key={item.cat} 
+              className="banner-item" 
+              style={{ backgroundImage: `url(${item.bgImage})` }}
+            >
+              <div className="banner-overlay" style={{ borderBottom: `4px solid ${item.color}` }}></div>
+              <span className="banner-text" style={{ fontSize: item.cat === "Mascotas y Viveros" ? "0.85rem" : "inherit" }}>
+                {item.cat.toUpperCase()}
+              </span>
+            </a>
+          ))}
         </div>
       </div>
 
@@ -248,14 +253,14 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
               transition: 'background-color 0.2s'
             }}
           >
-            ✖
+            ✕
           </button>
         )}
       </div>
 
       <h1 className="section-title">Comercios Locales</h1>
 
-      {/* SECCIÁ“N DE DESTACADOS (CON BANNER) */}
+      {/* SECCIÓN DE DESTACADOS (CON BANNER) */}
       {bannerCommerces.length > 0 && (
         <section style={{ marginBottom: '50px' }}>
           <h2 style={{ fontSize: '1.5rem', borderLeft: '5px solid var(--color-orange)', paddingLeft: '12px', marginBottom: '24px', color: 'var(--color-text-main)' }}>
@@ -266,7 +271,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
               return (
                 <button 
                   key={commerce.id} 
-                  style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: '2px solid var(--color-orange)' }}
+                  style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: '2px solid var(--color-orange)' , position: 'relative' }}
                   onClick={() => setSelectedCommerce(commerce)}
                   className="commerce-card"
                 >
@@ -286,7 +291,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                   </div>
                   <div style={{ padding: '16px' }}>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{commerce.name}</h3>
-                    <OpeningStatusBadge openingHours={commerce.openingHours} />
+                    <OpeningStatusBadge openingHours={commerce.openingHours} isVisible={commerce.showSchedule} />
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
                       {commerce.details?.slice(0, 3).map((d: any) => (
                         <span key={d.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
@@ -301,6 +306,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                     </div>
                     <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y contacto</p>
                   </div>
+                  <VerifiedBadge isVerified={commerce.isVerified} style={{ bottom: '8px', right: '8px' }} />
                 </button>
               );
             })}
@@ -333,7 +339,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                   return (
                     <button 
                       key={commerce.id} 
-                      style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)' }}
+                      style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)' , position: 'relative' }}
                       onClick={() => setSelectedCommerce(commerce)}
                       className="commerce-card"
                     >
@@ -347,13 +353,13 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                         }} />
                         {commerce.image ? (
                           <Image src={commerce.image.split(',')[0]} alt={commerce.name} fill style={{ objectFit: 'cover' }} />
-                        ) : (
-                          <div style={{ width: '100%', height: '100%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>Sin imagen</div>
-                        )}
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', background: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8' }}>Sin imagen</div>
+                    )}
                       </div>
                       <div style={{ padding: '16px' }}>
                         <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{commerce.name}</h3>
-                        <OpeningStatusBadge openingHours={commerce.openingHours} />
+                        <OpeningStatusBadge openingHours={commerce.openingHours} isVisible={commerce.showSchedule} />
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
                           {commerce.details?.slice(0, 3).map((d: any) => (
                             <span key={d.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
@@ -368,6 +374,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                         </div>
                         <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y contacto</p>
                       </div>
+                      <VerifiedBadge isVerified={commerce.isVerified} style={{ bottom: '8px', right: '8px' }} />
                     </button>
                   );
                 })}
@@ -388,7 +395,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
               return (
                 <button 
                   key={commerce.id} 
-                  style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)' }}
+                  style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)' , position: 'relative' }}
                   onClick={() => setSelectedCommerce(commerce)}
                   className="commerce-card"
                 >
@@ -408,7 +415,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                   </div>
                   <div style={{ padding: '16px' }}>
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{commerce.name}</h3>
-                    <OpeningStatusBadge openingHours={commerce.openingHours} />
+                    <OpeningStatusBadge openingHours={commerce.openingHours} isVisible={commerce.showSchedule} />
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
                       {commerce.details?.slice(0, 3).map((d: any) => (
                         <span key={d.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
@@ -423,6 +430,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                     </div>
                     <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y contacto</p>
                   </div>
+                  <VerifiedBadge isVerified={commerce.isVerified} style={{ bottom: '8px', right: '8px' }} />
                 </button>
               );
             })}
@@ -442,7 +450,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
           <div style={{ backgroundColor: 'white', width: '100%', maxWidth: '600px', maxHeight: '90vh', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '24px', overflowY: 'auto', position: 'relative' }}
             onClick={e => e.stopPropagation()}
           >
-            <button onClick={() => setSelectedCommerce(null)} style={{ position: 'absolute', top: '16px', right: '16px', fontSize: '1.5rem', fontWeight: 'bold', zIndex: 10, background: 'none', border: 'none', cursor: 'pointer' }}>✖</button>
+            <button onClick={() => setSelectedCommerce(null)} style={{ position: 'absolute', top: '16px', right: '16px', fontSize: '1.5rem', fontWeight: 'bold', zIndex: 10, background: 'none', border: 'none', cursor: 'pointer' }}>✕</button>
             
             <div style={{ position: 'relative', height: '250px', borderRadius: '16px', overflow: 'hidden', marginBottom: '20px', marginTop: '10px' }}>
               {(() => {
@@ -462,7 +470,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                           }}
                           style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 12, fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}
                         >
-                          â€¹
+                          ‹
                         </button>
                         <button 
                           onClick={(e) => {
@@ -471,7 +479,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                           }}
                           style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', cursor: 'pointer', zIndex: 12, fontWeight: 'bold', fontSize: '1.2rem', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}
                         >
-                          â€º
+                          ›
                         </button>
                         <div style={{ position: 'absolute', bottom: '10px', left: '0', right: '0', display: 'flex', justifyContent: 'center', gap: '6px', zIndex: 12 }}>
                           {images.map((_: string, idx: number) => (
@@ -488,9 +496,12 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
               })()}
             </div>
 
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '8px' }}>{selectedCommerce.name}</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+              <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0 }}>{selectedCommerce.name}</h2>
+              <VerifiedBadge isVerified={selectedCommerce.isVerified} style={{ position: 'relative', bottom: 0, right: 0 }} />
+            </div>
             <p style={{ color: 'var(--color-green)', fontWeight: 600, marginBottom: '8px', fontSize: '1.1rem' }}>{selectedCommerce.type}</p>
-            <OpeningStatusBadge openingHours={selectedCommerce.openingHours} showWeeklySchedule={true} />
+            <OpeningStatusBadge openingHours={selectedCommerce.openingHours} showWeeklySchedule={true} isVisible={selectedCommerce.showSchedule} />
             
             {selectedCommerce.description && (
               <p style={{ color: 'var(--color-text)', fontSize: '1rem', lineHeight: '1.6', marginBottom: '24px', whiteSpace: 'pre-line' }}>
@@ -550,5 +561,3 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
     </div>
   );
 }
-
-

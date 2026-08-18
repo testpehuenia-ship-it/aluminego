@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { verifySession, hashPassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
@@ -31,12 +31,12 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, type, image, whatsapp, description, details, selectedPricingKeys, latitude, longitude, locality, openingHours } = body;
+    const { name, type, image, whatsapp, description, details, selectedPricingKeys, latitude, longitude, locality, openingHours, isVerified, showSchedule } = body;
     const finalLocality = locality || 'Aluminé';
     const slug = await generateUniqueSlug(name, finalLocality);
     
-    const latFloat = (latitude !== undefined && latitude !== null && String(latitude).trim() !== '' && parseFloat(String(latitude)) !== 0) ? parseFloat(String(latitude)) : -39.237200;
-    const lngFloat = (longitude !== undefined && longitude !== null && String(longitude).trim() !== '' && parseFloat(String(longitude)) !== 0) ? parseFloat(String(longitude)) : -70.931400;
+    const latFloat = (latitude !== undefined && latitude !== null && String(latitude).trim() !== '' && parseFloat(String(latitude)) !== 0) ? parseFloat(String(latitude)) : -38.87942114574949;
+    const lngFloat = (longitude !== undefined && longitude !== null && String(longitude).trim() !== '' && parseFloat(String(longitude)) !== 0) ? parseFloat(String(longitude)) : -71.18375154775678;
     const DEFAULT_SCHEDULE_STRING = JSON.stringify([
       { day: 1, dayName: 'Lunes', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
       { day: 2, dayName: 'Martes', closed: false, periods: [{ open: '09:00', close: '13:00' }, { open: '17:00', close: '21:00' }] },
@@ -106,13 +106,13 @@ export async function POST(request: Request) {
         // 3. Generación automática de PortalUser
         if (selectedPricingKeys.includes('plan_comercio_completo') || selectedPricingKeys.includes('plan_basico_destacado')) {
           const safeName = commerce.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-          const email = `${safeName}@AluminéGO.ar`;
+          const email = `${safeName}@aluminego.ar`;
           
           const today = new Date();
           const d = String(today.getDate()).padStart(2, '0');
           const m = String(today.getMonth() + 1).padStart(2, '0');
           const y = today.getFullYear();
-          const password = `AluminéGO${d}${m}${y}`;
+          const password = `aluminego${d}${m}${y}`;
 
           // Verificar si ya existe el usuario
           let portalUser = await tx.portalUser.findUnique({ where: { email } });
@@ -146,5 +146,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-
-

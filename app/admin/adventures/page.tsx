@@ -39,9 +39,11 @@ export default function AdventuresAdminPage() {
     description: '',
     details: '',
     selectedPricingKeys: [] as string[],
-    latitude: '-39.237200',
-    longitude: '-70.931400',
-    openingHours: DEFAULT_SCHEDULE_STRING
+    latitude: '-38.87942114574949',
+    longitude: '-71.18375154775678',
+    openingHours: DEFAULT_SCHEDULE_STRING,
+    isVerified: false,
+    showSchedule: false
   });
   
   const [uploading, setUploading] = React.useState(false);
@@ -98,11 +100,13 @@ export default function AdventuresAdminPage() {
         selectedPricingKeys: adventure.subscription ? adventure.subscription.planType.split(', ').filter(Boolean) : [],
         latitude: adventure.latitude ? adventure.latitude.toString() : '',
         longitude: adventure.longitude ? adventure.longitude.toString() : '',
-        openingHours: adventure.openingHours || ''
+        openingHours: adventure.openingHours || '',
+        isVerified: adventure.isVerified || false,
+        showSchedule: adventure.showSchedule || false
       });
     } else {
       setEditingAdventure(null);
-      setFormData({ name: '', image: '', whatsapp: '', category: '', description: '', details: '', selectedPricingKeys: [], latitude: '-39.237200', longitude: '-70.931400', openingHours: DEFAULT_SCHEDULE_STRING });
+      setFormData({ name: '', image: '', whatsapp: '', category: '', description: '', details: '', selectedPricingKeys: [], latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING, isVerified: false, showSchedule: false });
     }
     setIsModalOpen(true);
   };
@@ -384,6 +388,26 @@ export default function AdventuresAdminPage() {
                       onChange={(val) => setFormData({...formData, openingHours: val})}
                     />
                   </div>
+                  <div style={{ display: 'flex', gap: '20px', marginTop: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.isVerified} 
+                        onChange={(e) => setFormData({...formData, isVerified: e.target.checked})}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <b>Comercio Verificado (Sello Seguro)</b>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.showSchedule} 
+                        onChange={(e) => setFormData({...formData, showSchedule: e.target.checked})}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <b>Mostrar Horarios Públicamente</b>
+                    </label>
+                  </div>
 
                   <div style={{ borderTop: '1px solid #cbd5e1', paddingTop: '16px', marginTop: '10px' }}>
                     <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
@@ -396,7 +420,7 @@ export default function AdventuresAdminPage() {
                           type="text" 
                           value={formData.latitude} 
                           onChange={(e) => setFormData({...formData, latitude: e.target.value})}
-                          placeholder="-39.2372"
+                          placeholder="-38.8833"
                         />
                       </div>
                       <div className="form-group" style={{ marginBottom: 0 }}>
@@ -405,7 +429,7 @@ export default function AdventuresAdminPage() {
                           type="text" 
                           value={formData.longitude} 
                           onChange={(e) => setFormData({...formData, longitude: e.target.value})}
-                          placeholder="-70.9314"
+                          placeholder="-71.1667"
                         />
                       </div>
                     </div>

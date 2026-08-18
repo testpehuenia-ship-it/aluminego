@@ -8,7 +8,7 @@ import PublicityBanner from '@/components/PublicityBanner';
 export const metadata: Metadata = {
   title: 'Blog y Novedades | AluminéGO',
   description: 'Descubre guías, recomendaciones y las últimas noticias sobre turismo en Aluminé.',
-  keywords: ['novedades Aluminé', 'blog turismo Aluminé', 'noticias Aluminé', 'guías viaje Aluminé'],
+  keywords: ['novedades alumine', 'blog turismo villa alumine', 'noticias moquehue', 'guías viaje alumine'],
   openGraph: {
     title: 'Blog y Novedades | AluminéGO',
     description: 'Guías, recomendaciones y noticias sobre turismo en Aluminé.',
@@ -40,7 +40,7 @@ export default async function NovedadesPage() {
       <div className="container" style={{ marginTop: '40px' }}>
         {articles.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'white', borderRadius: 'var(--radius-lg)' }}>
-            <p style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>Pronto publicaremos nuevos artículos y Guías de viaje.</p>
+            <p style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>Pronto publicaremos nuevos artículos y guías de viaje.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
@@ -83,5 +83,3 @@ export default async function NovedadesPage() {
     </div>
   );
 }
-
-

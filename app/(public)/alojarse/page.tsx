@@ -1,13 +1,13 @@
-﻿import { Metadata } from 'next';
+import { Metadata } from 'next';
 import { prisma, getActiveSubscriptionWhere } from '@/lib/db';
 import AlojarseClient from './AlojarseClient';
 
 export const metadata: Metadata = {
   title: 'Dónde Alojarse en Aluminé | Cabañas, Hoteles y Camping',
   description: 'Encuentra las mejores cabañas, hoteles, hostels y campings en Aluminé. Compara servicios, comodidades y reserva directo por WhatsApp.',
-  keywords: ['cabañas Aluminé', 'alojarse en Aluminé', 'hoteles Aluminé', 'camping Aluminé', 'alojamiento patagonia'],
+  keywords: ['cabañas villa alumine', 'alojarse en alumine', 'hoteles villa alumine', 'camping alumine', 'alojamiento patagonia'],
   alternates: {
-    canonical: 'https://www.AluminéGO.ar/alojarse',
+    canonical: 'https://www.aluminego.ar/alojarse',
   },
   openGraph: {
     title: 'Dónde Alojarse en Aluminé | Cabañas y Complejos Turísticos',
@@ -39,7 +39,7 @@ export default async function Page() {
     '@type': 'ItemList',
     'name': 'Alojamientos en Aluminé',
     'description': 'Directorio de cabañas, hoteles, aparts, hosterías y campings en Aluminé.',
-    'url': 'https://www.AluminéGO.ar/alojarse',
+    'url': 'https://www.aluminego.ar/alojarse',
     'itemListElement': accommodations.map((a, index) => ({
       '@type': 'ListItem',
       'position': index + 1,
@@ -48,12 +48,12 @@ export default async function Page() {
         'name': a.name,
         'image': a.image ? a.image.split(',').filter(Boolean) : [],
         'description': a.description || undefined,
-        'url': `https://www.AluminéGO.ar/alojarse/${a.id}`,
+        'url': `https://www.aluminego.ar/alojarse/${a.id}`,
         'telephone': a.whatsapp ? `+549${a.whatsapp}` : undefined,
         'address': {
           '@type': 'PostalAddress',
           'addressLocality': 'Aluminé',
-          'addressRegion': 'NeuQuén',
+          'addressRegion': 'Neuquén',
           'addressCountry': 'AR'
         }
       }
@@ -73,5 +73,3 @@ export default async function Page() {
     </>
   );
 }
-
-

@@ -41,7 +41,7 @@ export async function PUT(
     }
     const { id } = await params;
     const body = await request.json();
-    const { name, type, image, whatsapp, description, features, selectedPricingKeys, latitude, longitude, openingHours } = body;
+    const { name, type, image, whatsapp, description, features, selectedPricingKeys, latitude, longitude, openingHours, isVerified, showSchedule } = body;
 
     const result = await prisma.$transaction(async (tx: any) => {
       let generatedCredentials = null;
@@ -60,6 +60,8 @@ export async function PUT(
           latitude: latitude ? parseFloat(String(latitude)) : null,
           longitude: longitude ? parseFloat(String(longitude)) : null,
           openingHours: openingHours || null,
+          isVerified: Boolean(isVerified),
+          showSchedule: Boolean(showSchedule),
           features: {
             create: features.map((f: string) => ({ name: f }))
           }

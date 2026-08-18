@@ -7,6 +7,8 @@ import { Loader2, Search } from 'lucide-react';
 import Link from 'next/link';
 import FavoriteButton from '@/components/FavoriteButton';
 import OpeningStatusBadge from '@/components/OpeningStatusBadge';
+import VerifiedBadge from '@/components/VerifiedBadge';
+
 
 export default function ComerClient({ initialCategories, initialBusinesses }: { initialCategories?: any[], initialBusinesses?: any[] }) {
   const [selectedComercio, setSelectedComercio] = useState<any | null>(null);
@@ -94,7 +96,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
     return a.name.localeCompare(b.name);
   };
 
-  // Filtrar para mostrar Áºnicamente comercios de tipo 'Comercio Completo' o que tengan banner
+  // Filtrar para mostrar únicamente comercios de tipo 'Comercio Completo' o que tengan banner
   const activePremiumBusinesses = businesses.filter(b => getPriority(b) <= 3);
 
   const filteredActiveBusinesses = useMemo(() => {
@@ -273,12 +275,12 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
               transition: 'background-color 0.2s'
             }}
           >
-            ✖
+            ✕
           </button>
         )}
       </div>
 
-      {/* SECCIÁ“N DE DESTACADOS (CON BANNER) */}
+      {/* SECCIÓN DE DESTACADOS (CON BANNER) */}
       {bannerBusinesses.length > 0 && (
         <section style={{ marginBottom: '50px' }}>
           <h2 style={{ fontSize: '1.5rem', borderLeft: '5px solid var(--color-orange)', paddingLeft: '12px', marginBottom: '24px', color: 'var(--color-text-main)' }}>
@@ -287,7 +289,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
             {bannerBusinesses.map(comercio => {
               return (
-                <button key={comercio.id} style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: '2px solid var(--color-orange)' }}
+                <button key={comercio.id} style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: '2px solid var(--color-orange)' , position: 'relative' }}
                 onClick={() => {
                   setSelectedComercio(comercio);
                   setCart({});
@@ -299,7 +301,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                       id: comercio.id,
                       title: comercio.name,
                       image: comercio.image || '',
-                      type: 'gastronomía',
+                      type: 'Gastronomía',
                       url: `/comer/${comercio.id}`
                     }} />
                     {comercio.image ? (
@@ -313,9 +315,10 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                     <span style={{ fontSize: '0.75rem', color: 'var(--color-orange)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
                       {comercio.category?.title}
                     </span>
-                    <OpeningStatusBadge openingHours={comercio.openingHours} />
-                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '6px' }}>Ver menÁº y pedir</p>
+                    <OpeningStatusBadge openingHours={comercio.openingHours} isVisible={comercio.showSchedule} />
+                    <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600, marginTop: '6px' }}>Ver menú y pedir</p>
                   </div>
+                  <VerifiedBadge isVerified={comercio.isVerified} style={{ bottom: '8px', right: '8px' }} />
                 </button>
               );
             })}
@@ -378,7 +381,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                   catBusinesses.sort(sortServices).map(comercio => {
                     const isDestacado = comercio.subscription?.planType?.includes('plan_basico_destacado') || comercio.subscription?.planType?.includes('plan_comercio_completo');
                     return (
-                    <button key={comercio.id} style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)' }}
+                    <button key={comercio.id} style={{ backgroundColor: 'white', borderRadius: 'var(--radius-md)', overflow: 'hidden', boxShadow: 'var(--shadow-sm)', transition: 'var(--transition)', cursor: 'pointer', display: 'block', width: '100%', textAlign: 'left', border: isDestacado ? '2px solid var(--color-orange)' : '1px solid var(--color-border)' , position: 'relative' }}
                     onClick={() => {
                       setSelectedComercio(comercio);
                       setCart({});
@@ -390,7 +393,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                           id: comercio.id,
                           title: comercio.name,
                           image: comercio.image || '',
-                          type: 'gastronomía',
+                          type: 'Gastronomía',
                           url: `/comer/${comercio.id}`
                         }} />
                         {comercio.image ? (
@@ -401,10 +404,11 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                       </div>
                       <div style={{ padding: '16px' }}>
                         <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '4px', color: 'var(--color-text-main)' }}>{comercio.name}</h3>
-                        <OpeningStatusBadge openingHours={comercio.openingHours} />
-                        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '6px' }}>Ver menÁº y pedir</p>
-                      </div>
-                    </button>
+                        <OpeningStatusBadge openingHours={comercio.openingHours} isVisible={comercio.showSchedule} />
+                    <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600, marginTop: '6px' }}>Ver menú y pedir</p>
+                  </div>
+                  <VerifiedBadge isVerified={comercio.isVerified} style={{ bottom: '8px', right: '8px' }} />
+                </button>
                     );
                   })
                 )}
@@ -421,7 +425,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
         <PublicityBanner page="QueComer" section={3} height="100px" delay="4s" />
       </div>
 
-      {/* Modal de MenÁº */}
+      {/* Modal de Menú */}
       {selectedComercio && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}
         onClick={() => setSelectedComercio(null)}
@@ -431,14 +435,17 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
           >
             <div style={{ padding: '24px', borderBottom: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '4px' }}>{selectedComercio.name}</h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0 }}>{selectedComercio.name}</h2>
+                  <VerifiedBadge isVerified={selectedComercio.isVerified} style={{ position: 'relative', bottom: 0, right: 0 }} />
+                </div>
                 <p style={{ color: 'var(--color-orange)', fontWeight: 600, fontSize: '0.9rem' }}>{selectedComercio.category?.title}</p>
               </div>
-              <button onClick={() => setSelectedComercio(null)} style={{ fontSize: '1.5rem', fontWeight: 'bold', width: '40px', height: '40px', borderRadius: '50%', background: '#f1f5f9', border: 'none', cursor: 'pointer' }}>✖</button>
+              <button onClick={() => setSelectedComercio(null)} style={{ fontSize: '1.5rem', fontWeight: 'bold', width: '40px', height: '40px', borderRadius: '50%', background: '#f1f5f9', border: 'none', cursor: 'pointer' }}>✕</button>
             </div>
             
             <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
-              <OpeningStatusBadge openingHours={selectedComercio.openingHours} showWeeklySchedule={true} />
+              <OpeningStatusBadge openingHours={selectedComercio.openingHours} showWeeklySchedule={true} isVisible={selectedComercio.showSchedule} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '12px' }}>
                 {selectedComercio.menu?.map((item: any) => (
                   <div key={item.id} style={{ display: 'flex', gap: '16px', padding: '16px', border: '1px solid var(--color-border)', borderRadius: '20px', alignItems: 'center' }}>
@@ -467,7 +474,7 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
                   </div>
                 ))}
                 {(!selectedComercio.menu || selectedComercio.menu.length === 0) && (
-                  <p style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>Próximamente menÁº online para este comercio.</p>
+                  <p style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>Próximamente menú online para este comercio.</p>
                 )}
                 
                 {/* Botón estático para pedir carta completa por WhatsApp */}
@@ -543,5 +550,3 @@ export default function ComerClient({ initialCategories, initialBusinesses }: { 
     </div>
   );
 }
-
-

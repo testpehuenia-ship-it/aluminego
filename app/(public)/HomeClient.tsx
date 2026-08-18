@@ -107,8 +107,11 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
           <div style={{ marginBottom: '0px' }}>
             <h1 style={{ fontFamily: 'var(--font-oswald), sans-serif', fontSize: '4.5rem', fontWeight: 700, lineHeight: 0.9, marginBottom: '0px', textTransform: 'uppercase', letterSpacing: '1px', textShadow: '2px 4px 10px rgba(0,0,0,0.5)' }}>
               <span className="swap-green">TO</span><span className="swap-orange">DO</span>{' '}
-              <span style={{ color: 'white' }}>ALUMI</span><span className="swap-green">NÉ</span>
+              <span style={{ color: 'white' }}>PEHUEN</span><span className="swap-green">I</span><span className="swap-orange">A</span>
             </h1>
+            <h2 style={{ fontFamily: 'var(--font-oswald), sans-serif', fontSize: '4.0rem', fontWeight: 700, lineHeight: 0.9, marginBottom: '0px', textTransform: 'uppercase', letterSpacing: '1px', textShadow: '2px 4px 10px rgba(0,0,0,0.5)', textAlign: 'center', margin: 0 }}>
+              <span style={{ color: 'white' }}>MOQUE</span><span className="swap-green">HU</span><span className="swap-orange">E</span>
+            </h2>
           </div>
           <h2 style={{ fontFamily: 'var(--font-caveat), cursive', fontSize: '3.5rem', color: '#f1c40f', lineHeight: 0.8, marginBottom: '24px', transform: 'rotate(-2deg)', textShadow: '1px 2px 4px rgba(0,0,0,0.5)' }}>
             en un solo lugar
@@ -202,18 +205,57 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
       {/* 3. TRUST BADGES */}
       <section style={{ backgroundColor: 'white', padding: '30px 20px', marginTop: '10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', maxWidth: '600px', margin: '0 auto' }}>
-          {[
-            { icon: Clock, title: "RÁPIDO", sub: "Entrega en\nminutos" },
-            { icon: ShieldCheck, title: "SEGURO", sub: "Comercios\nverificados" },
-            { icon: Heart, title: "LOCAL", sub: "Apoyá lo\nnuestro" },
-            { icon: HeartHandshake, title: "SIEMPRE", sub: "Atención\ncercana" }
-          ].map((item, idx) => (
-            <div key={idx} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', borderRight: idx < 3 ? '1px solid var(--color-border)' : 'none' }}>
-              <item.icon size={32} color="var(--color-dark-green)" style={{ marginBottom: '8px' }} strokeWidth={1.5} />
-              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--color-dark-green)', marginBottom: '4px' }}>{item.title}</div>
-              <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', whiteSpace: 'pre-line', lineHeight: 1.2 }}>{item.sub}</div>
+          {/* RÁPIDO */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', borderRight: '1px solid var(--color-border)' }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '8px' }}>
+              <circle cx="12" cy="12" r="10" stroke="var(--color-dark-green)"></circle>
+              <polyline points="12 6 12 12 16 14" stroke="var(--color-orange)"></polyline>
+            </svg>
+            <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--color-dark-green)', marginBottom: '4px' }}>RÁPIDO</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', whiteSpace: 'pre-line', lineHeight: 1.2 }}>{'Entrega en\nminutos'}</div>
+          </div>
+
+          {/* SEGURO */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', borderRight: '1px solid var(--color-border)' }}>
+            <div style={{ position: 'relative', width: 32, height: 32, marginBottom: '8px' }}>
+              {/* The badge background */}
+              <svg viewBox="0 0 24 24" fill="var(--color-orange)" width="32" height="32">
+                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+              </svg>
+              {/* The checkmark */}
+              <svg viewBox="0 0 24 24" fill="none" stroke="var(--color-green)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" width="32" height="32" style={{ position: 'absolute', top: 0, left: 0 }}>
+                <path d="m9 12 2 2 4-4" />
+              </svg>
             </div>
-          ))}
+            <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--color-dark-green)', marginBottom: '4px' }}>SEGURO</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', whiteSpace: 'pre-line', lineHeight: 1.2 }}>{'Comercios\nverificados'}</div>
+          </div>
+
+          {/* LOCAL */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', borderRight: '1px solid var(--color-border)' }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '8px' }}>
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            </svg>
+            <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--color-dark-green)', marginBottom: '4px' }}>LOCAL</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', whiteSpace: 'pre-line', lineHeight: 1.2 }}>{'Apoyá lo\nnuestro'}</div>
+          </div>
+
+          {/* SIEMPRE */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '8px' }}>
+              <g stroke="var(--color-orange)">
+                <path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3" />
+                <path d="M3 4h8" />
+              </g>
+              <g stroke="var(--color-green)">
+                <path d="m11 17 2 2a1 1 0 1 0 3-3" />
+                <path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4" />
+                <path d="m21 3 1 11h-2" />
+              </g>
+            </svg>
+            <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--color-dark-green)', marginBottom: '4px' }}>SIEMPRE</div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', whiteSpace: 'pre-line', lineHeight: 1.2 }}>{'Atención\ncercana'}</div>
+          </div>
         </div>
       </section>
 
@@ -226,7 +268,7 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
       <section style={{ padding: '30px 20px', maxWidth: '600px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
-            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-dark-green)' }}>DESCUBRÍ Aluminé</h3>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-dark-green)' }}>DESCUBRÍ PEHUENIA</h3>
             <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Opciones para cada momento de tu viaje</p>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -286,5 +328,3 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
     </div>
   );
 }
-
-

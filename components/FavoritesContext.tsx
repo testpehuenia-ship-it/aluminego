@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
@@ -25,7 +25,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('AluminéGO_favorites');
+      const saved = localStorage.getItem('aluminego_favorites');
       if (saved) {
         setFavorites(JSON.parse(saved));
       }
@@ -37,7 +37,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('AluminéGO_favorites', JSON.stringify(favorites));
+      localStorage.setItem('aluminego_favorites', JSON.stringify(favorites));
     }
   }, [favorites, isLoaded]);
 
@@ -72,4 +72,3 @@ export function useFavorites() {
   }
   return context;
 }
-

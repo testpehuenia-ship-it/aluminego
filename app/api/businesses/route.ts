@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { verifySession, hashPassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, image, whatsapp, categoryId, menu, selectedPricingKeys, description, details, latitude, longitude, openingHours } = body;
+    const { name, image, whatsapp, categoryId, menu, selectedPricingKeys, description, details, latitude, longitude, openingHours, isVerified, showSchedule } = body;
 
     // Use a transaction if we are also creating subscriptions
     const result = await prisma.$transaction(async (tx) => {
@@ -51,6 +51,8 @@ export async function POST(request: Request) {
           latitude: latitude ? parseFloat(String(latitude)) : null,
           longitude: longitude ? parseFloat(String(longitude)) : null,
           openingHours: openingHours || null,
+          isVerified: Boolean(isVerified),
+          showSchedule: Boolean(showSchedule),
           menu: {
             create: menu 
               ? menu
@@ -112,13 +114,13 @@ export async function POST(request: Request) {
           // 3. Auto-generate PortalUser if applicable
           if (selectedPricingKeys.includes('plan_comercio_completo') || selectedPricingKeys.includes('plan_basico_destacado')) {
             const safeName = business.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            const email = `${safeName}@AluminéGO.ar`;
+            const email = `${safeName}@aluminego.ar`;
             
             const today = new Date();
             const d = String(today.getDate()).padStart(2, '0');
             const m = String(today.getMonth() + 1).padStart(2, '0');
             const y = today.getFullYear();
-            const password = `AluminéGO${d}${m}${y}`;
+            const password = `aluminego${d}${m}${y}`;
 
             // Check if user exists (to prevent unique constraint error)
             let portalUser = await tx.portalUser.findUnique({ where: { email } });
@@ -156,5 +158,3 @@ export async function POST(request: Request) {
     }, { status: 500 });
   }
 }
-
-

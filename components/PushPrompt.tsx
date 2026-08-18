@@ -40,7 +40,7 @@ export default function PushPrompt() {
       const daysSince = (Date.now() - lastInteraction) / (1000 * 60 * 60 * 24);
       
       if (daysSince < 1) {
-        // Menos de 1 día desde la Áºltima vez que dijo "Ahora no"
+        // Menos de 1 día desde la última vez que dijo "Ahora no"
         return;
       } else {
         // Pasaron más de 2 días, mostramos en modo recordatorio
@@ -64,53 +64,27 @@ export default function PushPrompt() {
   const handleSubscribe = async () => {
     setIsSubscribing(true);
     try {
-      // 1. Solicitar permiso nativo de forma compatible
-      let permission: NotificationPermission;
-      
-      if (typeof Notification === 'undefined' || !Notification.requestPermission) {
-        throw new Error('Notification.requestPermission no está soportado en este navegador.');
-      }
-
-      try {
-        const requestResult = Notification.requestPermission();
-        if (requestResult && typeof (requestResult as any).then === 'function') {
-          permission = await requestResult;
-        } else {
-          permission = await new Promise<NotificationPermission>((resolve) => {
-            Notification.requestPermission(resolve);
-          });
-        }
-      } catch (err) {
-        permission = await new Promise<NotificationPermission>((resolve) => {
-          Notification.requestPermission(resolve);
-        });
-      }
+      // 1. Solicitar permiso nativo
+      const permission = await Notification.requestPermission();
       
       localStorage.setItem('push_prompt_last_interaction', Date.now().toString());
       setShowPrompt(false);
 
       if (permission !== 'granted') {
-        console.log('Permiso de notificaciones denegado:', permission);
+        console.log('Permiso de notificaciones denegado');
         return;
       }
+      
 
-      // 2. Obtener registro del service worker con timeout para evitar colgarse
-      if (!('serviceWorker' in navigator)) {
-        throw new Error('Service workers no soportados.');
-      }
 
-      // Esperar a que el service worker esté listo, con un timeout máximo de 5 segundos
-      const registration = await Promise.race([
-        navigator.serviceWorker.ready,
-        new Promise<ServiceWorkerRegistration>((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout esperando al Service Worker')), 5000)
-        )
-      ]);
+      // 2. Obtener registro del service worker
+      const registration = await navigator.serviceWorker.ready;
 
       // 3. Suscribirse al Push Service del navegador
       const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
       if (!publicVapidKey) {
-        throw new Error('No se encontró NEXT_PUBLIC_VAPID_PUBLIC_KEY');
+        console.error('No se encontró NEXT_PUBLIC_VAPID_PUBLIC_KEY');
+        return;
       }
 
       const subscription = await registration.pushManager.subscribe({
@@ -119,7 +93,7 @@ export default function PushPrompt() {
       });
 
       // 4. Enviar suscripción a nuestro backend
-      const res = await fetch('/api/push/subscribe', {
+      await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -127,15 +101,10 @@ export default function PushPrompt() {
         body: JSON.stringify(subscription),
       });
 
-      if (!res.ok) {
-        throw new Error('Error al enviar la suscripción al servidor');
-      }
-
       console.log('Suscripción exitosa');
 
     } catch (error) {
       console.error('Error al suscribirse a push:', error);
-      // Siempre ocultamos el prompt en caso de error para no frustrar al usuario
       setShowPrompt(false);
     } finally {
       setIsSubscribing(false);
@@ -315,5 +284,3 @@ export default function PushPrompt() {
     </div>
   );
 }
-
-

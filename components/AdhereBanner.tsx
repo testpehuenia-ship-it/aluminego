@@ -82,5 +82,3 @@ export default function AdhereBanner() {
     </section>
   );
 }
-
-

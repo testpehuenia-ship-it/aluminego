@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { Send, Bell, Loader2, AlertCircle, CheckCircle2, Users, History, Copy, Trash2 } from 'lucide-react';
@@ -85,7 +85,7 @@ export default function NotificationsAdminPage() {
 
     const segmentNames: Record<string, string> = {
       'all': 'TODOS los usuarios',
-      'recent': 'Usuarios NUEVOS (Áºltimos 14 días)',
+      'recent': 'Usuarios NUEVOS (últimos 14 días)',
       'old': 'Usuarios ANTIGUOS (más de 14 días)'
     };
 
@@ -176,7 +176,7 @@ export default function NotificationsAdminPage() {
                 type="text" 
                 value={url} 
                 onChange={e => setUrl(e.target.value)} 
-                placeholder="Ej: https://AluminéGO.ar/alojarse (Por defecto va al inicio)"
+                placeholder="Ej: https://aluminego.ar/alojarse (Por defecto va al inicio)"
               />
             </div>
 
@@ -656,5 +656,3 @@ export default function NotificationsAdminPage() {
     </div>
   );
 }
-
-

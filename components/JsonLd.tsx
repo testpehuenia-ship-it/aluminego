@@ -5,7 +5,7 @@ export default function JsonLd() {
     "@context": "https://schema.org",
     "@type": ["WebSite", "LocalBusiness"],
     "name": "AluminéGO",
-    "url": "https://www.AluminéGO.ar",
+    "url": "https://www.aluminego.ar",
     "description": "Guía local, comercial y turística definitiva de Aluminé. Todo el turismo, alojamiento, gastronomía, paseos y servicios al alcance de tu mano.",
     "telephone": "+5492942524300",
     "address": {
@@ -19,7 +19,7 @@ export default function JsonLd() {
     ],
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://www.AluminéGO.ar/comercios?q={search_term_string}",
+      "target": "https://www.aluminego.ar/comercios?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };
@@ -31,4 +31,3 @@ export default function JsonLd() {
     />
   );
 }
-

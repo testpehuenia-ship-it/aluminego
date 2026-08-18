@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { 
@@ -43,9 +43,11 @@ export default function LocalServicesAdminPage() {
     bonifiedKeys: [] as string[],
     discountAmount: 0,
     linkedSections: [] as string[],
-    latitude: '-39.237200',
-    longitude: '-70.931400',
-    openingHours: DEFAULT_SCHEDULE_STRING
+    latitude: '-38.87942114574949',
+    longitude: '-71.18375154775678',
+    openingHours: DEFAULT_SCHEDULE_STRING,
+    isVerified: false,
+    showSchedule: false
   });
   
   const [uploading, setUploading] = React.useState(false);
@@ -84,7 +86,7 @@ export default function LocalServicesAdminPage() {
       const pricingData = await getPricingConfigs();
       setPricingOptions(pricingData);
 
-      // Extraer categorías Áºnicas de los servicios existentes + las fijas
+      // Extraer categorías únicas de los servicios existentes + las fijas
       const baseCats = ["Salud", "Seguridad", "Instituciones", "Transporte", "Comercios", "Servicios Profesionales", "Aventuras", "Otros", "Todos los servicios"];
       const existingCats = Array.from(new Set(data.map((s: any) => s.category).filter(Boolean))) as string[];
       setDynamicCategories(Array.from(new Set([...baseCats, ...existingCats])));
@@ -122,11 +124,13 @@ export default function LocalServicesAdminPage() {
         ].filter(Boolean) as string[],
         latitude: service.latitude ? service.latitude.toString() : '',
         longitude: service.longitude ? service.longitude.toString() : '',
-        openingHours: service.openingHours || ''
+        openingHours: service.openingHours || '',
+        isVerified: service.isVerified || false,
+        showSchedule: service.showSchedule || false
       });
     } else {
       setEditingService(null);
-      setFormData({ name: '', category: '', subcategory: '', address: '', whatsapp: '', image: '', description: '', details: '', selectedPricingKeys: [], bonifiedKeys: [], discountAmount: 0, linkedSections: [], latitude: '-39.237200', longitude: '-70.931400', openingHours: DEFAULT_SCHEDULE_STRING });
+      setFormData({ name: '', category: '', subcategory: '', address: '', whatsapp: '', image: '', description: '', details: '', selectedPricingKeys: [], bonifiedKeys: [], discountAmount: 0, linkedSections: [], latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING, isVerified: false, showSchedule: false });
     }
     setIsModalOpen(true);
   };
@@ -223,7 +227,7 @@ export default function LocalServicesAdminPage() {
           
           // Abrir WhatsApp automáticamente
           const cleanPhone = (creds.whatsapp || '').replace(/\D/g, '');
-          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://AluminéGO.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
+          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
           window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMsg)}`, '_blank');
         }
 
@@ -325,7 +329,7 @@ export default function LocalServicesAdminPage() {
         {loading ? (
           <div className="loading-state">
             <Loader2 size={40} className="animate-spin" />
-            <p>Cargando Guía local...</p>
+            <p>Cargando guía local...</p>
           </div>
         ) : (
           <div className="table-container">
@@ -402,7 +406,7 @@ export default function LocalServicesAdminPage() {
                   type="text" 
                   value={formData.name} 
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  placeholder="Ej: Policía de NeuQuén"
+                  placeholder="Ej: Policía de Neuquén"
                   required
                 />
               </div>
@@ -459,6 +463,26 @@ export default function LocalServicesAdminPage() {
                   onChange={(val) => setFormData({...formData, openingHours: val})}
                 />
               </div>
+                  <div style={{ display: 'flex', gap: '20px', marginTop: '12px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.isVerified} 
+                        onChange={(e) => setFormData({...formData, isVerified: e.target.checked})}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <b>Comercio Verificado (Sello Seguro)</b>
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.showSchedule} 
+                        onChange={(e) => setFormData({...formData, showSchedule: e.target.checked})}
+                        style={{ width: '16px', height: '16px' }}
+                      />
+                      <b>Mostrar Horarios Públicamente</b>
+                    </label>
+                  </div>
               <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '16px', marginTop: '8px', marginBottom: '8px' }}>
                 <label style={{ fontSize: '0.85rem', fontWeight: 600, color: '#475569', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                   <MapPin size={16} /> Geolocalización (Mapa)
@@ -470,7 +494,7 @@ export default function LocalServicesAdminPage() {
                       type="text" 
                       value={formData.latitude} 
                       onChange={(e) => setFormData({...formData, latitude: e.target.value})}
-                      placeholder="-39.2372"
+                      placeholder="-38.8833"
                     />
                   </div>
                   <div className="form-group" style={{ marginBottom: 0 }}>
@@ -479,7 +503,7 @@ export default function LocalServicesAdminPage() {
                       type="text" 
                       value={formData.longitude} 
                       onChange={(e) => setFormData({...formData, longitude: e.target.value})}
-                      placeholder="-70.9314"
+                      placeholder="-71.1667"
                     />
                   </div>
                 </div>
@@ -681,15 +705,15 @@ export default function LocalServicesAdminPage() {
                       <Building2 size={16} /> Aparecer en otras secciones
                     </h4>
                     <p style={{ fontSize: '0.8rem', color: '#0c4a6e', marginBottom: '16px' }}>
-                      Como tiene el plan Comercio Completo, puede elegir en Qué otras secciones de la Página aparecerá automáticamente.
+                      Como tiene el plan Comercio Completo, puede elegir en qué otras secciones de la página aparecerá automáticamente.
                     </p>
                     
                     <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                       {[
-                        { id: 'gastronomia', label: 'ðŸ½ï¸ gastronomía' },
-                        { id: 'alojamiento', label: 'ðŸ›ï¸ Alojamiento' },
-                        { id: 'aventuras', label: 'â›°ï¸ Aventuras' },
-                        { id: 'comercios', label: 'ðŸ›ï¸ Comercios' },
+                        { id: 'gastronomia', label: '🍽️ Gastronomía' },
+                        { id: 'alojamiento', label: '🛏️ Alojamiento' },
+                        { id: 'aventuras', label: '⛰️ Aventuras' },
+                        { id: 'comercios', label: '🛍️ Comercios' },
                         { id: 'guia-local', label: '📖 Guía Local' },
                         { id: 'novedades', label: '📰 Novedades' }
                       ].map(section => (
@@ -746,7 +770,7 @@ export default function LocalServicesAdminPage() {
             </div>
 
             <a 
-              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://AluminéGO.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
+              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"
@@ -822,5 +846,3 @@ export default function LocalServicesAdminPage() {
     </div>
   );
 }
-
-

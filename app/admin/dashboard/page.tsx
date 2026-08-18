@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -262,7 +262,7 @@ export default function DashboardPage() {
         <div className="analytics-header">
           <h2>Análisis de Tráfico</h2>
           <div className="chart-controls">
-            <button className={`chart-btn ${chartType === 'area' ? 'active' : ''}`} onClick={() => setChartType('area')} title="Gráfico de Área"><Activity size={18} /></button>
+            <button className={`chart-btn ${chartType === 'area' ? 'active' : ''}`} onClick={() => setChartType('area')} title="Gráfico de Área"><Activity size={18} /></button>
             <button className={`chart-btn ${chartType === 'line' ? 'active' : ''}`} onClick={() => setChartType('line')} title="Gráfico de Líneas"><LineChartIcon size={18} /></button>
             <button className={`chart-btn ${chartType === 'bar' ? 'active' : ''}`} onClick={() => setChartType('bar')} title="Gráfico de Barras"><BarChart2 size={18} /></button>
             <button className={`chart-btn ${chartType === 'pie' ? 'active' : ''}`} onClick={() => setChartType('pie')} title="Gráfico Circular (Top Páginas)"><PieChartIcon size={18} /></button>
@@ -293,7 +293,7 @@ export default function DashboardPage() {
                 </div>
               ))}
               {analytics.pageVisits.length === 0 && (
-                <div className="no-data-small">No hay visitas registradas aÁºn.</div>
+                <div className="no-data-small">No hay visitas registradas aún.</div>
               )}
             </div>
           </div>
@@ -353,7 +353,7 @@ export default function DashboardPage() {
                         <div className="row-info">
                           <span className="entity-name">{item.name}</span>
                           <span className="entity-extra">
-                            {item.type || item.category || (modalData.key === 'businesses' ? 'gastronomía' : '')}
+                            {item.type || item.category || (modalData.key === 'businesses' ? 'Gastronomía' : '')}
                           </span>
                         </div>
                         <span className={`plan-badge ${isPremium ? 'premium' : 'basic'}`}>
@@ -850,5 +850,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-

@@ -7,6 +7,8 @@ import Link from 'next/link';
 import ReviewSection from '@/components/ReviewSection';
 import EntityMap from '@/components/EntityMap';
 import OpeningStatusBadge from '@/components/OpeningStatusBadge';
+import VerifiedBadge from '@/components/VerifiedBadge';
+
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -32,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${commerce.name} en ${locality} | Tiendas y Mercados`,
-    description: `Conoce los detalles, contacto y ubicación de ${commerce.name} en ${locality}. Rubro: ${commerce.type}.`,
+    description: `Conoce los detalles, contacto y ubicación de ${commerce.name} en ${locality} y Moquehue. Rubro: ${commerce.type}.`,
     alternates: {
       canonical: `https://www.aluminego.ar/comercios/${commerce.slug || commerce.id}`,
     },
@@ -144,7 +146,7 @@ export default async function CommerceDetailPage({ params }: PageProps) {
                 </div>
               )}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
-                <OpeningStatusBadge openingHours={commerce.openingHours} showWeeklySchedule={true} />
+                <OpeningStatusBadge openingHours={commerce.openingHours} showWeeklySchedule={true} isVisible={commerce.showSchedule} />
               </div>
             </div>
             

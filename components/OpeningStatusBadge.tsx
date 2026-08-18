@@ -7,11 +7,12 @@ import { checkBusinessStatus, type BusinessStatus } from '@/lib/schedule';
 interface OpeningStatusBadgeProps {
   openingHours: string | null | undefined;
   showWeeklySchedule?: boolean;
+  isVisible?: boolean;
 }
 
 const DAYS_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
-export default function OpeningStatusBadge({ openingHours, showWeeklySchedule = false }: OpeningStatusBadgeProps) {
+export default function OpeningStatusBadge({ openingHours, showWeeklySchedule = false, isVisible = true }: OpeningStatusBadgeProps) {
   const [status, setStatus] = useState<BusinessStatus | null>(null);
   const [isOpenAccordion, setIsOpenAccordion] = useState(false);
 
@@ -27,6 +28,14 @@ export default function OpeningStatusBadge({ openingHours, showWeeklySchedule = 
     const interval = setInterval(updateStatus, 30000);
     return () => clearInterval(interval);
   }, [openingHours]);
+
+  if (isVisible === false) {
+    return (
+      <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '4px', margin: '8px 0' }}>
+        <Clock size={12} /> SIN INFORMACIÓN
+      </span>
+    );
+  }
 
   if (!status || !status.weeklySchedule) {
     return null;

@@ -6,11 +6,11 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Mapa Interactivo 3D y Estado de Rutas de Aluminé',
-  description: 'Explora Aluminé con nuestro mapa 3D interactivo. Conoce las principales rutas de acceso desde NeuQuén y Aluminé.',
-  keywords: ['mapa Aluminé', 'rutas a Aluminé', 'mapa 3d Aluminé', 'como llegar a Aluminé', 'estado de rutas Aluminé'],
+  description: 'Explora Aluminé con nuestro mapa 3D interactivo. Conoce las principales rutas de acceso desde Neuquén y Aluminé.',
+  keywords: ['mapa villa alumine', 'rutas a villa alumine', 'moquehue mapa 3d', 'como llegar a villa alumine', 'estado de rutas alumine'],
   openGraph: {
     title: 'Mapa Interactivo 3D y Rutas de Acceso a Aluminé | AluminéGO',
-    description: 'Navega en 3D por Aluminé, localiza atractivos turísticos y planifica tu ruta de llegada de forma segura.',
+    description: 'Navega en 3D por la villa, localiza atractivos turísticos y planifica tu ruta de llegada de forma segura.',
     url: '/mapa',
   }
 };
@@ -53,7 +53,7 @@ export default async function Page() {
   const mappedBusinesses = businesses.map(b => ({
     id: b.id,
     title: b.name,
-    description: b.category?.title || 'gastronomía',
+    description: b.category?.title || 'Gastronomía',
     latitude: b.latitude!,
     longitude: b.longitude!,
     color: '#ea580c', // Naranja
@@ -78,5 +78,3 @@ export default async function Page() {
     initialMarkers={JSON.parse(JSON.stringify(markers))} 
   />;
 }
-
-

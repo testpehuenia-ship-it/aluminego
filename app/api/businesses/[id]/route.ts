@@ -43,7 +43,7 @@ export async function PUT(
     }
     const { id } = await params;
     const body = await request.json();
-    const { name, image, whatsapp, categoryId, menu, selectedPricingKeys, description, details, latitude, longitude, openingHours } = body;
+    const { name, image, whatsapp, categoryId, menu, selectedPricingKeys, description, details, latitude, longitude, openingHours, isVerified, showSchedule } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'ID del comercio no proporcionado' }, { status: 400 });
@@ -65,6 +65,8 @@ export async function PUT(
           latitude: latitude ? parseFloat(String(latitude)) : null,
           longitude: longitude ? parseFloat(String(longitude)) : null,
           openingHours: openingHours || null,
+          isVerified: Boolean(isVerified),
+          showSchedule: Boolean(showSchedule),
         }
       });
 

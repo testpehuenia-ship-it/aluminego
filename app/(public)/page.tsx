@@ -4,12 +4,12 @@ import HomeClient from './HomeClient';
 import { getAluminéWeather } from '@/lib/services/weather';
 
 export const metadata: Metadata = {
-  title: 'AluminéGO | Guía turística y Delivery en Aluminé',
-  description: 'La Guía turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé.',
+  title: 'AluminéGO | Guía Turística y Delivery en Aluminé',
+  description: 'La Guía Turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé.',
   keywords: ['Aluminé', 'Guía turística Aluminé', 'delivery Aluminé', 'comer en Aluminé', 'cabañas Aluminé', 'turismo patagonia'],
   openGraph: {
-    title: 'AluminéGO | Guía turística y Delivery en Aluminé',
-    description: 'La Guía turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé.',
+    title: 'AluminéGO | Guía Turística y Delivery en Aluminé',
+    description: 'La Guía Turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé.',
     url: '/',
   }
 };
@@ -28,5 +28,3 @@ export default async function Page() {
     weatherData={weatherData} 
   />;
 }
-
-

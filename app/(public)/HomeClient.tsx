@@ -107,11 +107,8 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
           <div style={{ marginBottom: '0px' }}>
             <h1 style={{ fontFamily: 'var(--font-oswald), sans-serif', fontSize: '4.5rem', fontWeight: 700, lineHeight: 0.9, marginBottom: '0px', textTransform: 'uppercase', letterSpacing: '1px', textShadow: '2px 4px 10px rgba(0,0,0,0.5)' }}>
               <span className="swap-green">TO</span><span className="swap-orange">DO</span>{' '}
-              <span style={{ color: 'white' }}>PEHUEN</span><span className="swap-green">I</span><span className="swap-orange">A</span>
+              <span style={{ color: 'white' }}>ALUMI</span><span className="swap-green">N</span><span className="swap-orange">É</span>
             </h1>
-            <h2 style={{ fontFamily: 'var(--font-oswald), sans-serif', fontSize: '4.0rem', fontWeight: 700, lineHeight: 0.9, marginBottom: '0px', textTransform: 'uppercase', letterSpacing: '1px', textShadow: '2px 4px 10px rgba(0,0,0,0.5)', textAlign: 'center', margin: 0 }}>
-              <span style={{ color: 'white' }}>MOQUE</span><span className="swap-green">HU</span><span className="swap-orange">E</span>
-            </h2>
           </div>
           <h2 style={{ fontFamily: 'var(--font-caveat), cursive', fontSize: '3.5rem', color: '#f1c40f', lineHeight: 0.8, marginBottom: '24px', transform: 'rotate(-2deg)', textShadow: '1px 2px 4px rgba(0,0,0,0.5)' }}>
             en un solo lugar
@@ -268,7 +265,7 @@ export default function HomeClient({ initialCategories, weatherData }: { initial
       <section style={{ padding: '30px 20px', maxWidth: '600px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
-            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-dark-green)' }}>DESCUBRÍ PEHUENIA</h3>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-dark-green)' }}>DESCUBRÍ ALUMINÉ</h3>
             <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Opciones para cada momento de tu viaje</p>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>

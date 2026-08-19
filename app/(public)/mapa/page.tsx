@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Mapa Interactivo 3D y Estado de Rutas de Aluminé',
   description: 'Explora Aluminé con nuestro mapa 3D interactivo. Conoce las principales rutas de acceso desde Neuquén y Aluminé.',
-  keywords: ['mapa villa alumine', 'rutas a villa alumine', 'moquehue mapa 3d', 'como llegar a villa alumine', 'estado de rutas alumine'],
+  keywords: ['mapa villa alumine', 'rutas a villa alumine', 'alumine mapa 3d', 'como llegar a villa alumine', 'estado de rutas alumine'],
   openGraph: {
     title: 'Mapa Interactivo 3D y Rutas de Acceso a Aluminé | AluminéGO',
     description: 'Navega en 3D por la villa, localiza atractivos turísticos y planifica tu ruta de llegada de forma segura.',

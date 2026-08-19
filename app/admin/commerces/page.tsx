@@ -432,7 +432,6 @@ export default function CommercesAdminPage() {
                       style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.95rem' }}
                     >
                       <option value="Aluminé">Aluminé</option>
-                      <option value="Moquehue">Moquehue</option>
                     </select>
                   </div>
                   <div className="form-group">

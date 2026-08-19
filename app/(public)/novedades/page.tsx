@@ -8,7 +8,7 @@ import PublicityBanner from '@/components/PublicityBanner';
 export const metadata: Metadata = {
   title: 'Blog y Novedades | AluminéGO',
   description: 'Descubre guías, recomendaciones y las últimas noticias sobre turismo en Aluminé.',
-  keywords: ['novedades alumine', 'blog turismo villa alumine', 'noticias moquehue', 'guías viaje alumine'],
+  keywords: ['novedades alumine', 'blog turismo villa alumine', 'noticias alumine', 'guías viaje alumine'],
   openGraph: {
     title: 'Blog y Novedades | AluminéGO',
     description: 'Guías, recomendaciones y noticias sobre turismo en Aluminé.',

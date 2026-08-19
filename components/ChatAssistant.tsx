@@ -167,7 +167,7 @@ export default function ChatAssistant() {
       const userMessage: Message = { role: 'user', content: name };
       const welcomeMessage: Message = { 
         role: 'assistant', 
-        content: `¡Un placer conocerte, ${name}! ¿En qué te puedo ayudar hoy sobre Aluminé o Moquehue?` 
+        content: `¡Un placer conocerte, ${name}! ¿En qué te puedo ayudar hoy sobre Aluminé?` 
       };
       
       if (isVoiceMode) {

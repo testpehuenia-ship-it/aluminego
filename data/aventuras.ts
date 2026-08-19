@@ -1,4 +1,4 @@
-﻿export interface Aventura {
+export interface Aventura {
   id: string;
   name: string;
   category: string;
@@ -15,7 +15,7 @@ export const AVENTURAS: Aventura[] = [
     category: "Trekking",
     image: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=800&q=80",
     whatsapp: "5492942123456",
-    description: "Una caminata inolvidable hasta el cráter del volcán, donde podremos observar la laguna y tener una vista panorámica de los lagos Aluminé y Moquehue.",
+    description: "Una caminata inolvidable hasta el cráter del volcán, donde podremos observar la laguna y tener una vista panorámica del lago Aluminé.",
     details: ["Dificultad: Media", "Duración: 4hs", "Edad mín: 12 años"]
   },
   {

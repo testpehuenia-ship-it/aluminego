@@ -1,4 +1,4 @@
-﻿export interface GuiaItem {
+export interface GuiaItem {
   id: string;
   nombre: string;
   rubro?: string;
@@ -19,7 +19,7 @@ export const GUIA_ITEMS: GuiaItem[] = [
   // 1. Instituciones y Servicios Públicos
   {
     id: "inst-muni",
-    nombre: "Municipalidad Aluminé Moquehue",
+    nombre: "Municipalidad Aluminé",
     rubro: "Servicio Público",
     direccion: "Ruta Provincial 13, km 10",
     categoria: "Instituciones y Servicios Públicos"
@@ -100,7 +100,7 @@ export const GUIA_ITEMS: GuiaItem[] = [
     id: "aloj-melewe",
     nombre: "Melewe",
     rubro: "Hostería - Cabañas",
-    direccion: "Lago Moquehue",
+    direccion: "Lago Aluminé",
     categoria: "Alojamiento"
   },
   {
@@ -135,7 +135,7 @@ export const GUIA_ITEMS: GuiaItem[] = [
     id: "aloj-busqueda",
     nombre: "La Búsqueda",
     rubro: "Apart Hotel",
-    direccion: "Ruta 11 Km 10.2 Moquehue",
+    direccion: "Ruta 11 Km 10.2 Aluminé",
     categoria: "Alojamiento"
   },
 
@@ -179,7 +179,7 @@ export const GUIA_ITEMS: GuiaItem[] = [
     id: "gastro-isla",
     nombre: "Isla de Aire",
     rubro: "Resto-Bar",
-    direccion: "Moquehue (RP 11 Km 12)",
+    direccion: "Aluminé (RP 11 Km 12)",
     categoria: "Gastronomía"
   },
   {
@@ -209,14 +209,14 @@ export const GUIA_ITEMS: GuiaItem[] = [
     id: "com-radales",
     nombre: "Los Radales",
     rubro: "Supermercado",
-    direccion: "Moquehue",
+    direccion: "Aluminé",
     categoria: "Comercios y Proveedurías"
   },
   {
     id: "com-lengas",
     nombre: "Las Lengas",
     rubro: "Ferretería",
-    direccion: "Moquehue",
+    direccion: "Aluminé",
     categoria: "Comercios y Proveedurías"
   },
   {
@@ -244,7 +244,7 @@ export const GUIA_ITEMS: GuiaItem[] = [
     id: "com-pinonero",
     nombre: "El Piñonero",
     rubro: "Supermercado",
-    direccion: "Moquehue",
+    direccion: "Aluminé",
     categoria: "Comercios y Proveedurías"
   },
   {
@@ -330,9 +330,9 @@ export const GUIA_ITEMS: GuiaItem[] = [
   },
   {
     id: "medio-muni2",
-    nombre: "Radio Municipal Moquehue",
+    nombre: "Radio Municipal Aluminé",
     rubro: "FM 89.3",
-    direccion: "Moquehue",
+    direccion: "Aluminé",
     categoria: "Medios de Comunicación"
   }
 ];

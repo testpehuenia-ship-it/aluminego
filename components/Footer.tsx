@@ -13,7 +13,7 @@ export default function Footer() {
           <span style={{ color: 'var(--color-green)' }}>Aluminé</span>
           <span style={{ color: 'var(--color-orange)' }}>GO</span>
         </h3>
-        <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1rem' }}>La guía Oficial de Aluminé - Moquehue - Patagonia Argentina</p>
+        <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1rem' }}>La guía Oficial de Aluminé - Patagonia Argentina</p>
         
         <div style={{ margin: '16px 0' }}>
           <button 

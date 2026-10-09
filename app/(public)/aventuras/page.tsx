@@ -5,7 +5,7 @@ import AventurasClient from './AventurasClient';
 export const metadata: Metadata = {
   title: 'Qué Hacer y Aventuras en Aluminé | Excursiones',
   description: 'Descubre increíbles actividades en Aluminé: trekking, paseos lacustres, cabalgatas, esquí en el Batea Mahuida y pesca con mosca. Reserva directo por WhatsApp.',
-  keywords: ['qué hacer en villa alumine', 'actividades alumine', 'excursiones villa alumine', 'cabalgatas alumine', 'nieve batea mahuida', 'pesca en alumine'],
+  keywords: ['qué hacer en villa aluminé', 'actividades aluminé', 'excursiones villa aluminé', 'cabalgatas aluminé', 'nieve batea mahuida', 'pesca en aluminé'],
   alternates: {
     canonical: 'https://www.aluminego.ar/aventuras',
   },

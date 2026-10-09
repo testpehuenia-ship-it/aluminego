@@ -5,13 +5,16 @@ import MapaClient from './MapaClient';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Mapa Interactivo 3D y Estado de Rutas de Aluminé',
-  description: 'Explora Aluminé con nuestro mapa 3D interactivo. Conoce las principales rutas de acceso desde Neuquén y Aluminé.',
-  keywords: ['mapa villa alumine', 'rutas a villa alumine', 'alumine mapa 3d', 'como llegar a villa alumine', 'estado de rutas alumine'],
+  title: 'Mapa Interactivo y Estado de Rutas de Aluminé | AluminéGO',
+  description: 'Explora Aluminé con nuestro mapa interactivo. Consulta atractivos, servicios locales, clima y el estado oficial de rutas de la DPV Neuquén.',
+  keywords: ['mapa aluminé', 'rutas a aluminé', 'como llegar a aluminé', 'estado de rutas aluminé', 'clima aluminé', 'vialidad neuquén'],
+  alternates: {
+    canonical: 'https://www.aluminego.ar/mapa',
+  },
   openGraph: {
-    title: 'Mapa Interactivo 3D y Rutas de Acceso a Aluminé | AluminéGO',
-    description: 'Navega en 3D por la villa, localiza atractivos turísticos y planifica tu ruta de llegada de forma segura.',
-    url: '/mapa',
+    title: 'Mapa Interactivo y Rutas de Acceso a Aluminé | AluminéGO',
+    description: 'Navega por Aluminé, localiza atractivos turísticos, prestadores y planifica tu viaje de forma segura.',
+    url: 'https://www.aluminego.ar/mapa',
   }
 };
 

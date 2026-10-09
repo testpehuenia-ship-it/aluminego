@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { signSession, verifyPassword } from '@/lib/auth';
+import { signSession, verifyPassword, verifySession } from '@/lib/auth';
 import { cookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
@@ -33,5 +33,29 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error during login:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function GET() {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get('admin_session')?.value;
+    const session = verifySession(token);
+    if (session) {
+      return NextResponse.json({ authenticated: true, user: { username: session.username } });
+    }
+    return NextResponse.json({ authenticated: false }, { status: 401 });
+  } catch (error) {
+    return NextResponse.json({ authenticated: false }, { status: 500 });
+  }
+}
+
+export async function DELETE() {
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete('admin_session');
+    return NextResponse.json({ success: true, message: 'Sesión cerrada correctamente' });
+  } catch (error) {
+    return NextResponse.json({ error: 'Error cerrando sesión' }, { status: 500 });
   }
 }

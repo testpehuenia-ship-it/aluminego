@@ -39,6 +39,7 @@ model Business {
   openingHours String?
   isVerified   Boolean       @default(false)
   showSchedule Boolean       @default(false)
+  hasDelivery  Boolean       @default(false)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }
@@ -62,6 +63,7 @@ model Accommodation {
   image        String
   whatsapp     String
   description  String?
+  details      String?
   latitude     Float?
   longitude    Float?
   features     Feature[]
@@ -123,6 +125,7 @@ model LocalService {
   openingHours String?
   isVerified   Boolean       @default(false)
   showSchedule Boolean       @default(false)
+  hasDelivery  Boolean       @default(false)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 }
@@ -146,6 +149,7 @@ model Commerce {
   openingHours String?
   isVerified   Boolean          @default(false)
   showSchedule Boolean          @default(false)
+  hasDelivery  Boolean          @default(false)
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 }
@@ -336,4 +340,20 @@ model Review {
   
   commerceId      String?
   commerce        Commerce?      @relation(fields: [commerceId], references: [id], onDelete: Cascade)
+}
+
+model AppInstallation {
+  id           String   @id @default(cuid())
+  deviceId     String   @unique
+  platform     String   // "Android", "iOS", "Windows", "macOS", "Otro"
+  browser      String?  // "Chrome", "Safari", "Edge", "Firefox", etc.
+  isStandalone Boolean  @default(true) // Si está ejecutándose como PWA instalada
+  hasPush      Boolean  @default(false) // Si tiene notificaciones push habilitadas
+  language     String?  // ej. "es-AR", "es", "en"
+  screenSize   String?  // ej. "390x844"
+  installedAt  DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+  sessionCount Int      @default(1)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }

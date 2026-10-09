@@ -2,8 +2,19 @@
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
+import { verifySession } from '@/lib/auth'
+
+async function requireAdminAuth() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('admin_session')?.value
+  if (!verifySession(token)) {
+    throw new Error('No autorizado: sesión de administrador requerida')
+  }
+}
 
 export async function getPricingConfigs() {
+  await requireAdminAuth()
   const configs = await prisma.pricingConfig.findMany({
     orderBy: { createdAt: 'asc' }
   })
@@ -31,6 +42,7 @@ export async function getPricingConfigs() {
 }
 
 export async function updatePricingConfig(key: string, price: number) {
+  await requireAdminAuth()
   try {
     await prisma.pricingConfig.update({
       where: { key },

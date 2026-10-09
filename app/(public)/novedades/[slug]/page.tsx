@@ -19,14 +19,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: 'Artículo no encontrado | AluminéGO' };
   }
 
+  const snippet = article.content.replace(/<[^>]+>/g, '').substring(0, 160) + '...';
+
   return {
     title: `${article.title} | Novedades AluminéGO`,
-    description: article.content.replace(/<[^>]+>/g, '').substring(0, 160) + '...',
+    description: snippet,
+    alternates: {
+      canonical: `https://www.aluminego.ar/novedades/${slug}`,
+    },
     openGraph: {
       title: article.title,
-      description: article.content.replace(/<[^>]+>/g, '').substring(0, 160) + '...',
+      description: snippet,
       images: article.image ? [article.image] : [],
-      url: `/novedades/${slug}`,
+      url: `https://www.aluminego.ar/novedades/${slug}`,
+      type: 'article',
     }
   };
 }
@@ -41,8 +47,39 @@ export default async function ArticleDetailPage({ params }: PageProps) {
     notFound();
   }
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    'headline': article.title,
+    'description': article.content.replace(/<[^>]+>/g, '').substring(0, 160) + '...',
+    'image': article.image ? [article.image] : [],
+    'datePublished': article.createdAt.toISOString(),
+    'dateModified': article.updatedAt.toISOString(),
+    'author': {
+      '@type': 'Person',
+      'name': article.author || 'AluminéGO'
+    },
+    'publisher': {
+      '@type': 'Organization',
+      'name': 'AluminéGO',
+      'logo': {
+        '@type': 'ImageObject',
+        'url': 'https://www.aluminego.ar/icon-512x512.png'
+      }
+    },
+    'mainEntityOfPage': {
+      '@type': 'WebPage',
+      '@id': `https://www.aluminego.ar/novedades/${slug}`
+    }
+  };
+
   return (
-    <div style={{ backgroundColor: 'var(--color-bg)', minHeight: '100vh', paddingBottom: '80px' }}>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <div style={{ backgroundColor: 'var(--color-bg)', minHeight: '100vh', paddingBottom: '80px' }}>
       <div style={{ position: 'relative', height: '45vh', width: '100%', minHeight: '350px' }}>
         {article.image ? (
           <Image src={article.image} alt={article.title} fill style={{ objectFit: 'cover' }} priority />
@@ -100,5 +137,6 @@ export default async function ArticleDetailPage({ params }: PageProps) {
         </div>
       </div>
     </div>
+    </>
   );
 }

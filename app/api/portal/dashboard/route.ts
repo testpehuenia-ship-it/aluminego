@@ -43,7 +43,8 @@ export async function GET() {
         image: b.image || '', 
         latitude: b.latitude || '', 
         longitude: b.longitude || '',
-        categoryId: b.categoryId || ''
+        categoryId: b.categoryId || '',
+        hasDelivery: b.hasDelivery || false
       })),
       ...portalUser.accommodations.map(a => ({ 
         id: a.id, 
@@ -55,7 +56,8 @@ export async function GET() {
         image: a.image || '', 
         latitude: a.latitude || '', 
         longitude: a.longitude || '',
-        accommodationType: a.type || ''
+        accommodationType: a.type || '',
+        hasDelivery: false
       })),
       ...portalUser.adventures.map(a => ({ 
         id: a.id, 
@@ -67,7 +69,8 @@ export async function GET() {
         image: a.image || '', 
         latitude: a.latitude || '', 
         longitude: a.longitude || '',
-        category: a.category || ''
+        category: a.category || '',
+        hasDelivery: false
       })),
       ...portalUser.localServices.map(l => ({ 
         id: l.id, 
@@ -81,7 +84,8 @@ export async function GET() {
         longitude: l.longitude || '',
         category: l.category || '',
         subcategory: l.subcategory || '',
-        address: l.address || ''
+        address: l.address || '',
+        hasDelivery: l.hasDelivery || false
       })),
       ...portalUser.commerces.map(c => ({
         id: c.id,
@@ -94,7 +98,8 @@ export async function GET() {
         latitude: c.latitude || '',
         longitude: c.longitude || '',
         category: 'Comercios',
-        subcategory: c.type || ''
+        subcategory: c.type || '',
+        hasDelivery: c.hasDelivery || false
       }))
     ];
 

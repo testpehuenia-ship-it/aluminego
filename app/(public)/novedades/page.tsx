@@ -6,13 +6,16 @@ import { Calendar, ArrowRight } from 'lucide-react';
 import PublicityBanner from '@/components/PublicityBanner';
 
 export const metadata: Metadata = {
-  title: 'Blog y Novedades | AluminéGO',
-  description: 'Descubre guías, recomendaciones y las últimas noticias sobre turismo en Aluminé.',
-  keywords: ['novedades alumine', 'blog turismo villa alumine', 'noticias alumine', 'guías viaje alumine'],
+  title: 'Blog y Novedades de Aluminé | Guías y Noticias | AluminéGO',
+  description: 'Descubre guías, recomendaciones y las últimas noticias sobre turismo, rafting y comercio en Aluminé, Neuquén.',
+  keywords: ['novedades alumine', 'blog turismo alumine', 'noticias alumine', 'guías viaje alumine', 'rafting río alumine'],
+  alternates: {
+    canonical: 'https://www.aluminego.ar/novedades',
+  },
   openGraph: {
     title: 'Blog y Novedades | AluminéGO',
     description: 'Guías, recomendaciones y noticias sobre turismo en Aluminé.',
-    url: '/novedades',
+    url: 'https://www.aluminego.ar/novedades',
   }
 };
 
@@ -40,7 +43,7 @@ export default async function NovedadesPage() {
       <div className="container" style={{ marginTop: '40px' }}>
         {articles.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', backgroundColor: 'white', borderRadius: 'var(--radius-lg)' }}>
-            <p style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>Pronto publicaremos nuevos artículos y guías de viaje.</p>
+            <p style={{ fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>Pronto publicaremos nuevos artículos y guías de viaje sobre Aluminé.</p>
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
@@ -62,7 +65,6 @@ export default async function NovedadesPage() {
                   </div>
                   <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--color-text-main)', marginBottom: '12px', lineHeight: 1.4 }}>{article.title}</h2>
                   
-                  {/* Extract brief snippet from content (removing basic HTML if present) */}
                   <p style={{ color: 'var(--color-text)', fontSize: '0.95rem', lineHeight: 1.5, marginBottom: '20px', flex: 1 }}>
                     {article.content.replace(/<[^>]+>/g, '').substring(0, 120)}...
                   </p>

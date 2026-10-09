@@ -26,11 +26,43 @@ export default function EntityMap({ latitude, longitude, title }: EntityMapProps
 
       map.current = new maplibregl.Map({
         container: mapContainer.current,
+        cooperativeGestures: true,
         style: 'https://tiles.openfreemap.org/styles/liberty',
         center: [longitude, latitude],
         zoom: 15,
         attributionControl: false
       });
+
+      // Función para ocultar todos los comercios / POIs de fondo de OpenStreetMap
+      const hideBackgroundPOIs = () => {
+        if (!map.current) return;
+        const layers = map.current.getStyle()?.layers || [];
+        for (const layer of layers) {
+          const id = layer.id.toLowerCase();
+          const sourceLayer = ((layer as any)['source-layer'] || '').toLowerCase();
+          if (
+            id.includes('poi') ||
+            sourceLayer.includes('poi') ||
+            id.includes('amenity') ||
+            id.includes('shop') ||
+            id.includes('food') ||
+            id.includes('restaurant') ||
+            id.includes('hotel') ||
+            id.includes('lodging') ||
+            id.includes('tourism') ||
+            id.includes('commercial') ||
+            id.includes('place_other') ||
+            id.includes('place-other')
+          ) {
+            try {
+              map.current.setLayoutProperty(layer.id, 'visibility', 'none');
+            } catch (e) {}
+          }
+        }
+      };
+
+      map.current.on('style.load', hideBackgroundPOIs);
+      map.current.on('load', hideBackgroundPOIs);
 
       // Añadir controles de navegación (zoom, rotación)
       map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
@@ -60,18 +92,23 @@ export default function EntityMap({ latitude, longitude, title }: EntityMapProps
   }, [latitude, longitude, title]);
 
   return (
-    <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', padding: '24px', boxShadow: 'var(--shadow-sm)', marginTop: '24px' }}>
+    <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', padding: '24px 20px', boxShadow: 'var(--shadow-sm)', marginTop: '24px' }}>
       <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-main)', marginBottom: '16px' }}>Ubicación</h2>
-      <div 
-        ref={mapContainer} 
-        style={{ 
-          width: '100%', 
-          height: '320px', 
-          borderRadius: '12px', 
-          overflow: 'hidden', 
-          border: '1px solid var(--color-border)' 
-        }} 
-      />
+      <div style={{ display: 'flex', width: '100%' }}>
+        <div 
+          ref={mapContainer} 
+          style={{ 
+            width: '100%', 
+            maxWidth: 'calc(100% - 20px)',
+            height: '320px', 
+            borderRadius: '12px', 
+            overflow: 'hidden', 
+            border: '1px solid var(--color-border)' 
+          }} 
+        />
+        {/* Safe touch scroll gutter on the right side for mobile swiping */}
+        <div style={{ width: '20px', flexShrink: 0 }} aria-hidden="true" />
+      </div>
     </div>
   );
 }

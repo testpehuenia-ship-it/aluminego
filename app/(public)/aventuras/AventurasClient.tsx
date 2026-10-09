@@ -18,11 +18,11 @@ export default function AventurasClient({ initialAdventures, initialCategories }
   const [searchQuery, setSearchQuery] = useState('');
 
   const categoryStyles: { [key: string]: { color: string, bgImage: string } } = {
-    "Trekking": { color: "#2a9d8f", bgImage: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=800&q=80" },
+    "Trekking": { color: "#2a9d8f", bgImage: "/images/cascada-araucarias-aluminé.jpg" },
     "A. Acuaticas": { color: "#00b4d8", bgImage: "/images/aventura_rafting.png" },
     "Aventuras Acuáticas": { color: "#00b4d8", bgImage: "/images/aventura_rafting.png" },
     "Cabalgatas": { color: "#f4a261", bgImage: "/images/aventura_cabalgatas.png" },
-    "Nieve": { color: "#e9c46a", bgImage: "https://images.unsplash.com/photo-1605540436563-5bca919ae766?auto=format&fit=crop&w=800&q=80" },
+    "Nieve": { color: "#e9c46a", bgImage: "/images/muelle-lago-aluminé.jpg" },
     "Pesca": { color: "#e76f51", bgImage: "/images/aventura_pesca.png" },
     "Agencia de turismo": { color: "#264653", bgImage: "/images/aventura_agencia.png" },
     "Agencias de Turismo": { color: "#264653", bgImage: "/images/aventura_agencia.png" }
@@ -237,7 +237,7 @@ export default function AventurasClient({ initialAdventures, initialCategories }
         )}
       </div>
 
-      <h1 className="section-title">¿Qué aventura elegimos hoy?</h1>
+      <h1 className="section-title">Qué Hacer y Excursiones en Aluminé</h1>
 
       {/* SECCIÓN DE DESTACADOS (CON BANNER) */}
       {bannerAdventures.length > 0 && (

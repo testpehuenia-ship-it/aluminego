@@ -22,11 +22,11 @@ export interface WeatherData {
   daily: WeatherDaily;
 }
 
-export async function getAluminéWeather(): Promise<WeatherData | null> {
+export async function getAlumineWeather(): Promise<WeatherData | null> {
   try {
-    // Coordenadas aproximadas de Aluminé
-    const lat = -39.2372;
-    const lon = -70.9314;
+    // Coordenadas oficiales de Aluminé, Neuquén
+    const lat = -39.2369;
+    const lon = -70.9194;
     const timezone = 'America/Argentina/Salta';
 
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=${encodeURIComponent(timezone)}`;
@@ -67,3 +67,5 @@ export async function getAluminéWeather(): Promise<WeatherData | null> {
   }
 }
 
+// Alias for compatibility
+export const getPehueniaWeather = getAlumineWeather;

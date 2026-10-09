@@ -50,7 +50,7 @@ export async function POST(request: Request) {
         slug,
         content: data.content,
         image: data.image || null,
-        author: data.author || 'AluminéGO',
+        author: data.author || 'PehueniaGO',
         published: data.published !== undefined ? data.published : true,
       }
     });

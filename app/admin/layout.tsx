@@ -2,8 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { 
+  Loader2,
   LayoutDashboard, 
   Store, 
   Home, 
@@ -29,10 +30,47 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
 
   // No mostramos el sidebar en la página de login
   const isLoginPage = pathname === '/admin/login' || pathname === '/admin';
+  const [authChecking, setAuthChecking] = React.useState(!isLoginPage);
+  const [adminUser, setAdminUser] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (isLoginPage) {
+      setAuthChecking(false);
+      return;
+    }
+
+    fetch('/api/auth')
+      .then(res => {
+        if (!res.ok) {
+          router.replace('/admin');
+          return null;
+        }
+        return res.json();
+      })
+      .then(data => {
+        if (data?.authenticated) {
+          setAdminUser(data.user?.username || 'Administrador');
+          setAuthChecking(false);
+        } else {
+          router.replace('/admin');
+        }
+      })
+      .catch(() => {
+        router.replace('/admin');
+      });
+  }, [pathname, isLoginPage, router]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth', { method: 'DELETE' });
+    } catch (e) {}
+    router.replace('/admin');
+  };
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
@@ -56,13 +94,22 @@ export default function AdminLayout({
     return <>{children}</>;
   }
 
+  if (authChecking) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#f8fafc', gap: '12px' }}>
+        <Loader2 className="animate-spin text-teal-600" size={36} />
+        <p style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 500 }}>Verificando credenciales de administrador...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-container">
       {/* Sidebar */}
       <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
           <div className="logo-container">
-            <span className="logo-text">Aluminé<span>GO</span></span>
+            <span className="logo-text">Pehuenia<span>GO</span></span>
             <span className="admin-badge">Admin</span>
           </div>
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="sidebar-toggle">
@@ -89,10 +136,15 @@ export default function AdminLayout({
         </nav>
 
         <div className="sidebar-footer">
-          <Link href="/" className="nav-item logout">
+          <button 
+            type="button"
+            onClick={handleLogout} 
+            className="nav-item logout" 
+            style={{ width: '100%', textAlign: 'left', border: 'none', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
+          >
             <LogOut size={20} />
             <span className="nav-label">Cerrar Sesión</span>
-          </Link>
+          </button>
         </div>
       </aside>
 
@@ -120,10 +172,10 @@ export default function AdminLayout({
           </div>
           <div className="header-user">
             <div className="user-info">
-              <span className="user-name">Súper Admin</span>
+              <span className="user-name">{adminUser || 'Súper Admin'}</span>
               <span className="user-role">Administrador Principal</span>
             </div>
-            <div className="user-avatar">AD</div>
+            <div className="user-avatar">{adminUser ? adminUser.slice(0, 2).toUpperCase() : 'AD'}</div>
           </div>
         </header>
 

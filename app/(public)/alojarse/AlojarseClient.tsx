@@ -10,6 +10,33 @@ import OpeningStatusBadge from '@/components/OpeningStatusBadge';
 import VerifiedBadge from '@/components/VerifiedBadge';
 
 
+// Helper para parsear los detalles/productos/servicios destacados (hasta 5 ítems)
+const parseAccommodationDetails = (detailsStr?: string | null) => {
+  if (!detailsStr) return [];
+  try {
+    const trimmed = detailsStr.trim();
+    if (trimmed.startsWith('[')) {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed.map((it: any) => {
+          if (typeof it === 'string') return { name: it };
+          return {
+            name: it.name || '',
+            description: it.description || '',
+            price: it.price !== undefined && it.price !== null ? String(it.price) : '',
+            image: it.image || ''
+          };
+        }).filter((it: any) => it && it.name);
+      }
+    } else {
+      return detailsStr.split(',').map((s: string) => ({ name: s.trim() })).filter((p: any) => p.name);
+    }
+  } catch {
+    return (detailsStr || '').split(',').map((s: string) => ({ name: s.trim() })).filter((p: any) => p.name);
+  }
+  return [];
+};
+
 export default function AlojarseClient({ initialAccommodations, initialCategories }: { initialAccommodations?: any[], initialCategories?: any[] }) {
   const [selectedAlojamiento, setSelectedAlojamiento] = useState<any | null>(null);
   const [accommodations, setAccommodations] = useState<any[]>(initialAccommodations || []);
@@ -23,10 +50,10 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
   }, [selectedAlojamiento]);
 
   const categoryStyles: { [key: string]: { color: string, bgImage: string } } = {
-    "Cabañas": { color: "#e63946", bgImage: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80" },
-    "Hoteles": { color: "#f4a261", bgImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" },
-    "Hostel": { color: "#e9c46a", bgImage: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80" },
-    "Campings": { color: "#2a9d8f", bgImage: "https://images.unsplash.com/photo-1508873696983-2dfd5898f08b?auto=format&fit=crop&w=800&q=80" }
+    "Cabañas": { color: "#e63946", bgImage: "/images/refugio_bosque.png" },
+    "Hoteles": { color: "#f4a261", bgImage: "/images/hotel_pehuenia.png" },
+    "Hostel": { color: "#e9c46a", bgImage: "/images/refugio_bosque.png" },
+    "Campings": { color: "#2a9d8f", bgImage: "/images/atardecer-aluminé.jpg" }
   };
 
   const closeModal = () => {
@@ -167,10 +194,10 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
         </div>
         <div className="banner-categories" style={{ gridTemplateColumns: 'repeat(2, 1fr)', gridTemplateRows: 'repeat(2, 150px)' }}>
           {[
-            { cat: "Cabañas", color: "#e63946", bgImage: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=800&q=80" },
-            { cat: "Hoteles", color: "#f4a261", bgImage: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80" },
-            { cat: "Hostel", color: "#e9c46a", bgImage: "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80" },
-            { cat: "Campings", color: "#2a9d8f", bgImage: "https://images.unsplash.com/photo-1508873696983-2dfd5898f08b?auto=format&fit=crop&w=800&q=80" }
+            { cat: "Cabañas", color: "#e63946", bgImage: "/images/refugio_bosque.png" },
+            { cat: "Hoteles", color: "#f4a261", bgImage: "/images/hotel_pehuenia.png" },
+            { cat: "Hostel", color: "#e9c46a", bgImage: "/images/refugio_bosque.png" },
+            { cat: "Campings", color: "#2a9d8f", bgImage: "/images/atardecer-aluminé.jpg" }
           ].map((item) => (
             <a 
               href={`#${item.cat.toLowerCase()}`} 
@@ -249,7 +276,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
         )}
       </div>
 
-      <h1 className="section-title">¿Dónde vas a dormir?</h1>
+      <h1 className="section-title">Dónde Alojarse en Aluminé</h1>
 
       {/* SECCIÓN DE DESTACADOS (CON BANNER) */}
       {bannerAccommodations.length > 0 && (
@@ -284,16 +311,30 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{alojamiento.name}</h3>
                     <OpeningStatusBadge openingHours={alojamiento.openingHours} isVisible={alojamiento.showSchedule} />
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
-                      {alojamiento.features?.slice(0, 3).map((f: any) => (
-                        <span key={f.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
-                          {f.name}
-                        </span>
-                      ))}
-                      {alojamiento.features?.length > 3 && (
-                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '4px 8px' }}>
-                          +{alojamiento.features.length - 3}
-                        </span>
-                      )}
+                      {(() => {
+                        const detailsItems = parseAccommodationDetails(alojamiento.details);
+                        const displayItems = detailsItems.length > 0 
+                          ? detailsItems 
+                          : (alojamiento.features || []).map((f: any) => ({ name: f.name }));
+                        
+                        return (
+                          <>
+                            {displayItems.slice(0, 3).map((f: any, idx: number) => (
+                              <span key={idx} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                {detailsItems.length > 0 ? '🏕️' : '✓'} {f.name}
+                                {f.price && !isNaN(parseFloat(String(f.price))) && (
+                                  <b style={{ color: '#16a34a' }}>(${new Intl.NumberFormat('es-AR').format(parseFloat(String(f.price)))})</b>
+                                )}
+                              </span>
+                            ))}
+                            {displayItems.length > 3 && (
+                              <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '4px 8px' }}>
+                                +{displayItems.length - 3}
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                     <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y reservar</p>
                   </div>
@@ -342,16 +383,30 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                       <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{alojamiento.name}</h3>
                       <OpeningStatusBadge openingHours={alojamiento.openingHours} isVisible={alojamiento.showSchedule} />
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
-                        {alojamiento.features?.slice(0, 3).map((f: any) => (
-                          <span key={f.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
-                            {f.name}
-                          </span>
-                        ))}
-                        {alojamiento.features?.length > 3 && (
-                          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '4px 8px' }}>
-                            +{alojamiento.features.length - 3}
-                          </span>
-                        )}
+                        {(() => {
+                          const detailsItems = parseAccommodationDetails(alojamiento.details);
+                          const displayItems = detailsItems.length > 0 
+                            ? detailsItems 
+                            : (alojamiento.features || []).map((f: any) => ({ name: f.name }));
+                          
+                          return (
+                            <>
+                              {displayItems.slice(0, 3).map((f: any, idx: number) => (
+                                <span key={idx} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                  {detailsItems.length > 0 ? '🏕️' : '✓'} {f.name}
+                                  {f.price && !isNaN(parseFloat(String(f.price))) && (
+                                    <b style={{ color: '#16a34a' }}>(${new Intl.NumberFormat('es-AR').format(parseFloat(String(f.price)))})</b>
+                                  )}
+                                </span>
+                              ))}
+                              {displayItems.length > 3 && (
+                                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '4px 8px' }}>
+                                  +{displayItems.length - 3}
+                                </span>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                       <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y reservar</p>
                     </div>
@@ -397,16 +452,30 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{alojamiento.name}</h3>
                     <OpeningStatusBadge openingHours={alojamiento.openingHours} isVisible={alojamiento.showSchedule} />
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
-                      {alojamiento.features?.slice(0, 3).map((f: any) => (
-                        <span key={f.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
-                          {f.name}
-                        </span>
-                      ))}
-                      {alojamiento.features?.length > 3 && (
-                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '4px 8px' }}>
-                          +{alojamiento.features.length - 3}
-                        </span>
-                      )}
+                      {(() => {
+                        const detailsItems = parseAccommodationDetails(alojamiento.details);
+                        const displayItems = detailsItems.length > 0 
+                          ? detailsItems 
+                          : (alojamiento.features || []).map((f: any) => ({ name: f.name }));
+                        
+                        return (
+                          <>
+                            {displayItems.slice(0, 3).map((f: any, idx: number) => (
+                              <span key={idx} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--color-border)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                {detailsItems.length > 0 ? '🏕️' : '✓'} {f.name}
+                                {f.price && !isNaN(parseFloat(String(f.price))) && (
+                                  <b style={{ color: '#16a34a' }}>(${new Intl.NumberFormat('es-AR').format(parseFloat(String(f.price)))})</b>
+                                )}
+                              </span>
+                            ))}
+                            {displayItems.length > 3 && (
+                              <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '4px 8px' }}>
+                                +{displayItems.length - 3}
+                              </span>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                     <p style={{ color: 'var(--color-orange)', fontSize: '0.95rem', fontWeight: 600 }}>Ver detalles y reservar</p>
                   </div>
@@ -422,11 +491,13 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
         <PublicityBanner page="Dormir" section={3} height="150px" delay="4s" />
       </div>
 
-      {selectedAlojamiento && (
+      {selectedAlojamiento && (() => {
+        const parsedProducts = parseAccommodationDetails(selectedAlojamiento.details);
+        return (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'flex-end', zIndex: 1000, padding: '20px' }}
         onClick={closeModal}
         >
-          <div style={{ backgroundColor: 'white', width: '100%', maxWidth: '600px', maxHeight: '90vh', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '24px', overflowY: 'auto', position: 'relative' }}
+          <div style={{ backgroundColor: 'white', width: '100%', maxWidth: '650px', maxHeight: '90vh', borderTopLeftRadius: '24px', borderTopRightRadius: '24px', padding: '24px', overflowY: 'auto', position: 'relative' }}
           onClick={e => e.stopPropagation()}
           >
             <button onClick={closeModal} style={{ position: 'absolute', top: '16px', right: '16px', fontSize: '1.5rem', fontWeight: 'bold', zIndex: 10 }}>✕</button>
@@ -490,21 +561,77 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
                 color: 'var(--color-text)', 
                 fontSize: '1rem', 
                 lineHeight: '1.6', 
-                marginBottom: '24px', 
+                marginBottom: '20px', 
                 whiteSpace: 'pre-line' 
               }}>
                 {selectedAlojamiento.description}
               </p>
             )}
 
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '12px' }}>Comodidades</h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '32px' }}>
-              {selectedAlojamiento.features?.map((f: any) => (
-                <div key={f.id} style={{ backgroundColor: 'var(--color-bg)', padding: '8px 16px', borderRadius: '50px', fontSize: '0.9rem', fontWeight: 500, border: '1px solid var(--color-border)' }}>
-                  ✓ {f.name}
+            {/* SECCIÓN 1: PRODUCTOS / OFERTAS / SERVICIOS DESTACADOS CON FOTOS */}
+            {parsedProducts.length > 0 && (
+              <div style={{ marginTop: '16px', marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-text-main)', marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  🏕️ Opciones y Servicios Destacados
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '14px' }}>
+                  {parsedProducts.map((prod: any, idx: number) => {
+                    const productMsg = `Hola ${selectedAlojamiento.name}, te contacto desde AluminéGO. Quisiera consultar sobre la opción: ${prod.name}${prod.price ? ` ($${new Intl.NumberFormat('es-AR').format(parseFloat(prod.price))})` : ''}...`;
+                    return (
+                      <div key={idx} style={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '1.5px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
+                        {prod.image && (
+                          <div style={{ position: 'relative', width: '100%', height: '130px', backgroundColor: '#f1f5f9' }}>
+                            <img src={prod.image} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </div>
+                        )}
+                        <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', flex: 1, gap: '6px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                            <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#1e293b' }}>{prod.name}</span>
+                            {prod.price && !isNaN(parseFloat(String(prod.price))) && (
+                              <span style={{ fontWeight: 800, color: '#16a34a', fontSize: '0.9rem', backgroundColor: '#f0fdf4', padding: '2px 8px', borderRadius: '6px', border: '1px solid #bbf7d0', whiteSpace: 'nowrap' }}>
+                                ${new Intl.NumberFormat('es-AR').format(parseFloat(String(prod.price)))}
+                              </span>
+                            )}
+                          </div>
+                          {prod.description && (
+                            <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0, lineHeight: 1.4 }}>
+                              {prod.description}
+                            </p>
+                          )}
+                          {selectedAlojamiento.whatsapp && (
+                            <a
+                              href={`https://wa.me/${selectedAlojamiento.whatsapp}?text=${encodeURIComponent(productMsg)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ marginTop: 'auto', paddingTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 700, color: '#16a34a', textDecoration: 'none' }}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Consultar por WhatsApp →
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+
+            {/* SECCIÓN 2: COMODIDADES Y SERVICIOS (CON TILDES) */}
+            {selectedAlojamiento.features && selectedAlojamiento.features.length > 0 && (
+              <div style={{ marginBottom: '24px' }}>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '12px', color: 'var(--color-text-main)' }}>
+                  Servicios y Comodidades
+                </h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {selectedAlojamiento.features.map((f: any) => (
+                    <div key={f.id || f.name} style={{ backgroundColor: 'var(--color-bg)', padding: '6px 14px', borderRadius: '50px', fontSize: '0.88rem', fontWeight: 600, color: '#334155', border: '1px solid var(--color-border)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ color: 'var(--color-green)', fontWeight: 800 }}>✓</span> {f.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div style={{ paddingTop: '16px', borderTop: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column' }}>
               <a 
@@ -532,7 +659,8 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
             </div>
           </div>
         </div>
-                    )}
+        );
+      })()}
 
       <style jsx global>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

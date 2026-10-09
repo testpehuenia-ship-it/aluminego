@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, image, whatsapp, categoryId, menu, selectedPricingKeys, description, details, latitude, longitude, openingHours, isVerified, showSchedule } = body;
+    const { name, image, whatsapp, categoryId, menu, selectedPricingKeys, description, details, latitude, longitude, openingHours, isVerified, showSchedule, hasDelivery } = body;
 
     // Use a transaction if we are also creating subscriptions
     const result = await prisma.$transaction(async (tx) => {
@@ -53,6 +53,7 @@ export async function POST(request: Request) {
           openingHours: openingHours || null,
           isVerified: Boolean(isVerified),
           showSchedule: Boolean(showSchedule),
+          hasDelivery: Boolean(hasDelivery),
           menu: {
             create: menu 
               ? menu
@@ -114,13 +115,13 @@ export async function POST(request: Request) {
           // 3. Auto-generate PortalUser if applicable
           if (selectedPricingKeys.includes('plan_comercio_completo') || selectedPricingKeys.includes('plan_basico_destacado')) {
             const safeName = business.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            const email = `${safeName}@aluminego.ar`;
+            const email = `${safeName}@pehueniago.ar`;
             
             const today = new Date();
             const d = String(today.getDate()).padStart(2, '0');
             const m = String(today.getMonth() + 1).padStart(2, '0');
             const y = today.getFullYear();
-            const password = `aluminego${d}${m}${y}`;
+            const password = `pehueniago${d}${m}${y}`;
 
             // Check if user exists (to prevent unique constraint error)
             let portalUser = await tx.portalUser.findUnique({ where: { email } });
@@ -143,6 +144,35 @@ export async function POST(request: Request) {
               data: { portalUserId: portalUser.id }
             });
           }
+        }
+
+        if (!generatedCredentials) {
+          const safeName = (business.name || 'comercio').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          let email = `${safeName}@pehueniago.ar`;
+          const today = new Date();
+          const d = String(today.getDate()).padStart(2, '0');
+          const m = String(today.getMonth() + 1).padStart(2, '0');
+          const y = today.getFullYear();
+          const password = `pehueniago${d}${m}${y}`;
+          
+          let portalUser = await tx.portalUser.findUnique({ where: { email } });
+          let counter = 1;
+          while (portalUser) {
+            email = `${safeName}${counter}@pehueniago.ar`;
+            portalUser = await tx.portalUser.findUnique({ where: { email } });
+            counter++;
+          }
+          
+          const newUser = await tx.portalUser.create({
+            data: { name: business.name, email, password: hashPassword(password) }
+          });
+          
+          await tx.business.update({
+            where: { id: business.id },
+            data: { portalUserId: newUser.id }
+          });
+          
+          generatedCredentials = { email, password };
         }
 
       return { business, generatedCredentials };

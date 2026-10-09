@@ -31,7 +31,8 @@ export async function PUT(request: Request) {
       accommodationType,
       category,
       subcategory,
-      address
+      address,
+      hasDelivery
     } = body;
 
     // Optional: update password if requested (doesn't need entity checks)
@@ -79,6 +80,7 @@ export async function PUT(request: Request) {
     if (name) updateData.name = name;
     if (latitude !== undefined) updateData.latitude = latitude === "" ? null : parseFloat(latitude);
     if (longitude !== undefined) updateData.longitude = longitude === "" ? null : parseFloat(longitude);
+    if (hasDelivery !== undefined) updateData.hasDelivery = Boolean(hasDelivery);
     
     if (entityType === 'business') {
       if (details) updateData.details = details;
@@ -110,7 +112,30 @@ export async function PUT(request: Request) {
       const commUpdate: any = { ...updateData };
       if (accommodationType) commUpdate.type = accommodationType; // maps commerce type
       if (details) {
-        const detailNames = details.split(',').map((f: string) => f.trim()).filter(Boolean);
+        let detailNames: string[] = [];
+        const trimmed = details.trim();
+        if (trimmed.startsWith('[')) {
+          try {
+            const p = JSON.parse(trimmed);
+            if (Array.isArray(p)) {
+              detailNames = p.map((it: any) => {
+                if (typeof it === 'string') return it.trim();
+                if (it && typeof it === 'object') {
+                  return JSON.stringify({
+                    name: it.name || '',
+                    description: it.description || '',
+                    price: it.price !== undefined && it.price !== null ? String(it.price) : '',
+                    image: it.image || ''
+                  });
+                }
+                return String(it);
+              }).filter(Boolean);
+            }
+          } catch {}
+        }
+        if (detailNames.length === 0) {
+          detailNames = trimmed.split(',').map((f: string) => f.trim()).filter(Boolean);
+        }
         commUpdate.details = {
           deleteMany: {},
           create: detailNames.map((name: string) => ({ name }))

@@ -46,7 +46,8 @@ export default function BusinessesAdminPage() {
     longitude: '-71.18375154775678',
     openingHours: DEFAULT_SCHEDULE_STRING,
     isVerified: false,
-    showSchedule: false
+    showSchedule: false,
+    hasDelivery: false
   });
   
   const [uploading, setUploading] = React.useState(false);
@@ -100,11 +101,12 @@ export default function BusinessesAdminPage() {
         longitude: business.longitude ? business.longitude.toString() : '',
         openingHours: business.openingHours || '',
         isVerified: business.isVerified || false,
-        showSchedule: business.showSchedule || false
+        showSchedule: business.showSchedule || false,
+        hasDelivery: business.hasDelivery || false
       });
     } else {
       setEditingBusiness(null);
-      setFormData({ name: '', image: '', whatsapp: '', categoryId: '', menu: [], selectedPricingKeys: [], description: '', details: '', latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING, isVerified: false, showSchedule: false });
+      setFormData({ name: '', image: '', whatsapp: '', categoryId: '', menu: [], selectedPricingKeys: [], description: '', details: '', latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING, isVerified: false, showSchedule: false, hasDelivery: false });
     }
     setNewMenuItem({ name: '', description: '', price: '', image: '' });
     setEditingMenuItemId(null);
@@ -247,7 +249,7 @@ export default function BusinessesAdminPage() {
         await fetchData();
         closeModal();
 
-        if (data.generatedCredentials) {
+        if (!editingBusiness && data.generatedCredentials && data.generatedCredentials.password && !data.generatedCredentials.password.includes('anteriormente')) {
           const creds = {
             ...data.generatedCredentials,
             businessName: formData.name,
@@ -255,10 +257,12 @@ export default function BusinessesAdminPage() {
           };
           setGeneratedCredentials(creds);
           
-          // Abrir WhatsApp automáticamente
+          // Abrir WhatsApp automáticamente SOLO en alta nueva
           const cleanPhone = (creds.whatsapp || '').replace(/\D/g, '');
-          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
-          window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMsg)}`, '_blank');
+          const textMsg = `Hola! Bienvenido a PehueniaGO. Ya puedes acceder a tu panel de control desde https://pehueniago.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
+          if (cleanPhone) {
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMsg)}`, '_blank');
+          }
         } else {
           // Check if any banner plans were selected
           const hasBanner = formData.selectedPricingKeys.some(k => k.includes('banner') || k.includes('portada'));
@@ -480,7 +484,16 @@ export default function BusinessesAdminPage() {
                       onChange={(val) => setFormData({...formData, openingHours: val})}
                     />
                   </div>
-                  <div style={{ display: 'flex', gap: '20px', marginTop: '12px' }}>
+                  <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '12px', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.hasDelivery} 
+                        onChange={(e) => setFormData({...formData, hasDelivery: e.target.checked})}
+                        style={{ width: '18px', height: '18px', accentColor: '#10b981' }}
+                      />
+                      <b style={{ color: formData.hasDelivery ? '#059669' : '#334155' }}>🛵 Cuenta con servicio de Delivery</b>
+                    </label>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
                       <input 
                         type="checkbox" 
@@ -684,7 +697,7 @@ export default function BusinessesAdminPage() {
             </div>
 
             <a 
-              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
+              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a PehueniaGO. Ya puedes acceder a tu panel de control desde https://pehueniago.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"

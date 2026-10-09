@@ -41,7 +41,7 @@ export async function PUT(
     }
     const { id } = await params;
     const body = await request.json();
-    const { name, type, image, whatsapp, description, features, selectedPricingKeys, latitude, longitude, openingHours, isVerified, showSchedule } = body;
+    const { name, type, image, whatsapp, description, details, features, selectedPricingKeys, latitude, longitude, openingHours, isVerified, showSchedule } = body;
 
     const result = await prisma.$transaction(async (tx: any) => {
       let generatedCredentials = null;
@@ -57,13 +57,14 @@ export async function PUT(
           image,
           whatsapp,
           description,
+          details: details || '',
           latitude: latitude ? parseFloat(String(latitude)) : null,
           longitude: longitude ? parseFloat(String(longitude)) : null,
           openingHours: openingHours || null,
           isVerified: Boolean(isVerified),
           showSchedule: Boolean(showSchedule),
           features: {
-            create: features.map((f: string) => ({ name: f }))
+            create: (features || []).map((f: string) => ({ name: f }))
           }
         },
         include: {
@@ -136,14 +137,14 @@ export async function PUT(
           });
           if (!accCheck?.portalUserId) {
             const safeName = accCheck.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            let email = `${safeName}@aluminego.ar`;
+            let email = `${safeName}@pehueniago.ar`;
             const today = new Date();
-            const password = `aluminego${String(today.getDate()).padStart(2, '0')}${String(today.getMonth() + 1).padStart(2, '0')}${today.getFullYear()}`;
+            const password = `pehueniago${String(today.getDate()).padStart(2, '0')}${String(today.getMonth() + 1).padStart(2, '0')}${today.getFullYear()}`;
             
             let portalUser = await tx.portalUser.findUnique({ where: { email } });
             let counter = 1;
             while (portalUser) {
-              email = `${safeName}${counter}@aluminego.ar`;
+              email = `${safeName}${counter}@pehueniago.ar`;
               portalUser = await tx.portalUser.findUnique({ where: { email } });
               counter++;
             }
@@ -158,11 +159,6 @@ export async function PUT(
             });
             
             generatedCredentials = { email, password };
-          } else if (accCheck.portalUser) {
-            generatedCredentials = {
-              email: accCheck.portalUser.email,
-              password: "Tu contraseña ya fue creada anteriormente. Si la olvidaste, contactanos."
-            };
           }
         }
       }

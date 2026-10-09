@@ -1,0 +1,10 @@
+{
+  "streamUrl": "https://streaming01.shockmedia.com.ar/9180/stream",
+  "fallbackStreamUrl": "https://streaming01.shockmedia.com.ar:10798/stream",
+  "name": "FM Radio Regional",
+  "frequency": "En Vivo",
+  "slogan": "Radio de Montaña y Cordillera",
+  "city": "Aluminé",
+  "isActive": true,
+  "updatedAt": "2026-10-09T12:00:00.000Z"
+}

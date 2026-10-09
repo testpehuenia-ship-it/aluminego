@@ -1,11 +1,11 @@
 :root {
-  /* AluminéGO Identity Colors */
-  --color-green: #0013C5;         /* Azul exacto del logo AluminéGO (sampled) */
-  --color-orange: #E84600;        /* Naranja GO del logo */
+  /* PehuenGo Identity Colors */
+  --color-green: #38b000;
+  --color-orange: #d35400; /* Adjusted to match mockup orange */
   --color-celeste: #00b4d8;
-  --color-dark-green: #000e8a;   /* Azul oscuro derivado del logo */
-  --color-purple: #5c3a7a;
-  --color-light-green: #1a2edb;  /* Azul medio */
+  --color-dark-green: #14352a; /* For excursiones button */
+  --color-purple: #5c3a7a; /* For comercios button */
+  --color-light-green: #689f38; /* For alojamiento button */
   
   --color-primary: var(--color-green);
   --color-secondary: var(--color-orange);
@@ -58,6 +58,12 @@ button {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 12px;
+  }
 }
 
 .btn-primary {

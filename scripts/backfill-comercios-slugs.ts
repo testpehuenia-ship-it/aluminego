@@ -1,4 +1,4 @@
-﻿import 'dotenv/config';
+import 'dotenv/config';
 import { prisma } from '../lib/db';
 import { generateUniqueSlug } from '../lib/slugs';
 
@@ -10,7 +10,7 @@ async function main() {
   
   let updated = 0;
   for (const commerce of commerces) {
-    const locality = commerce.locality || 'Aluminé';
+    const locality = commerce.locality || 'Villa Pehuenia';
     const slug = await generateUniqueSlug(commerce.name, locality, commerce.id);
     
     await prisma.commerce.update({
@@ -35,4 +35,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

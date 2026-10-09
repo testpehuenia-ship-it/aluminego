@@ -52,7 +52,7 @@ export default function PublicityBanner({
     return (
       <div className="ad-banner-container" style={{ height: height, maxWidth: maxWidth, margin: '0 auto 24px auto', position: 'relative' }}>
         <a 
-          href="https://wa.me/5492942524300?text=Hola%20quiero%20publicitar%20en%20AluminéGO" 
+          href="https://wa.me/5492942524300?text=Hola%20quiero%20publicitar%20en%20PehueniaGO" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="ad-slide ad-slide-1" 
@@ -63,14 +63,14 @@ export default function PublicityBanner({
           }}
         >
           <h2 style={{ fontSize: height === '100px' ? '1.8rem' : '2.5rem', margin: 0, color: 'var(--color-green)', fontFamily: 'var(--font-oswald), sans-serif', textTransform: 'uppercase', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
-            Aluminé<span style={{ color: 'var(--color-orange)' }}>GO</span>
+            Pehuenia<span style={{ color: 'var(--color-orange)' }}>GO</span>
           </h2>
           <p style={{ color: 'white', fontSize: height === '100px' ? '0.9rem' : '1.2rem', marginTop: '4px', fontWeight: 700, textShadow: '1px 1px 3px rgba(0,0,0,0.5)' }}>
             Publicite Aquí
           </p>
         </a>
         <a 
-          href="https://wa.me/5492942524300?text=Hola%20quiero%20publicitar%20en%20AluminéGO" 
+          href="https://wa.me/5492942524300?text=Hola%20quiero%20publicitar%20en%20PehueniaGO" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="ad-slide ad-slide-2" 
@@ -84,7 +84,7 @@ export default function PublicityBanner({
           </p>
         </a>
         <a 
-          href="https://wa.me/5492942524300?text=Hola%20quiero%20publicitar%20en%20AluminéGO" 
+          href="https://wa.me/5492942524300?text=Hola%20quiero%20publicitar%20en%20PehueniaGO" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="ad-slide ad-slide-3" 

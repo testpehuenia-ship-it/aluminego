@@ -15,7 +15,7 @@ export async function GET() {
   const d = String(new Date().getDate()).padStart(2, '0');
   const m = String(new Date().getMonth() + 1).padStart(2, '0');
   const y = new Date().getFullYear();
-  const password = `aluminego${d}${m}${y}`;
+  const password = `pehueniago${d}${m}${y}`;
   const hashedPassword = hashPassword(password);
   let count = 0;
 
@@ -35,13 +35,13 @@ export async function GET() {
 
     for (const entity of entities) {
       const safeName = entity.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      let email = `${safeName}@aluminego.ar`;
+      let email = `${safeName}@pehueniago.ar`;
       
       let portalUser = await prisma.portalUser.findUnique({ where: { email } });
       
       let counter = 1;
       while (portalUser) {
-        email = `${safeName}${counter}@aluminego.ar`;
+        email = `${safeName}${counter}@pehueniago.ar`;
         portalUser = await prisma.portalUser.findUnique({ where: { email } });
         counter++;
       }

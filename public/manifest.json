@@ -1,11 +1,11 @@
 {
   "name": "AluminéGO",
   "short_name": "AluminéGO",
-  "description": "Descubre dónde comer, alojarte y qué hacer en Aluminé.",
+  "description": "Guía Comercial y Turística de Aluminé, Neuquén",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0013C5",
+  "theme_color": "#27ae60",
   "icons": [
     {
       "src": "/icon-192x192.png",

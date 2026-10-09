@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePortal } from '@/components/PortalContext';
-import { Loader2, Save, Upload, ArrowLeft } from 'lucide-react';
+import { Loader2, Save, Upload, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PortalPerfilPage() {
@@ -27,8 +27,10 @@ export default function PortalPerfilPage() {
     accommodationType: '',
     category: '',
     subcategory: '',
-    address: ''
+    address: '',
+    hasDelivery: false
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{type: 'success'|'error', text: string} | null>(null);
@@ -83,7 +85,8 @@ export default function PortalPerfilPage() {
       accommodationType: service.accommodationType || '',
       category: service.category || '',
       subcategory: service.subcategory || '',
-      address: service.address || ''
+      address: service.address || '',
+      hasDelivery: service.hasDelivery || false
     });
   };
 
@@ -153,6 +156,7 @@ export default function PortalPerfilPage() {
       details: formData.details,
       latitude: latStr,
       longitude: lngStr,
+      hasDelivery: Boolean(formData.hasDelivery),
     };
     if (selectedService.type === 'business') payload.categoryId = formData.categoryId;
     if (selectedService.type === 'accommodation') payload.accommodationType = formData.accommodationType;
@@ -419,6 +423,25 @@ export default function PortalPerfilPage() {
             />
           </div>
 
+          {['business', 'localservice', 'commerce'].includes(selectedService?.type) && (
+            <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '0.95rem' }}>
+                <input 
+                  type="checkbox" 
+                  checked={formData.hasDelivery} 
+                  onChange={e => setFormData({ ...formData, hasDelivery: e.target.checked })}
+                  style={{ width: '18px', height: '18px', accentColor: '#10b981' }}
+                />
+                <span style={{ fontWeight: 600, color: formData.hasDelivery ? '#059669' : '#334155' }}>
+                  🛵 Cuenta con servicio de Delivery
+                </span>
+              </label>
+              <p style={{ margin: '4px 0 0 28px', fontSize: '0.8rem', color: '#64748b' }}>
+                Si no está tildado, se mostrará en la ficha pública que el comercio no cuenta con servicio de delivery (solo consumo en el local o retiro).
+              </p>
+            </div>
+          )}
+
           <div style={{ marginTop: '16px', paddingTop: '20px', borderTop: '1px solid #e2e8f0' }}>
             <h3 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', color: '#1e293b' }}>Ubicación en el Mapa</h3>
             <p style={{ fontSize: '0.9rem', color: '#64748b', marginBottom: '16px' }}>
@@ -455,15 +478,37 @@ export default function PortalPerfilPage() {
             <label style={{ display: 'block', fontWeight: 600, marginBottom: '8px' }}>Nueva Contraseña de Acceso</label>
             {/* Campo oculto con opacity 0 para evitar que Chrome autocompleta el email en "Longitud". Display none es ignorado por Chrome. */}
             <input type="text" name="username" autoComplete="username" style={{ position: 'absolute', opacity: 0, height: '1px', width: '1px', zIndex: -1 }} defaultValue={session?.email || ''} tabIndex={-1} />
-            <input 
-              type="password" 
-              name="password"
-              autoComplete="new-password"
-              value={formData.newPassword} 
-              onChange={e => setFormData({ ...formData, newPassword: e.target.value })}
-              placeholder="Ingresa una nueva contraseña (mínimo 6 caracteres) o deja en blanco"
-              style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '1rem' }}
-            />
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input 
+                type={showPassword ? "text" : "password"} 
+                name="password"
+                autoComplete="new-password"
+                value={formData.newPassword} 
+                onChange={e => setFormData({ ...formData, newPassword: e.target.value })}
+                placeholder="Ingresa una nueva contraseña (mínimo 6 caracteres) o deja en blanco"
+                style={{ width: '100%', padding: '12px 42px 12px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '1rem' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: '#64748b',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: 0
+                }}
+                title={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           <button 

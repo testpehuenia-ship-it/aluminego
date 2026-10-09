@@ -1,17 +1,32 @@
-﻿export const CATEGORIES_DATA = [
+export const CATEGORIES_DATA = [
+  { title: "Restaurante", link: "/comer#restaurante", image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=400&q=80" },
   { title: "Pizzería", link: "/comer#pizzería", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80" },
   { title: "Hamburguesa", link: "/comer#hamburguesa", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=400&q=80" },
   { title: "Cervecería", link: "/comer#cervecería", image: "https://images.unsplash.com/photo-1532634922-8fe0b757fb13?auto=format&fit=crop&w=400&q=80" },
   { title: "Rotisería", link: "/comer#rotisería", image: "https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?auto=format&fit=crop&w=400&q=80" },
-  { title: "Restaurante", link: "/comer#restaurante", image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=400&q=80" },
+  { title: "Cafetería y Heladería", link: "/comer#cafetería", image: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=400&q=80" },
+  { title: "Bar y Pub", link: "/comer#bar", image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=400&q=80" },
+  { title: "Parrilla y Minutas", link: "/comer#parrilla", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80" },
   { title: "Cabañas", link: "/alojarse#cabañas", image: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=400&q=80" },
-  { title: "Hoteles", link: "/alojarse#hoteles", image: "/images/hotel_Aluminé.png" },
+  { title: "Hoteles", link: "/alojarse#hoteles", image: "/images/hotel_pehuenia.png" },
   { title: "Campings", link: "/alojarse#campings", image: "https://images.unsplash.com/photo-1508873696983-2dfd5898f08b?auto=format&fit=crop&w=400&q=80" },
   { title: "Trekking", link: "/aventuras#trekking", image: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=400&q=80" },
   { title: "A. Acuaticas", link: "/aventuras#a.-acuaticas", image: "/images/aventura_rafting.png" },
   { title: "Cabalgatas", link: "/aventuras#cabalgatas", image: "/images/aventura_cabalgatas.png" },
   { title: "Nieve", link: "/aventuras#nieve", image: "https://images.unsplash.com/photo-1605540436563-5bca919ae766?auto=format&fit=crop&w=400&q=80" },
   { title: "Pesca", link: "/aventuras#pesca", image: "/images/aventura_pesca.png" },
-  { title: "Agencia de turismo", link: "/aventuras#agencia-de-turismo", image: "/images/aventura_agencia.png" }
+  { title: "Agencia de turismo", link: "/aventuras#agencia-de-turismo", image: "/images/aventura_agencia.png" },
+  { title: "Supermercados y Almacenes", link: "/comercios#supermercados", image: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=400&q=80" },
+  { title: "Indumentaria y Calzado", link: "/comercios#indumentaria", image: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=400&q=80" },
+  { title: "Farmacias y Salud", link: "/comercios#farmacias", image: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=400&q=80" },
+  { title: "Ferretería y Construcción", link: "/comercios#ferretería", image: "https://images.unsplash.com/photo-1581783342308-f792dbdd27c5?auto=format&fit=crop&w=400&q=80" },
+  { title: "Parques, Jardines, Mascotas", link: "/comercios#parques-jardines-mascotas", image: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=400&q=80" },
+  { title: "Regionales y Artesanías", link: "/comercios#regionales", image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=400&q=80" },
+  { title: "Kioscos y Regalería", link: "/comercios#kioscos", image: "https://images.unsplash.com/photo-1526178613552-2b45c6c302f0?auto=format&fit=crop&w=400&q=80" },
+  { title: "Panaderías y Pastelerías", link: "/comercios#panaderías", image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=400&q=80" },
+  { title: "Librerías y Fotografía", link: "/comercios#librerías", image: "https://images.unsplash.com/photo-1507842229456-748530865586?auto=format&fit=crop&w=400&q=80" },
+  { title: "Hogar y Decoración", link: "/comercios#hogar", image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=400&q=80" },
+  { title: "Servicios y Medios", link: "/comercios#servicios", image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=400&q=80" },
+  { title: "Forrajería y Agro", link: "/comercios#forrajería", image: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?auto=format&fit=crop&w=400&q=80" },
+  { title: "Otros Comercios", link: "/comercios#otros", image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=400&q=80" }
 ];
-

@@ -1,16 +1,21 @@
 import { Metadata } from 'next';
 import { prisma } from '@/lib/db';
 import HomeClient from './HomeClient';
-import { getAluminéWeather } from '@/lib/services/weather';
+import { getAlumineWeather } from '@/lib/services/weather';
 
 export const metadata: Metadata = {
-  title: 'AluminéGO | Guía Turística y Delivery en Aluminé',
-  description: 'La Guía Turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé.',
-  keywords: ['Aluminé', 'Guía turística Aluminé', 'delivery Aluminé', 'comer en Aluminé', 'cabañas Aluminé', 'turismo patagonia'],
+  title: {
+    absolute: 'AluminéGO | Guía Digital y Comercial de Aluminé, Neuquén',
+  },
+  description: 'Guía oficial de Aluminé: gastronomía, delivery, cabañas, hoteles, rafting en Río Aluminé, Ruca Choroy, Quillén y estado oficial de rutas.',
+  keywords: ['aluminé', 'alumine neuquen', 'guía turística alumine', 'delivery alumine', 'comer en alumine', 'cabañas alumine', 'rafting alumine', 'turismo patagonia'],
+  alternates: {
+    canonical: 'https://www.aluminego.ar',
+  },
   openGraph: {
-    title: 'AluminéGO | Guía Turística y Delivery en Aluminé',
-    description: 'La Guía Turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé.',
-    url: '/',
+    title: 'AluminéGO | Guía Digital y Comercial de Aluminé, Neuquén',
+    description: 'Guía oficial de Aluminé: gastronomía, delivery, cabañas, hoteles, rafting en Río Aluminé, Ruca Choroy, Quillén y estado oficial de rutas.',
+    url: 'https://www.aluminego.ar',
   }
 };
 
@@ -20,7 +25,7 @@ export const revalidate = 60;
 export default async function Page() {
   const [categories, weatherData] = await Promise.all([
     prisma.category.findMany({ orderBy: { title: 'asc' } }),
-    getAluminéWeather()
+    getAlumineWeather()
   ]);
   
   return <HomeClient 

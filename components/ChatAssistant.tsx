@@ -14,7 +14,7 @@ export default function ChatAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: '¡Hola! Soy el asistente virtual de AluminéGO, parte del ecosistema digital de ADNQN, diseñado para acompañarte en tu experiencia por nuestra región. Antes de comenzar, ¿cuál es tu nombre para poder dirigirirme a ti?'
+      content: '¡Hola! Soy el asistente virtual de AluminéGO, diseñado para acompañarte en tu experiencia por Aluminé y sus alrededores. Antes de comenzar, ¿cuál es tu nombre para poder dirigirme a ti?'
     }
   ]);
   const [input, setInput] = useState('');
@@ -48,7 +48,7 @@ export default function ChatAssistant() {
       setMessages([
         {
           role: 'assistant',
-          content: `¡Hola ${savedName}! Soy el asistente virtual de AluminéGO, parte del ecosistema digital de ADNQN. ¿En qué te puedo ayudar hoy?`
+          content: `¡Hola ${savedName}! Soy el asistente virtual de AluminéGO. ¿En qué te puedo ayudar hoy?`
         }
       ]);
     } else {
@@ -56,7 +56,7 @@ export default function ChatAssistant() {
       setMessages([
         {
           role: 'assistant',
-          content: '¡Hola! Soy el asistente virtual de AluminéGO, parte del ecosistema digital de ADNQN, diseñado para acompañarte en tu experiencia por nuestra región. Antes de comenzar, ¿cuál es tu nombre para poder dirigirme a ti?'
+          content: '¡Hola! Soy el asistente virtual de AluminéGO, diseñado para acompañarte en tu experiencia por Aluminé y sus alrededores. Antes de comenzar, ¿cuál es tu nombre para poder dirigirme a ti?'
         }
       ]);
     }
@@ -167,7 +167,7 @@ export default function ChatAssistant() {
       const userMessage: Message = { role: 'user', content: name };
       const welcomeMessage: Message = { 
         role: 'assistant', 
-        content: `¡Un placer conocerte, ${name}! ¿En qué te puedo ayudar hoy sobre Aluminé?` 
+        content: `¡Un placer conocerte, ${name}! ¿En qué te puedo ayudar hoy sobre Aluminé, alojamientos, comidas o excursiones?` 
       };
       
       if (isVoiceMode) {
@@ -273,8 +273,8 @@ export default function ChatAssistant() {
   };
 
   const suggestions = [
-    "¿Qué puedo hacer en Aluminé? 🚣",
-    "Buscar cabañas para hospedarme 🏡",
+    "¿Qué hacer en Aluminé? 🚣",
+    "Buscar cabañas y hospedajes 🏡",
     "Recomiéndame dónde comer 🍕",
     "Contacto comercial / Anunciar 📱"
   ];
@@ -337,7 +337,7 @@ export default function ChatAssistant() {
             ✦
           </div>
 
-          {/* Sparkle Star 3 (Top Right) */}
+          {/* Sparkle Star 3 */}
           <div style={{
             position: 'absolute',
             top: '8px',
@@ -377,7 +377,7 @@ export default function ChatAssistant() {
               e.currentTarget.style.transform = 'scale(1)';
               e.currentTarget.style.boxShadow = '0 4px 10px rgba(0,0,0,0.15)';
             }}
-            title="Asistente Virtual"
+            title="Asistente Virtual AluminéGO"
           >
             <img src="/images/bot-icon.jpg" alt="Asistente" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             {/* Status Indicator Dot */}
@@ -454,7 +454,7 @@ export default function ChatAssistant() {
               </div>
               <div>
                 <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, letterSpacing: '0.3px' }}>Asistente AluminéGO</h4>
-                <span style={{ fontSize: '0.75rem', opacity: 0.85, display: 'block', marginTop: '1px' }}>Ecosistema digital ADNQN</span>
+                <span style={{ fontSize: '0.75rem', opacity: 0.85, display: 'block', marginTop: '1px' }}>Guía digital inteligente</span>
               </div>
             </div>
             <button 
@@ -529,7 +529,7 @@ export default function ChatAssistant() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Suggestions (rendered when not loading, input is empty and name is set) */}
+          {/* Quick Suggestions */}
           {!isSending && userName && input.trim() === '' && (
             <div style={{
               padding: '10px 16px',

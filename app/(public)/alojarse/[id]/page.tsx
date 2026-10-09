@@ -140,12 +140,90 @@ export default async function AlojamientoDetallePage({ params }: PageProps) {
             )}
           </div>
 
+          {/* SECCIÓN 1: PRODUCTOS / OPCIONES / SERVICIOS DESTACADOS CON FOTOS Y PRECIOS */}
+          {(() => {
+            let parsedDetails: any[] = [];
+            if (alojamiento.details) {
+              try {
+                const trimmed = alojamiento.details.trim();
+                if (trimmed.startsWith('[')) {
+                  const p = JSON.parse(trimmed);
+                  if (Array.isArray(p)) {
+                    parsedDetails = p.map((it: any) => {
+                      if (typeof it === 'string') return { name: it };
+                      return {
+                        name: it.name || '',
+                        description: it.description || '',
+                        price: it.price !== undefined && it.price !== null ? String(it.price) : '',
+                        image: it.image || ''
+                      };
+                    }).filter((it: any) => it && it.name);
+                  }
+                } else {
+                  parsedDetails = alojamiento.details.split(',').map((s: string) => ({ name: s.trim() })).filter(Boolean);
+                }
+              } catch {
+                parsedDetails = (alojamiento.details || '').split(',').map((s: string) => ({ name: s.trim() })).filter(Boolean);
+              }
+            }
+
+            if (parsedDetails.length === 0) return null;
+
+            return (
+              <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', padding: '24px', boxShadow: 'var(--shadow-sm)' }}>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-main)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  🏕️ Opciones y Servicios Destacados
+                </h2>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '16px' }}>
+                  {parsedDetails.map((prod: any, idx: number) => {
+                    const productMsg = `Hola ${alojamiento.name}, vi en AluminéGO la opción "${prod.name}" y me gustaría consultar disponibilidad...`;
+                    return (
+                      <div key={idx} style={{ backgroundColor: '#ffffff', borderRadius: '14px', border: '1.5px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
+                        {prod.image && (
+                          <div style={{ position: 'relative', width: '100%', height: '160px', backgroundColor: '#f1f5f9' }}>
+                            <img src={prod.image} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </div>
+                        )}
+                        <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1, gap: '8px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                            <span style={{ fontWeight: 800, fontSize: '1.05rem', color: '#1e293b' }}>{prod.name}</span>
+                            {prod.price && !isNaN(parseFloat(String(prod.price))) && (
+                              <span style={{ fontWeight: 800, color: '#16a34a', fontSize: '1rem', backgroundColor: '#f0fdf4', padding: '3px 10px', borderRadius: '6px', border: '1px solid #bbf7d0', whiteSpace: 'nowrap' }}>
+                                ${new Intl.NumberFormat('es-AR').format(parseFloat(String(prod.price)))}
+                              </span>
+                            )}
+                          </div>
+                          {prod.description && (
+                            <p style={{ fontSize: '0.88rem', color: '#64748b', margin: 0, lineHeight: 1.4 }}>
+                              {prod.description}
+                            </p>
+                          )}
+                          {alojamiento.whatsapp && (
+                            <a
+                              href={`https://wa.me/${alojamiento.whatsapp}?text=${encodeURIComponent(productMsg)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ marginTop: 'auto', paddingTop: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.88rem', fontWeight: 700, color: '#16a34a', textDecoration: 'none' }}
+                            >
+                              Consultar por WhatsApp →
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* SECCIÓN 2: COMODIDADES Y SERVICIOS CON TILDES */}
           {alojamiento.features && alojamiento.features.length > 0 && (
             <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', padding: '24px', boxShadow: 'var(--shadow-sm)' }}>
               <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-main)', marginBottom: '16px' }}>Servicios y Comodidades</h2>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
-                {alojamiento.features.map((f) => (
-                  <div key={f.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-main)' }}>
+                {alojamiento.features.map((f: any) => (
+                  <div key={f.id || f.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-text-main)' }}>
                     <Check size={18} color="var(--color-green)" />
                     <span>{f.name}</span>
                   </div>

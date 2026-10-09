@@ -2,12 +2,13 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { Lock, User, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [showPassword, setShowPassword] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 
@@ -42,7 +43,7 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-header">
-          <div className="logo">Aluminé<span>GO</span></div>
+          <div className="logo">Pehuenia<span>GO</span></div>
           <h1>Bienvenido de nuevo</h1>
           <p>Ingresa tus credenciales para acceder al panel</p>
         </div>
@@ -65,16 +66,37 @@ export default function LoginPage() {
 
           <div className="form-group">
             <label htmlFor="password">Contraseña</label>
-            <div className="input-wrapper">
+            <div className="input-wrapper" style={{ position: 'relative' }}>
               <Lock size={18} className="input-icon" />
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
+                style={{ paddingRight: '42px' }}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: '#64748b',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: 0
+                }}
+                title={showPassword ? "Ocultar contraseña" : "Ver contraseña"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
@@ -92,7 +114,7 @@ export default function LoginPage() {
         </form>
 
         <div className="login-footer">
-          <p>© 2026 AluminéGO - Súper Admin Panel</p>
+          <p>© 2026 PehueniaGO - Súper Admin Panel</p>
         </div>
       </div>
 

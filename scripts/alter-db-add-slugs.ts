@@ -1,4 +1,4 @@
-﻿import 'dotenv/config';
+import 'dotenv/config';
 import { createClient } from '@libsql/client';
 
 const client = createClient({
@@ -14,7 +14,7 @@ async function run() {
     await client.execute(`ALTER TABLE "Commerce" ADD COLUMN "slug" TEXT`);
     console.log('Added slug column successfully.');
   } catch (e: any) {
-    console.log(`âš ï¸  slug column: ${e.message}`);
+    console.log(`⚠️  slug column: ${e.message}`);
   }
 
   try {
@@ -22,15 +22,15 @@ async function run() {
     await client.execute(`CREATE UNIQUE INDEX IF NOT EXISTS "Commerce_slug_key" ON "Commerce"("slug")`);
     console.log('Created index successfully.');
   } catch (e: any) {
-    console.log(`âš ï¸  index: ${e.message}`);
+    console.log(`⚠️  index: ${e.message}`);
   }
 
   try {
     console.log('Adding locality column to Commerce...');
-    await client.execute(`ALTER TABLE "Commerce" ADD COLUMN "locality" TEXT DEFAULT 'Aluminé'`);
+    await client.execute(`ALTER TABLE "Commerce" ADD COLUMN "locality" TEXT DEFAULT 'Villa Pehuenia'`);
     console.log('Added locality column successfully.');
   } catch (e: any) {
-    console.log(`âš ï¸  locality column: ${e.message}`);
+    console.log(`⚠️  locality column: ${e.message}`);
   }
 
   console.log('>>> Modificaciones completadas.');
@@ -38,4 +38,3 @@ async function run() {
 }
 
 run();
-

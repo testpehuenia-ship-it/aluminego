@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDPVStatus } from '@/lib/services/dpv';
-import { getAluminéWeather } from '@/lib/services/weather';
+import { getPehueniaWeather } from '@/lib/services/weather';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const [dpvData, weatherData] = await Promise.all([
       getDPVStatus(),
-      getAluminéWeather()
+      getPehueniaWeather()
     ]);
 
     return NextResponse.json({ dpvData, weatherData });

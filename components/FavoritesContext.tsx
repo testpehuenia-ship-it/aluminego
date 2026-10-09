@@ -25,7 +25,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('aluminego_favorites');
+      const saved = localStorage.getItem('pehueniago_favorites');
       if (saved) {
         setFavorites(JSON.parse(saved));
       }
@@ -37,7 +37,7 @@ export function FavoritesProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('aluminego_favorites', JSON.stringify(favorites));
+      localStorage.setItem('pehueniago_favorites', JSON.stringify(favorites));
     }
   }, [favorites, isLoaded]);
 

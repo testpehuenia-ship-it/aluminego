@@ -2,8 +2,19 @@
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
+import { verifySession } from '@/lib/auth'
+
+async function requireAdminAuth() {
+  const cookieStore = await cookies()
+  const token = cookieStore.get('admin_session')?.value
+  if (!verifySession(token)) {
+    throw new Error('No autorizado: sesión de administrador requerida')
+  }
+}
 
 export async function getSubscriptions() {
+  await requireAdminAuth()
   const subscriptions = await prisma.subscription.findMany({
     include: {
       business: true,
@@ -22,6 +33,7 @@ export async function getSubscriptions() {
 }
 
 export async function registerPayment(subscriptionId: string) {
+  await requireAdminAuth()
   try {
     const subscription = await prisma.subscription.findUnique({
       where: { id: subscriptionId }
@@ -56,6 +68,7 @@ export async function registerPayment(subscriptionId: string) {
 }
 
 export async function getBillingStats() {
+  await requireAdminAuth()
   const subscriptions = await prisma.subscription.findMany({
     include: {
       business: true,

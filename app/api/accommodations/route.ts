@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
     const body = await request.json();
-    const { name, type, image, whatsapp, description, features, selectedPricingKeys, latitude, longitude, openingHours, isVerified, showSchedule } = body;
+    const { name, type, image, whatsapp, description, details, features, selectedPricingKeys, latitude, longitude, openingHours, isVerified, showSchedule } = body;
 
     const result = await prisma.$transaction(async (tx: any) => {
       const accommodation = await tx.accommodation.create({
@@ -39,13 +39,14 @@ export async function POST(request: Request) {
           image,
           whatsapp,
           description,
+          details: details || '',
           latitude: latitude ? parseFloat(String(latitude)) : null,
           longitude: longitude ? parseFloat(String(longitude)) : null,
           openingHours: openingHours || null,
           isVerified: Boolean(isVerified),
           showSchedule: Boolean(showSchedule),
           features: {
-            create: features.map((f: string) => ({ name: f }))
+            create: (features || []).map((f: string) => ({ name: f }))
           }
         },
         include: {
@@ -87,13 +88,13 @@ export async function POST(request: Request) {
         // 3. Auto-generate PortalUser if applicable
         if (selectedPricingKeys.includes('plan_comercio_completo') || selectedPricingKeys.includes('plan_basico_destacado')) {
           const safeName = accommodation.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-          const email = `${safeName}@aluminego.ar`;
+          const email = `${safeName}@pehueniago.ar`;
           
           const today = new Date();
           const d = String(today.getDate()).padStart(2, '0');
           const m = String(today.getMonth() + 1).padStart(2, '0');
           const y = today.getFullYear();
-          const password = `aluminego${d}${m}${y}`;
+          const password = `pehueniago${d}${m}${y}`;
 
           // Check if user exists
           let portalUser = await tx.portalUser.findUnique({ where: { email } });

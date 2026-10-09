@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Send, Bell, Loader2, AlertCircle, CheckCircle2, Users, History, Copy, Trash2 } from 'lucide-react';
+import { Send, Bell, Loader2, AlertCircle, CheckCircle2, Users, History, Copy, Trash2, Smartphone, Download } from 'lucide-react';
 
 interface PushHistoryItem {
   id: string;
@@ -24,16 +24,31 @@ export default function NotificationsAdminPage() {
 
   const [history, setHistory] = useState<PushHistoryItem[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [appStats, setAppStats] = useState({
+    totalInstalled: 0,
+    pushCount: 0,
+    pushPercentage: 0,
+    active30Days: 0,
+    platforms: { Android: 0, iOS: 0, Windows: 0, macOS: 0, Otro: 0 }
+  });
 
   const fetchHistory = async () => {
     try {
-      const res = await fetch('/api/push/history');
-      if (res.ok) {
-        const data = await res.json();
+      const [histRes, appRes] = await Promise.all([
+        fetch('/api/push/history'),
+        fetch('/api/app-analytics')
+      ]);
+
+      if (histRes.ok) {
+        const data = await histRes.json();
         setHistory(data);
       }
+      if (appRes.ok) {
+        const data = await appRes.json();
+        setAppStats(data);
+      }
     } catch (error) {
-      console.error("Error fetching history", error);
+      console.error("Error fetching history or app stats", error);
     } finally {
       setLoadingHistory(false);
     }
@@ -132,6 +147,31 @@ export default function NotificationsAdminPage() {
         <p>Enviá avisos, descuentos y promociones directamente al celular de los usuarios.</p>
       </div>
 
+      {/* AUDIENCE OVERVIEW BAR */}
+      <div className="audience-bar">
+        <div className="aud-card">
+          <div className="aud-icon blue"><Download size={22} /></div>
+          <div className="aud-info">
+            <span className="aud-val">{appStats.totalInstalled}</span>
+            <span className="aud-label">Apps Descargadas</span>
+          </div>
+        </div>
+        <div className="aud-card">
+          <div className="aud-icon green"><Bell size={22} /></div>
+          <div className="aud-info">
+            <span className="aud-val">{appStats.pushCount}</span>
+            <span className="aud-label">Suscriptores Push ({appStats.pushPercentage}% de las Apps)</span>
+          </div>
+        </div>
+        <div className="aud-card">
+          <div className="aud-icon purple"><Smartphone size={22} /></div>
+          <div className="aud-info">
+            <span className="aud-val">{appStats.active30Days}</span>
+            <span className="aud-label">Celulares Activos (30 días)</span>
+          </div>
+        </div>
+      </div>
+
       <div className="content-grid">
         <div className="card compose-card">
           <h2>Redactar Notificación</h2>
@@ -176,7 +216,7 @@ export default function NotificationsAdminPage() {
                 type="text" 
                 value={url} 
                 onChange={e => setUrl(e.target.value)} 
-                placeholder="Ej: https://aluminego.ar/alojarse (Por defecto va al inicio)"
+                placeholder="Ej: https://pehueniago.ar/alojarse (Por defecto va al inicio)"
               />
             </div>
 
@@ -217,7 +257,7 @@ export default function NotificationsAdminPage() {
             <div className="preview-phone">
               <div className="preview-header">
                 <img src="/icon.png" alt="icon" className="preview-icon" />
-                <span>AluminéGO • Ahora</span>
+                <span>PehueniaGO • Ahora</span>
               </div>
               <div className="preview-body">
                 <strong>{title || 'Título de ejemplo'}</strong>
@@ -302,6 +342,56 @@ export default function NotificationsAdminPage() {
 
         .inline-icon {
           color: #ea580c; /* Naranja para notificaciones */
+        }
+
+        .audience-bar {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          gap: 16px;
+          margin-bottom: 28px;
+        }
+
+        .aud-card {
+          background: white;
+          border-radius: 16px;
+          border: 1px solid #e2e8f0;
+          padding: 16px 20px;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .aud-icon {
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .aud-icon.blue { background: #e0f2fe; color: #0284c7; }
+        .aud-icon.green { background: #dcfce7; color: #16a34a; }
+        .aud-icon.purple { background: #f3e8ff; color: #8b5cf6; }
+
+        .aud-info {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .aud-val {
+          font-size: 1.35rem;
+          font-weight: 800;
+          color: #0f172a;
+          line-height: 1.2;
+        }
+
+        .aud-label {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: #64748b;
         }
 
         .content-grid {

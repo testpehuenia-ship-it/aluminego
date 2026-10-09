@@ -5,7 +5,7 @@ import AlojarseClient from './AlojarseClient';
 export const metadata: Metadata = {
   title: 'Dónde Alojarse en Aluminé | Cabañas, Hoteles y Camping',
   description: 'Encuentra las mejores cabañas, hoteles, hostels y campings en Aluminé. Compara servicios, comodidades y reserva directo por WhatsApp.',
-  keywords: ['cabañas villa alumine', 'alojarse en alumine', 'hoteles villa alumine', 'camping alumine', 'alojamiento patagonia'],
+  keywords: ['cabañas villa aluminé', 'alojarse en aluminé', 'hoteles villa aluminé', 'camping aluminé', 'alojamiento patagonia'],
   alternates: {
     canonical: 'https://www.aluminego.ar/alojarse',
   },

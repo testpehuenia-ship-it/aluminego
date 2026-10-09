@@ -16,7 +16,11 @@ import {
   Building2,
   DollarSign,
   Check,
-  MessageCircle
+  MessageCircle,
+  Key,
+  Eye,
+  EyeOff,
+  Copy
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import OpeningHoursEditor, { DEFAULT_SCHEDULE_STRING } from '@/components/admin/OpeningHoursEditor';
@@ -47,14 +51,45 @@ export default function LocalServicesAdminPage() {
     longitude: '-71.18375154775678',
     openingHours: DEFAULT_SCHEDULE_STRING,
     isVerified: false,
-    showSchedule: false
+    showSchedule: false,
+    hasDelivery: false
   });
   
+  // Multi-item / Products state before saving
+  const [productsList, setProductsList] = React.useState<any[]>([]);
+  const [newProduct, setNewProduct] = React.useState<{ name: string; description: string; price: string; image: string }>({
+    name: '',
+    description: '',
+    price: '',
+    image: ''
+  });
+  const [editingProductIdx, setEditingProductIdx] = React.useState<number | null>(null);
+  const [uploadingProductImg, setUploadingProductImg] = React.useState(false);
+
   const [uploading, setUploading] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
   const [generatedCredentials, setGeneratedCredentials] = React.useState<any>(null);
   const [pricingOptions, setPricingOptions] = React.useState<any[]>([]);
   const [dynamicCategories, setDynamicCategories] = React.useState<string[]>([]);
+
+  // Password reset modal state
+  const [resetModalData, setResetModalData] = React.useState<{
+    isOpen: boolean;
+    serviceName: string;
+    whatsapp: string;
+    loading: boolean;
+    credentials: { email: string; newPassword: string } | null;
+    showPassword: boolean;
+    copied: boolean;
+  }>({
+    isOpen: false,
+    serviceName: '',
+    whatsapp: '',
+    loading: false,
+    credentials: null,
+    showPassword: true,
+    copied: false
+  });
 
   const existingSubcategories = React.useMemo(() => {
     if (!formData.category) return [];
@@ -104,6 +139,43 @@ export default function LocalServicesAdminPage() {
   const openModal = (service: any = null) => {
     if (service) {
       setEditingService(service);
+      let initialProducts: any[] = [];
+      if (service.details) {
+        try {
+          if (service.details.trim().startsWith('[')) {
+            const parsed = JSON.parse(service.details);
+            initialProducts = parsed.map((item: any) => {
+              if (typeof item === 'string') {
+                return { name: item, description: '', price: '', image: '' };
+              }
+              return {
+                name: item.name || '',
+                description: item.description || '',
+                price: item.price !== undefined && item.price !== null ? String(item.price) : '',
+                image: item.image || ''
+              };
+            });
+          } else {
+            initialProducts = service.details.split(',').map((s: string) => ({
+              name: s.trim(),
+              description: '',
+              price: '',
+              image: ''
+            })).filter((p: any) => p.name);
+          }
+        } catch {
+          initialProducts = service.details.split(',').map((s: string) => ({
+            name: s.trim(),
+            description: '',
+            price: '',
+            image: ''
+          })).filter((p: any) => p.name);
+        }
+      }
+      setProductsList(initialProducts);
+      setNewProduct({ name: '', description: '', price: '', image: '' });
+      setEditingProductIdx(null);
+
       setFormData({
         name: service.name,
         category: service.category || '',
@@ -126,11 +198,15 @@ export default function LocalServicesAdminPage() {
         longitude: service.longitude ? service.longitude.toString() : '',
         openingHours: service.openingHours || '',
         isVerified: service.isVerified || false,
-        showSchedule: service.showSchedule || false
+        showSchedule: service.showSchedule || false,
+        hasDelivery: service.hasDelivery || false
       });
     } else {
       setEditingService(null);
-      setFormData({ name: '', category: '', subcategory: '', address: '', whatsapp: '', image: '', description: '', details: '', selectedPricingKeys: [], bonifiedKeys: [], discountAmount: 0, linkedSections: [], latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING, isVerified: false, showSchedule: false });
+      setProductsList([]);
+      setNewProduct({ name: '', description: '', price: '', image: '' });
+      setEditingProductIdx(null);
+      setFormData({ name: '', category: '', subcategory: '', address: '', whatsapp: '', image: '', description: '', details: '', selectedPricingKeys: [], bonifiedKeys: [], discountAmount: 0, linkedSections: [], latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING, isVerified: false, showSchedule: false, hasDelivery: false });
     }
     setIsModalOpen(true);
   };
@@ -138,6 +214,118 @@ export default function LocalServicesAdminPage() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingService(null);
+    setProductsList([]);
+    setNewProduct({ name: '', description: '', price: '', image: '' });
+    setEditingProductIdx(null);
+  };
+
+  const handleProductImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingProductImg(true);
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataUpload,
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNewProduct(prev => ({ ...prev, image: data.url }));
+      } else {
+        alert('Error al subir imagen: ' + data.error);
+      }
+    } catch (err) {
+      alert('Error de conexión al subir imagen');
+    } finally {
+      setUploadingProductImg(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleSaveProduct = () => {
+    if (!newProduct.name.trim()) {
+      alert('El nombre o título del producto/oferta es obligatorio');
+      return;
+    }
+
+    if (editingProductIdx !== null) {
+      const updated = [...productsList];
+      updated[editingProductIdx] = { ...newProduct };
+      setProductsList(updated);
+      setEditingProductIdx(null);
+    } else {
+      if (productsList.length >= 5) {
+        alert('⚠️ Límite alcanzado: El máximo permitido es de 5 productos u ofertas. El comercio puede enviar su catálogo completo por WhatsApp.');
+        return;
+      }
+      setProductsList([...productsList, { ...newProduct }]);
+    }
+    setNewProduct({ name: '', description: '', price: '', image: '' });
+  };
+
+  const handleEditProduct = (index: number) => {
+    const item = productsList[index];
+    setNewProduct({
+      name: item.name || '',
+      description: item.description || '',
+      price: item.price !== undefined && item.price !== null ? String(item.price) : '',
+      image: item.image || ''
+    });
+    setEditingProductIdx(index);
+  };
+
+  const handleCancelEditProduct = () => {
+    setNewProduct({ name: '', description: '', price: '', image: '' });
+    setEditingProductIdx(null);
+  };
+
+  const handleRemoveProduct = (index: number) => {
+    setProductsList(prev => prev.filter((_, idx) => idx !== index));
+    if (editingProductIdx === index) {
+      handleCancelEditProduct();
+    }
+  };
+
+  const handleResetPasswordClick = async (service: any) => {
+    const targetId = service.portalUserId || service.id;
+    setResetModalData({
+      isOpen: true,
+      serviceName: service.name,
+      whatsapp: service.whatsapp || '',
+      loading: true,
+      credentials: null,
+      showPassword: true,
+      copied: false
+    });
+
+    try {
+      const res = await fetch(`/api/admin/portal-users/${targetId}/reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setResetModalData(prev => ({
+          ...prev,
+          loading: false,
+          credentials: {
+            email: data.email,
+            newPassword: data.newPassword
+          },
+          whatsapp: data.whatsapp || service.whatsapp || ''
+        }));
+      } else {
+        alert(data.error || 'No se pudo generar nueva contraseña');
+        setResetModalData(prev => ({ ...prev, isOpen: false, loading: false }));
+      }
+    } catch (e) {
+      alert('Error de conexión al resetear contraseña');
+      setResetModalData(prev => ({ ...prev, isOpen: false, loading: false }));
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,9 +385,15 @@ export default function LocalServicesAdminPage() {
       return;
     }
 
+    const payload = {
+      ...formData,
+      details: JSON.stringify(productsList.slice(0, 5))
+    };
+
     setSaving(true);
 
     try {
+      const isNew = !editingService;
       const url = editingService 
         ? `/api/local-services/${editingService.id}` 
         : '/api/local-services';
@@ -209,7 +403,7 @@ export default function LocalServicesAdminPage() {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
@@ -217,7 +411,8 @@ export default function LocalServicesAdminPage() {
         await fetchData();
         closeModal();
 
-        if (data.generatedCredentials) {
+        // IMPORTANTE: SOLO enviar mensaje de WhatsApp y mostrar modal de bienvenida si es un ALTA NUEVA
+        if (isNew && data.generatedCredentials && data.generatedCredentials.password && !data.generatedCredentials.password.includes('anteriormente')) {
           const creds = {
             ...data.generatedCredentials,
             businessName: formData.name,
@@ -225,10 +420,11 @@ export default function LocalServicesAdminPage() {
           };
           setGeneratedCredentials(creds);
           
-          // Abrir WhatsApp automáticamente
           const cleanPhone = (creds.whatsapp || '').replace(/\D/g, '');
-          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
-          window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMsg)}`, '_blank');
+          const textMsg = `Hola! Bienvenido a PehueniaGO. Ya puedes acceder a tu panel de control desde https://pehueniago.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
+          if (cleanPhone) {
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMsg)}`, '_blank');
+          }
         }
 
         const bannerKeys = formData.selectedPricingKeys.filter((k: string) => k.includes('banner') || k.includes('portada'));
@@ -379,8 +575,9 @@ export default function LocalServicesAdminPage() {
                     <td>{s.address || 'Sin dirección'}</td>
                     <td>
                       <div className="actions-cell">
-                        <button className="icon-btn edit" onClick={() => openModal(s)}><Edit2 size={16} /></button>
-                        <button className="icon-btn delete" onClick={() => handleDelete(s.id)}><Trash2 size={16} /></button>
+                        <button className="icon-btn edit" title="Editar" onClick={() => openModal(s)}><Edit2 size={16} /></button>
+                        <button className="icon-btn" title="Generar / Resetear Clave de Portal" style={{ color: '#0d9488' }} onClick={() => handleResetPasswordClick(s)}><Key size={16} /></button>
+                        <button className="icon-btn delete" title="Eliminar" onClick={() => handleDelete(s.id)}><Trash2 size={16} /></button>
                       </div>
                     </td>
                   </tr>
@@ -428,13 +625,18 @@ export default function LocalServicesAdminPage() {
                 </datalist>
               </div>
               <div className="form-group">
-                <label>Subcategoría (Opcional)</label>
+                <label style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span>Subcategoría / Rubro de Referencia (Opcional)</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: '#64748b' }}>
+                    Indica el rubro o servicio general de referencia (ej: <em>Artesanías</em>, <em>Gomería</em>, <em>Poda</em>). Los productos a la venta se cargan por separado más abajo.
+                  </span>
+                </label>
                 <input 
                   type="text" 
                   list="subcategories-list"
                   value={formData.subcategory || ''} 
                   onChange={(e) => setFormData({...formData, subcategory: e.target.value})}
-                  placeholder="Ej: Poda, Raleo, etc."
+                  placeholder="Ej: Artesanías, Regalería, Taller mecánico..."
                   className="admin-select"
                 />
                 <datalist id="subcategories-list">
@@ -463,7 +665,16 @@ export default function LocalServicesAdminPage() {
                   onChange={(val) => setFormData({...formData, openingHours: val})}
                 />
               </div>
-                  <div style={{ display: 'flex', gap: '20px', marginTop: '12px' }}>
+                  <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '12px', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={formData.hasDelivery} 
+                        onChange={(e) => setFormData({...formData, hasDelivery: e.target.checked})}
+                        style={{ width: '18px', height: '18px', accentColor: '#10b981' }}
+                      />
+                      <b style={{ color: formData.hasDelivery ? '#059669' : '#334155' }}>🛵 Cuenta con servicio de Delivery</b>
+                    </label>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
                       <input 
                         type="checkbox" 
@@ -553,6 +764,214 @@ export default function LocalServicesAdminPage() {
                 )}
               </div>
 
+              {/* Sección Artículos y Productos u Ofertas (Estilo Gastronomía) */}
+              <div className="modal-section" style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '1rem', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    🛍️ Productos u Ofertas Destacadas
+                  </label>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 700, color: productsList.length >= 5 ? '#dc2626' : '#0d9488', background: productsList.length >= 5 ? '#fee2e2' : '#ccfbf1', padding: '3px 10px', borderRadius: '12px' }}>
+                    {productsList.length} / 5 máx.
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0 0 16px 0', lineHeight: 1.4 }}>
+                  Ingresa hasta <strong>5 productos u ofertas</strong> con título, foto, descripción y precio opcional (el comercio puede enviar la carta o catálogo completo por WhatsApp cuando lo contacten).
+                </p>
+
+                {/* Formulario para agregar / editar producto */}
+                <div 
+                  style={{
+                    border: editingProductIdx !== null ? '2px solid #0d9488' : '1px dashed #cbd5e1',
+                    borderRadius: '12px',
+                    padding: '16px',
+                    marginBottom: '16px',
+                    backgroundColor: editingProductIdx !== null ? '#f0fdfa' : 'white'
+                  }}
+                >
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px', gap: '12px', marginBottom: '12px' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>Título / Nombre del Producto *</label>
+                      <input 
+                        type="text" 
+                        value={newProduct.name} 
+                        onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                        placeholder="Ej: Remera Térmica / Pack Oferta"
+                        disabled={productsList.length >= 5 && editingProductIdx === null}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+                      />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>Precio (Opcional)</label>
+                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <span style={{ position: 'absolute', left: '10px', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>$</span>
+                        <input 
+                          type="number" 
+                          value={newProduct.price} 
+                          onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                          placeholder="0.00"
+                          disabled={productsList.length >= 5 && editingProductIdx === null}
+                          style={{ width: '100%', padding: '9px 12px 9px 24px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="form-group" style={{ marginBottom: '12px' }}>
+                    <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>Descripción (Opcional)</label>
+                    <textarea 
+                      value={newProduct.description} 
+                      onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+                      placeholder="Ej: Talles del S al XXL, colores negro y azul..."
+                      rows={2}
+                      disabled={productsList.length >= 5 && editingProductIdx === null}
+                      style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <input 
+                        type="file" 
+                        id="product-item-image"
+                        accept="image/*"
+                        onChange={handleProductImageUpload}
+                        style={{ display: 'none' }}
+                        disabled={productsList.length >= 5 && editingProductIdx === null}
+                      />
+                      <label 
+                        htmlFor="product-item-image" 
+                        style={{ 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          gap: '6px', 
+                          padding: '8px 14px', 
+                          backgroundColor: '#e2e8f0', 
+                          color: '#1e293b', 
+                          borderRadius: '8px', 
+                          fontSize: '0.82rem', 
+                          fontWeight: 600, 
+                          cursor: productsList.length >= 5 && editingProductIdx === null ? 'not-allowed' : 'pointer' 
+                        }}
+                      >
+                        {uploadingProductImg ? <Loader2 size={14} className="animate-spin" /> : <ImageIcon size={14} />}
+                        {newProduct.image ? 'Cambiar Foto' : 'Subir Foto'}
+                      </label>
+                      {newProduct.image && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#f1f5f9', padding: '4px 8px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                          <img src={newProduct.image} alt="Preview" style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '6px' }} />
+                          <button type="button" onClick={() => setNewProduct({...newProduct, image: ''})} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }} title="Quitar foto">
+                            <X size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {editingProductIdx !== null && (
+                        <button 
+                          type="button" 
+                          onClick={handleCancelEditProduct} 
+                          style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', background: 'white', color: '#475569', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}
+                        >
+                          Cancelar
+                        </button>
+                      )}
+                      <button 
+                        type="button" 
+                        onClick={handleSaveProduct} 
+                        disabled={productsList.length >= 5 && editingProductIdx === null}
+                        style={{ 
+                          backgroundColor: editingProductIdx !== null ? '#0d9488' : (productsList.length >= 5 ? '#94a3b8' : '#1e293b'), 
+                          color: 'white', 
+                          border: 'none', 
+                          padding: '8px 18px', 
+                          borderRadius: '8px', 
+                          fontWeight: 700, 
+                          fontSize: '0.85rem', 
+                          cursor: productsList.length >= 5 && editingProductIdx === null ? 'not-allowed' : 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        {editingProductIdx !== null ? <Check size={16} /> : <Plus size={16} />}
+                        {editingProductIdx !== null ? 'Guardar Cambios' : 'Agregar Producto'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lista de productos cargados */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {productsList.length === 0 ? (
+                    <div style={{ padding: '16px', textAlign: 'center', color: '#94a3b8', fontStyle: 'italic', fontSize: '0.85rem', backgroundColor: 'white', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+                      Aún no hay productos u ofertas cargadas. Completa los datos de arriba y presiona "Agregar Producto".
+                    </div>
+                  ) : (
+                    productsList.map((prod, idx) => (
+                      <div 
+                        key={idx} 
+                        style={{ 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'space-between', 
+                          gap: '12px', 
+                          backgroundColor: 'white', 
+                          padding: '12px 16px', 
+                          borderRadius: '12px', 
+                          border: '1px solid #e2e8f0',
+                          boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+                          {prod.image ? (
+                            <img src={prod.image} alt={prod.name} style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e2e8f0', flexShrink: 0 }} />
+                          ) : (
+                            <div style={{ width: '44px', height: '44px', borderRadius: '8px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '1.2rem', flexShrink: 0 }}>
+                              🛍️
+                            </div>
+                          )}
+                          <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                              <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>{prod.name}</span>
+                              {prod.price && !isNaN(parseFloat(String(prod.price))) && (
+                                <span style={{ fontWeight: 800, color: '#16a34a', fontSize: '0.85rem', backgroundColor: '#dcfce7', padding: '2px 8px', borderRadius: '6px' }}>
+                                  ${new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2 }).format(parseFloat(String(prod.price)))}
+                                </span>
+                              )}
+                            </div>
+                            {prod.description && (
+                              <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: '#64748b', lineHeight: 1.3 }}>
+                                {prod.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button 
+                            type="button" 
+                            onClick={() => handleEditProduct(idx)} 
+                            style={{ background: '#f1f5f9', border: 'none', color: '#0d9488', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', fontWeight: 600 }}
+                            title="Editar"
+                          >
+                            <Edit2 size={14} /> Editar
+                          </button>
+                          <button 
+                            type="button" 
+                            onClick={() => handleRemoveProduct(idx)} 
+                            style={{ background: '#fee2e2', border: 'none', color: '#dc2626', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', fontWeight: 600 }}
+                            title="Eliminar"
+                          >
+                            <Trash2 size={14} /> Borrar
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
               {formData.selectedPricingKeys.includes('plan_comercio_completo') && (
                 <div className="modal-section" style={{ background: '#fdf4ff', padding: '20px', borderRadius: '16px', border: '1px solid #fbcfe8', marginBottom: '16px' }}>
                   <h3 className="section-title" style={{ borderBottom: 'none', paddingBottom: 0, marginTop: 0, color: '#be185d' }}>Campos Premium (Plan Completo)</h3>
@@ -563,16 +982,6 @@ export default function LocalServicesAdminPage() {
                       onChange={(e) => setFormData({...formData, description: e.target.value})}
                       placeholder="Escribe una descripción larga del comercio o servicio..."
                       rows={4}
-                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Detalles / Características Adicionales</label>
-                    <textarea 
-                      value={formData.details || ''} 
-                      onChange={(e) => setFormData({...formData, details: e.target.value})}
-                      placeholder="Ej: Acepta tarjetas, Wi-Fi, Estacionamiento..."
-                      rows={2}
                       style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
                     />
                   </div>
@@ -770,7 +1179,7 @@ export default function LocalServicesAdminPage() {
             </div>
 
             <a 
-              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
+              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a PehueniaGO. Ya puedes acceder a tu panel de control desde https://pehueniago.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"
@@ -786,6 +1195,88 @@ export default function LocalServicesAdminPage() {
             >
               Cerrar y continuar
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Reset / Generar Contraseña */}
+      {resetModalData.isOpen && (
+        <div className="modal-overlay" onClick={() => setResetModalData(prev => ({ ...prev, isOpen: false }))}>
+          <div className="modal-content" style={{ maxWidth: '480px', textAlign: 'center', padding: '24px' }} onClick={e => e.stopPropagation()}>
+            <div style={{ backgroundColor: '#ccfbf1', width: '60px', height: '60px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: '#0f766e' }}>
+              <Key size={28} />
+            </div>
+            
+            <h2 style={{ fontSize: '1.4rem', marginBottom: '8px', color: '#0f766e' }}>
+              Clave de Acceso al Portal
+            </h2>
+            <p style={{ color: '#475569', fontSize: '0.9rem', marginBottom: '20px' }}>
+              Comercio: <strong>{resetModalData.serviceName}</strong>
+            </p>
+
+            {resetModalData.loading ? (
+              <div style={{ padding: '30px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                <Loader2 size={32} className="animate-spin" color="#0d9488" />
+                <p style={{ fontSize: '0.9rem', color: '#64748b' }}>Generando nueva clave segura...</p>
+              </div>
+            ) : resetModalData.credentials ? (
+              <div>
+                <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px', textAlign: 'left' }}>
+                  <div style={{ marginBottom: '12px' }}>
+                    <span style={{ fontSize: '0.8rem', color: '#64748b', display: 'block' }}>Usuario / Email:</span>
+                    <strong style={{ fontSize: '1rem', color: '#1e293b' }}>{resetModalData.credentials.email}</strong>
+                  </div>
+
+                  <div>
+                    <span style={{ fontSize: '0.8rem', color: '#64748b', display: 'block', marginBottom: '4px' }}>Nueva Contraseña Asignada:</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'white', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                      <input 
+                        type={resetModalData.showPassword ? "text" : "password"} 
+                        value={resetModalData.credentials.newPassword} 
+                        readOnly
+                        style={{ border: 'none', background: 'transparent', outline: 'none', flex: 1, fontWeight: 700, fontSize: '1.1rem', color: '#0f766e' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setResetModalData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
+                        style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                        title={resetModalData.showPassword ? "Ocultar" : "Mostrar"}
+                      >
+                        {resetModalData.showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(resetModalData.credentials?.newPassword || '');
+                          setResetModalData(prev => ({ ...prev, copied: true }));
+                          setTimeout(() => setResetModalData(prev => ({ ...prev, copied: false })), 2000);
+                        }}
+                        style={{ background: 'none', border: 'none', color: resetModalData.copied ? '#16a34a' : '#64748b', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }}
+                        title="Copiar contraseña"
+                      >
+                        {resetModalData.copied ? <Check size={18} /> : <Copy size={18} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <a 
+                  href={`https://wa.me/${(resetModalData.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Tu nueva contraseña de acceso a PehueniaGO es: ${resetModalData.credentials.newPassword}\n\nPuedes ingresar a tu panel de control desde https://pehueniago.ar/portal-comercial/login con tu email: ${resetModalData.credentials.email}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ width: '100%', padding: '14px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '1rem', textDecoration: 'none', backgroundColor: '#25D366', color: 'white', borderRadius: '10px', fontWeight: 'bold', marginBottom: '12px' }}
+                >
+                  <MessageCircle size={20} /> Enviar Nueva Clave por WhatsApp
+                </a>
+
+                <button 
+                  onClick={() => setResetModalData(prev => ({ ...prev, isOpen: false }))}
+                  style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
+                >
+                  Cerrar
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
       )}

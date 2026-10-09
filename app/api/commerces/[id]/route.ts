@@ -43,7 +43,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { name, type, image, whatsapp, description, details, selectedPricingKeys, latitude, longitude, locality, openingHours, isVerified, showSchedule } = body;
+    const { name, type, image, whatsapp, description, details, selectedPricingKeys, latitude, longitude, locality, openingHours, isVerified, showSchedule, hasDelivery } = body;
     const finalLocality = locality || 'Aluminé';
     const slug = await generateUniqueSlug(name, finalLocality, id);
     
@@ -84,6 +84,7 @@ export async function PUT(
           openingHours: finalOpeningHours,
           isVerified: Boolean(isVerified),
           showSchedule: Boolean(showSchedule),
+          hasDelivery: Boolean(hasDelivery),
           details: {
             create: details ? details.map((d: string) => ({ name: d })) : []
           }
@@ -158,14 +159,14 @@ export async function PUT(
           });
           if (!commerceCheck?.portalUserId) {
             const safeName = commerceCheck.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            let email = `${safeName}@aluminego.ar`;
+            let email = `${safeName}@pehueniago.ar`;
             const today = new Date();
-            const password = `aluminego${String(today.getDate()).padStart(2, '0')}${String(today.getMonth() + 1).padStart(2, '0')}${today.getFullYear()}`;
+            const password = `pehueniago${String(today.getDate()).padStart(2, '0')}${String(today.getMonth() + 1).padStart(2, '0')}${today.getFullYear()}`;
             
             let portalUser = await tx.portalUser.findUnique({ where: { email } });
             let counter = 1;
             while (portalUser) {
-              email = `${safeName}${counter}@aluminego.ar`;
+              email = `${safeName}${counter}@pehueniago.ar`;
               portalUser = await tx.portalUser.findUnique({ where: { email } });
               counter++;
             }
@@ -180,11 +181,6 @@ export async function PUT(
             });
             
             generatedCredentials = { email, password };
-          } else if (commerceCheck.portalUser) {
-            generatedCredentials = {
-              email: commerceCheck.portalUser.email,
-              password: "Tu contraseña ya fue creada anteriormente. Si la olvidaste, contactanos."
-            };
           }
         }
       }

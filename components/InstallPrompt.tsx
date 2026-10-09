@@ -137,7 +137,7 @@ export default function InstallPrompt() {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <div style={{ position: 'relative', width: '70px', height: '70px', marginBottom: '16px' }}>
               {/* Imagen base en blanco y negro o tenue (usamos el ícono subido con la araucaria) */}
-              <img src="/icon-192x192.png" alt="AluminéGO Icon" width="70" height="70" style={{ borderRadius: '16px', filter: isInstalling ? 'grayscale(100%) opacity(0.3)' : 'none', transition: 'filter 0.3s', objectFit: 'contain' }} />
+              <img src="/icon-192x192.png" alt="PehueniaGO Icon" width="70" height="70" style={{ borderRadius: '16px', filter: isInstalling ? 'grayscale(100%) opacity(0.3)' : 'none', transition: 'filter 0.3s', objectFit: 'contain' }} />
               
               {/* Imagen a color que se "llena" de abajo hacia arriba */}
               {isInstalling && (
@@ -151,21 +151,21 @@ export default function InstallPrompt() {
                   animation: 'fillUp 3s ease-in-out forwards',
                   borderRadius: '16px',
                 }}>
-                  <img src="/icon-192x192.png" alt="AluminéGO Icon" width="70" height="70" style={{ position: 'absolute', bottom: 0, left: 0, objectFit: 'contain' }} />
+                  <img src="/icon-192x192.png" alt="PehueniaGO Icon" width="70" height="70" style={{ position: 'absolute', bottom: 0, left: 0, objectFit: 'contain' }} />
                 </div>
               )}
             </div>
             
-            {/* Corregido a Aluminé (solo P mayúscula) */}
+            {/* Corregido a Pehuenia (solo P mayúscula) */}
             <h2 style={{ fontFamily: 'var(--font-oswald), sans-serif', fontSize: '1.8rem', margin: '0 0 8px 0' }}>
-              <span style={{ color: 'var(--color-green)', fontWeight: 700 }}>Aluminé</span>
+              <span style={{ color: 'var(--color-green)', fontWeight: 700 }}>Pehuenia</span>
               <span style={{ color: 'var(--color-orange)', fontWeight: 700 }}>GO</span>
             </h2>
             
             <p style={{ color: '#444', fontSize: '1.1rem', margin: '0 0 24px 0', lineHeight: 1.4 }}>
               {isInstalling 
                 ? 'Preparando tu app... ¡Ya casi listo!' 
-                : <>¡Lleva AluminéGO siempre contigo!<br/>Instala la aplicación para disfrutar de Aluminé estés donde estés.</>}
+                : <>¡Lleva PehueniaGO siempre contigo!<br/>Instala la aplicación para disfrutar de Villa Pehuenia y Moquehue estés donde estés.</>}
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>

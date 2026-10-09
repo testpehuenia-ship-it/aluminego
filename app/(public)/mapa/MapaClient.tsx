@@ -151,6 +151,7 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
         setMapError(null);
         map.current = new maplibregl.Map({
           container: mapContainer.current,
+          cooperativeGestures: true,
           style: mapLayer === 'satelite' 
             ? {
                 version: 8,
@@ -173,11 +174,42 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
                 ]
               }
             : 'https://tiles.openfreemap.org/styles/liberty',
-          center: isLocal ? [-70.9314, -39.2372] : [-70.6, -39.2], 
-          zoom: isLocal ? 13 : 7,
+          center: isLocal ? [-70.9314, -39.2372] : [-70.3, -38.8], 
+          zoom: isLocal ? 12 : 6,
           pitch: 0, 
           bearing: 0
         });
+
+        // Función para ocultar todos los comercios / POIs de fondo de OpenStreetMap
+        const hideBackgroundPOIs = () => {
+          if (!map.current) return;
+          const layers = map.current.getStyle()?.layers || [];
+          for (const layer of layers) {
+            const id = layer.id.toLowerCase();
+            const sourceLayer = ((layer as any)['source-layer'] || '').toLowerCase();
+            if (
+              id.includes('poi') ||
+              sourceLayer.includes('poi') ||
+              id.includes('amenity') ||
+              id.includes('shop') ||
+              id.includes('food') ||
+              id.includes('restaurant') ||
+              id.includes('hotel') ||
+              id.includes('lodging') ||
+              id.includes('tourism') ||
+              id.includes('commercial') ||
+              id.includes('place_other') ||
+              id.includes('place-other')
+            ) {
+              try {
+                map.current.setLayoutProperty(layer.id, 'visibility', 'none');
+              } catch (e) {}
+            }
+          }
+        };
+
+        map.current.on('style.load', hideBackgroundPOIs);
+        map.current.on('load', hideBackgroundPOIs);
 
         map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
 
@@ -263,7 +295,7 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
       <div className="dashboard-hero">
         <div className="hero-overlay"></div>
         <div className="hero-content">
-          <h1>Info Hub Aluminé</h1>
+          <h1>Mapa Interactivo 3D y Estado de Rutas de Aluminé</h1>
           <p>Tu centro de planificación: Clima en tiempo real, mapa interactivo y estado oficial de rutas de la DPV Neuquén.</p>
         </div>
       </div>
@@ -335,21 +367,28 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
             ) : (
               <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
             )}
-            
-            <div className="map-legend glass-panel">
-              <h4 style={{ fontSize: '0.85rem', fontWeight: 800, marginBottom: '8px' }}>
-                {mapView === 'local' ? 'Mapa Local' : 'Pasos Internacionales'}
-              </h4>
-              {mapView === 'local' ? (
-                <p style={{ fontSize: '0.8rem', margin: 0, color: '#475569' }}>Atractivos y puntos de interés locales.</p>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem' }}><div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#16a34a' }}></div> Transitable</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem' }}><div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ea580c' }}></div> Precaución</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem' }}><div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#dc2626' }}></div> Cerrado</div>
+          </div>
+          
+          {/* Referencias ubicadas debajo del mapa */}
+          <div className="map-legend">
+            <h4 style={{ fontSize: '0.95rem', fontWeight: 800, marginBottom: '8px', color: '#14352a' }}>
+              {mapView === 'local' ? 'Referencias - Mapa Local' : 'Referencias - Pasos Internacionales'}
+            </h4>
+            {mapView === 'local' ? (
+              <p style={{ fontSize: '0.88rem', margin: 0, color: '#475569' }}>Atractivos y puntos de interés locales de Aluminé.</p>
+            ) : (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginTop: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', fontWeight: 600, color: '#1e293b' }}>
+                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#16a34a' }}></div> Transitable
                 </div>
-              )}
-            </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', fontWeight: 600, color: '#1e293b' }}>
+                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ea580c' }}></div> Precaución
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', fontWeight: 600, color: '#1e293b' }}>
+                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#dc2626' }}></div> Cerrado
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -650,7 +689,10 @@ export default function MapaClient({ initialMarkers }: MapaClientProps) {
         </div>
       )}
 
-      <PublicityBanner page="GuiaLocal" section={2} delay="4s" />
+      {/* Espaciado generoso antes del banner inferior */}
+      <div style={{ marginTop: '36px', marginBottom: '24px' }}>
+        <PublicityBanner page="GuiaLocal" section={2} delay="4s" />
+      </div>
     </div>
   );
 }

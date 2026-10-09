@@ -3,15 +3,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePortal } from '@/components/PortalContext';
-import { Loader2, Plus, Trash2, Upload, ArrowLeft } from 'lucide-react';
+import { Loader2, Plus, Trash2, Upload, ArrowLeft, ShoppingBag, Utensils } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PortalMenuPage() {
   const router = useRouter();
   const { user: session, loading } = usePortal();
   
-  const [businesses, setBusinesses] = useState<any[]>([]);
-  const [selectedBusiness, setSelectedBusiness] = useState<any>(null);
+  const [entities, setEntities] = useState<any[]>([]);
+  const [selectedEntity, setSelectedEntity] = useState<any>(null);
   
   const [items, setItems] = useState<any[]>([]);
   const [fetchingItems, setFetchingItems] = useState(false);
@@ -35,20 +35,22 @@ export default function PortalMenuPage() {
         .then(res => res.json())
         .then(data => {
           if (data.services) {
-            const onlyBusinesses = data.services.filter((s: any) => s.type === 'business');
-            setBusinesses(onlyBusinesses);
-            if (onlyBusinesses.length > 0) {
-              handleSelectBusiness(onlyBusinesses[0]);
+            const availableEntities = data.services.filter((s: any) => 
+              s.type === 'business' || s.type === 'commerce' || s.type === 'localservice'
+            );
+            setEntities(availableEntities);
+            if (availableEntities.length > 0) {
+              handleSelectEntity(availableEntities[0]);
             }
           }
         });
     }
   }, [session]);
 
-  const handleSelectBusiness = (business: any) => {
-    setSelectedBusiness(business);
+  const handleSelectEntity = (entity: any) => {
+    setSelectedEntity(entity);
     setFetchingItems(true);
-    fetch(`/api/portal/menu?businessId=${business.id}`)
+    fetch(`/api/portal/menu?serviceId=${entity.id}&serviceType=${entity.type}`)
       .then(res => res.json())
       .then(data => {
         if (data.items) setItems(data.items);
@@ -77,11 +79,7 @@ export default function PortalMenuPage() {
       
       if (data.success) {
         setFormData(prev => ({ ...prev, image: data.url }));
-        if (data.isHeavy) {
-          setMessage({ type: 'success', text: 'Imagen subida (optimizada).' });
-        } else {
-          setMessage({ type: 'success', text: 'Imagen subida correctamente.' });
-        }
+        setMessage({ type: 'success', text: 'Foto subida correctamente.' });
       } else {
         setMessage({ type: 'error', text: data.error || 'Error al subir la imagen' });
       }
@@ -89,14 +87,15 @@ export default function PortalMenuPage() {
       setMessage({ type: 'error', text: 'Error de conexión al subir' });
     } finally {
       setUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedBusiness) return;
+    if (!selectedEntity) return;
     if (items.length >= 5) {
-      setMessage({ type: 'error', text: 'Has alcanzado el límite de 5 ítems de menú permitidos.' });
+      setMessage({ type: 'error', text: 'Has alcanzado el límite de 5 productos u ofertas permitidas.' });
       return;
     }
 
@@ -108,10 +107,11 @@ export default function PortalMenuPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          businessId: selectedBusiness.id,
+          serviceId: selectedEntity.id,
+          serviceType: selectedEntity.type,
           name: formData.name,
           description: formData.description,
-          price: parseFloat(formData.price),
+          price: formData.price ? formData.price : '',
           image: formData.image
         })
       });
@@ -120,7 +120,7 @@ export default function PortalMenuPage() {
       if (data.success) {
         setItems([data.item, ...items]);
         setFormData({ name: '', description: '', price: '', image: '' });
-        setMessage({ type: 'success', text: 'Plato agregado al menú.' });
+        setMessage({ type: 'success', text: isGastronomy ? 'Plato agregado al menú.' : 'Producto u oferta agregada exitosamente.' });
       } else {
         setMessage({ type: 'error', text: data.error || 'Error al guardar.' });
       }
@@ -132,18 +132,23 @@ export default function PortalMenuPage() {
   };
 
   const handleDeleteItem = async (itemId: string) => {
-    if (!confirm('¿Seguro que deseas borrar este plato?')) return;
+    const itemTypeLabel = isGastronomy ? 'plato' : 'producto';
+    if (!confirm(`¿Seguro que deseas borrar este ${itemTypeLabel}?`)) return;
 
     try {
       const res = await fetch('/api/portal/menu', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ businessId: selectedBusiness.id, itemId })
+        body: JSON.stringify({
+          serviceId: selectedEntity.id,
+          serviceType: selectedEntity.type,
+          itemId
+        })
       });
       const data = await res.json();
       if (data.success) {
         setItems(items.filter(i => i.id !== itemId));
-        setMessage({ type: 'success', text: 'Plato eliminado.' });
+        setMessage({ type: 'success', text: isGastronomy ? 'Plato eliminado.' : 'Producto eliminado.' });
       } else {
         setMessage({ type: 'error', text: data.error || 'Error al borrar.' });
       }
@@ -151,6 +156,8 @@ export default function PortalMenuPage() {
       setMessage({ type: 'error', text: 'Error de red.' });
     }
   };
+
+  const isGastronomy = selectedEntity?.type === 'business';
 
   if (loading) return <div style={{ minHeight: '60vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}><Loader2 className="animate-spin" size={40} color="var(--color-orange)" /></div>;
   if (!session) return null;
@@ -161,27 +168,36 @@ export default function PortalMenuPage() {
         <Link href="/portal-comercial" style={{ padding: '8px', borderRadius: '50%', backgroundColor: 'white', display: 'flex', color: 'var(--color-text-main)', border: '1px solid #e2e8f0' }}>
           <ArrowLeft size={20} />
         </Link>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: '#1e293b' }}>Gestión de Menú</h1>
+        <div>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: '#1e293b' }}>
+            {isGastronomy ? 'Gestión de Menú' : 'Productos y Ofertas a la Venta'}
+          </h1>
+          <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>
+            Carga hasta 5 productos u ofertas destacadas para que tus clientes las vean en la app.
+          </p>
+        </div>
       </div>
 
       <div style={{ backgroundColor: 'white', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-        {businesses.length === 0 ? (
-          <p style={{ textAlign: 'center', color: '#64748b' }}>No tienes locales comerciales (gastronomía) asignados.</p>
+        {entities.length === 0 ? (
+          <p style={{ textAlign: 'center', color: '#64748b' }}>No tienes comercios o servicios asignados.</p>
         ) : (
           <>
-            {businesses.length > 1 && (
+            {entities.length > 1 && (
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontWeight: 600, marginBottom: '8px' }}>Seleccionar Negocio:</label>
+                <label style={{ display: 'block', fontWeight: 600, marginBottom: '8px' }}>Seleccionar Negocio / Comercio:</label>
                 <select 
-                  value={selectedBusiness?.id || ''} 
+                  value={selectedEntity?.id || ''} 
                   onChange={e => {
-                    const s = businesses.find(x => x.id === e.target.value);
-                    if (s) handleSelectBusiness(s);
+                    const s = entities.find(x => x.id === e.target.value);
+                    if (s) handleSelectEntity(s);
                   }}
                   style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '1rem', backgroundColor: '#f8fafc' }}
                 >
-                  {businesses.map(b => (
-                    <option key={b.id} value={b.id}>{b.name}</option>
+                  {entities.map(e => (
+                    <option key={e.id} value={e.id}>
+                      {e.name} ({e.type === 'business' ? 'Gastronomía' : e.type === 'commerce' ? 'Comercio' : 'Guía Local'})
+                    </option>
                   ))}
                 </select>
               </div>
@@ -195,7 +211,10 @@ export default function PortalMenuPage() {
 
             <div style={{ marginBottom: '32px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', marginBottom: '16px' }}>
-                <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 700 }}>Mis Platos Destacados</h2>
+                <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {isGastronomy ? <Utensils size={20} color="var(--color-orange)" /> : <ShoppingBag size={20} color="#0d9488" />}
+                  {isGastronomy ? 'Mis Platos Destacados' : 'Mis Productos u Ofertas'}
+                </h2>
                 <span style={{ backgroundColor: items.length >= 5 ? '#fee2e2' : '#e0f2fe', color: items.length >= 5 ? '#991b1b' : '#0369a1', padding: '4px 12px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 'bold' }}>
                   {items.length} / 5
                 </span>
@@ -204,7 +223,9 @@ export default function PortalMenuPage() {
               {fetchingItems ? (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}><Loader2 className="animate-spin" /></div>
               ) : items.length === 0 ? (
-                <p style={{ color: '#64748b', textAlign: 'center', padding: '20px', backgroundColor: '#f8fafc', borderRadius: '8px' }}>No hay platos en tu menú. Agrega tu primer plato destacado abajo.</p>
+                <p style={{ color: '#64748b', textAlign: 'center', padding: '20px', backgroundColor: '#f8fafc', borderRadius: '8px' }}>
+                  {isGastronomy ? 'No hay platos en tu menú. Agrega tu primer plato destacado abajo.' : 'Aún no has cargado productos u ofertas a la venta. Agrega hasta 5 ítems abajo.'}
+                </p>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {items.map(item => (
@@ -212,14 +233,24 @@ export default function PortalMenuPage() {
                       {item.image ? (
                         <img src={item.image} alt={item.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} />
                       ) : (
-                        <div style={{ width: '80px', height: '80px', backgroundColor: '#e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '0.8rem' }}>Sin foto</div>
+                        <div style={{ width: '80px', height: '80px', backgroundColor: '#e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '1.5rem' }}>
+                          {isGastronomy ? '🍔' : '🛍️'}
+                        </div>
                       )}
-                      <div style={{ flex: 1 }}>
-                        <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', fontWeight: 700 }}>{item.name}</h3>
-                        <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '0.9rem' }}>{item.description}</p>
-                        <strong style={{ color: 'var(--color-orange)' }}>${item.price.toLocaleString('es-AR')}</strong>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>{item.name}</h3>
+                        {item.description && (
+                          <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '0.88rem', lineHeight: 1.3 }}>{item.description}</p>
+                        )}
+                        {item.price && !isNaN(parseFloat(String(item.price))) && parseFloat(String(item.price)) > 0 ? (
+                          <strong style={{ color: '#16a34a', fontSize: '1rem' }}>
+                            ${parseFloat(String(item.price)).toLocaleString('es-AR', { minimumFractionDigits: 2 })}
+                          </strong>
+                        ) : (
+                          <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic' }}>Sin precio publicado</span>
+                        )}
                       </div>
-                      <button onClick={() => handleDeleteItem(item.id)} style={{ padding: '8px', color: '#ef4444', backgroundColor: '#fee2e2', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
+                      <button onClick={() => handleDeleteItem(item.id)} style={{ padding: '8px', color: '#ef4444', backgroundColor: '#fee2e2', border: 'none', borderRadius: '8px', cursor: 'pointer' }} title="Eliminar">
                         <Trash2 size={20} />
                       </button>
                     </div>
@@ -230,24 +261,50 @@ export default function PortalMenuPage() {
 
             {items.length < 5 && (
               <div style={{ border: '2px dashed #cbd5e1', borderRadius: '16px', padding: '24px', backgroundColor: '#f8fafc' }}>
-                <h3 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}><Plus size={20} /> Añadir Nuevo Plato</h3>
+                <h3 style={{ margin: '0 0 16px 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px', color: '#1e293b' }}>
+                  <Plus size={20} /> {isGastronomy ? 'Añadir Nuevo Plato' : 'Añadir Producto u Oferta'}
+                </h3>
                 <form onSubmit={handleAddItem} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px', gap: '16px' }}>
                     <div>
-                      <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '4px' }}>Nombre del Plato *</label>
-                      <input required value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})} placeholder="Ej: Trucha al Limón" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                      <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '4px' }}>
+                        {isGastronomy ? 'Nombre del Plato *' : 'Título / Nombre del Producto *'}
+                      </label>
+                      <input 
+                        required 
+                        value={formData.name} 
+                        onChange={e => setFormData({...formData, name: e.target.value})} 
+                        placeholder={isGastronomy ? 'Ej: Trucha al Limón' : 'Ej: Mate de Alpaca / Poncho'} 
+                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }} 
+                      />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '4px' }}>Precio ($) *</label>
-                      <input required type="number" value={formData.price} onChange={e=>setFormData({...formData, price: e.target.value})} placeholder="Ej: 8500" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                      <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '4px' }}>
+                        {isGastronomy ? 'Precio ($) *' : 'Precio ($) (Opcional)'}
+                      </label>
+                      <input 
+                        required={isGastronomy}
+                        type="number" 
+                        value={formData.price} 
+                        onChange={e => setFormData({...formData, price: e.target.value})} 
+                        placeholder="0.00" 
+                        style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }} 
+                      />
                     </div>
                   </div>
                   <div>
                     <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '4px' }}>Descripción (Opcional)</label>
-                    <input value={formData.description} onChange={e=>setFormData({...formData, description: e.target.value})} placeholder="Ej: Acompañada con papas rústicas" style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
+                    <input 
+                      value={formData.description} 
+                      onChange={e => setFormData({...formData, description: e.target.value})} 
+                      placeholder={isGastronomy ? 'Ej: Acompañada con papas rústicas y ensalada' : 'Ej: Cincelado a mano, incluye bombilla de alpaca...'} 
+                      style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }} 
+                    />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '4px' }}>Foto del Plato (Opcional)</label>
+                    <label style={{ display: 'block', fontWeight: 600, fontSize: '0.9rem', marginBottom: '4px' }}>
+                      {isGastronomy ? 'Foto del Plato (Opcional)' : 'Foto del Producto (Opcional)'}
+                    </label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                       {formData.image && <img src={formData.image} alt="Preview" style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px' }} />}
                       <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
@@ -258,14 +315,14 @@ export default function PortalMenuPage() {
                     </div>
                   </div>
                   <button type="submit" disabled={saving} style={{ marginTop: '8px', padding: '12px', backgroundColor: 'var(--color-orange)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' }}>
-                    {saving ? 'Guardando...' : 'Guardar Plato'}
+                    {saving ? 'Guardando...' : (isGastronomy ? 'Guardar Plato' : 'Guardar Producto')}
                   </button>
                 </form>
               </div>
             )}
             {items.length >= 5 && (
               <div style={{ textAlign: 'center', padding: '16px', backgroundColor: '#f1f5f9', borderRadius: '8px', color: '#475569', fontWeight: 500 }}>
-                Has alcanzado el límite máximo de 5 platos destacados.<br/>
+                Has alcanzado el límite máximo de 5 productos u ofertas destacadas.<br/>
                 Para añadir uno nuevo, elimina alguno de los existentes.
               </div>
             )}

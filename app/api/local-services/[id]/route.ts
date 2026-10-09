@@ -12,13 +12,13 @@ export async function PUT(
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('admin_session')?.value;
-    // if (!verifySession(token)) {
-    //   return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    // }
+    if (!verifySession(token)) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
     const { id } = await params;
     console.log('[DEBUG PUT] id:', id);
     const body = await request.json();
-    const { name, category, subcategory, address, whatsapp, image, description, details, selectedPricingKeys, bonifiedKeys, discountAmount, linkedSections, latitude, longitude, openingHours, isVerified, showSchedule } = body;
+    const { name, category, subcategory, address, whatsapp, image, description, details, selectedPricingKeys, bonifiedKeys, discountAmount, linkedSections, latitude, longitude, openingHours, isVerified, showSchedule, hasDelivery } = body;
     const latFloat = (latitude !== undefined && latitude !== null && String(latitude).trim() !== '' && parseFloat(String(latitude)) !== 0) ? parseFloat(String(latitude)) : -38.87942114574949;
     const lngFloat = (longitude !== undefined && longitude !== null && String(longitude).trim() !== '' && parseFloat(String(longitude)) !== 0) ? parseFloat(String(longitude)) : -71.18375154775678;
     const finalAddress = (address && address.trim().length > 0) ? address.trim() : 'Aluminé';
@@ -86,20 +86,21 @@ export async function PUT(
       const upperName = name ? name.toUpperCase() : '';
       const updatedService = await tx.localService.update({
         where: { id },
-        data: {
-          name: upperName,
-          category,
-          subcategory,
-          address: finalAddress,
-          whatsapp,
-          image,
-          description,
-          details,
-          latitude: latFloat,
-          longitude: lngFloat,
+        data: { 
+          name: upperName, 
+          category, 
+          subcategory, 
+          address: finalAddress, 
+          whatsapp, 
+          image, 
+          description, 
+          details, 
+          latitude: latFloat, 
+          longitude: lngFloat, 
           openingHours: finalOpeningHours,
           isVerified: Boolean(isVerified),
-          showSchedule: Boolean(showSchedule)
+          showSchedule: Boolean(showSchedule),
+          hasDelivery: Boolean(hasDelivery)
         }
       });
 
@@ -174,9 +175,9 @@ export async function PUT(
             if (linkedSections && Array.isArray(linkedSections) && selectedPricingKeys.includes('plan_comercio_completo')) {
               // Gastronomia
               if (linkedSections.includes('gastronomia')) {
-                const catTitle = subcategory || category;
+                const catTitle = subcategory || category || 'Gastronomía';
                 let bizCat = existingBizCat;
-                if (!bizCat && catTitle) {
+                if (!bizCat) {
                   const safeLink = '/' + catTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-');
                   bizCat = await tx.category.create({ data: { title: catTitle, link: safeLink, image: image || '' } });
                 }
@@ -184,14 +185,14 @@ export async function PUT(
                   name: upperName,
                   whatsapp: whatsapp || '',
                   image: image || '',
-                  categoryId: bizCat.id,
+                  categoryId: (bizCat as any)?.id || '',
                   latitude: latFloat,
                   longitude: lngFloat,
                   description: description || '',
                   details: details || '',
                   openingHours: openingHours || null,
-          isVerified: Boolean(isVerified),
-          showSchedule: Boolean(showSchedule),
+                  isVerified: Boolean(isVerified),
+                  showSchedule: Boolean(showSchedule),
                 };
                 if (!existingSub?.business) {
                   await tx.business.create({
@@ -212,7 +213,21 @@ export async function PUT(
 
               // Alojamiento
               if (linkedSections.includes('alojamiento')) {
-                const detailArray = details ? details.split(',').map((d: string) => d.trim()).filter(Boolean) : [];
+                let featArray: string[] = [];
+                if (details && details.trim()) {
+                  const trimmed = details.trim();
+                  if (trimmed.startsWith('[')) {
+                    try {
+                      const p = JSON.parse(trimmed);
+                      if (Array.isArray(p)) {
+                        featArray = p.map((it: any) => typeof it === 'string' ? it.trim() : (it?.name ? String(it.name).trim() : '')).filter(Boolean);
+                      }
+                    } catch {}
+                  }
+                  if (featArray.length === 0) {
+                    featArray = trimmed.split(',').map((d: string) => d.trim()).filter(Boolean);
+                  }
+                }
                 const accData = {
                   name: upperName,
                   whatsapp: whatsapp || '',
@@ -221,27 +236,29 @@ export async function PUT(
                   latitude: latFloat,
                   longitude: lngFloat,
                   description: description || '',
+                  details: details || '',
                   openingHours: openingHours || null,
-          isVerified: Boolean(isVerified),
-          showSchedule: Boolean(showSchedule),
+                  isVerified: Boolean(isVerified),
+                  showSchedule: Boolean(showSchedule),
                 };
                 if (!existingSub?.accommodation) {
                   await tx.accommodation.create({
                     data: {
                       ...accData,
                       subscription: { connect: { id: targetSubId } },
-                      features: { create: detailArray.map((featName: string) => ({ name: featName })) }
+                      features: { create: featArray.map((featName: string) => ({ name: featName })) }
                     }
                   });
                 } else {
+                  const existingAcc = existingSub.accommodation;
                   await tx.accommodation.update({
-                    where: { id: existingSub.accommodation.id },
+                    where: { id: existingAcc.id },
                     data: accData
                   });
-                  await tx.feature.deleteMany({ where: { accommodationId: existingSub.accommodation.id } });
-                  if (detailArray.length > 0) {
+                  await tx.feature.deleteMany({ where: { accommodationId: existingAcc.id } });
+                  if (featArray.length > 0) {
                     await tx.feature.createMany({
-                      data: detailArray.map((featName: string) => ({ name: featName, accommodationId: existingSub.accommodation.id }))
+                      data: featArray.map((featName: string) => ({ name: featName, accommodationId: existingAcc.id }))
                     });
                   }
                 }
@@ -285,7 +302,33 @@ export async function PUT(
 
               // Comercios
               if (linkedSections.includes('comercios')) {
-                const detailArray = details ? details.split(',').map((d: string) => d.trim()).filter(Boolean) : [];
+                let detailArray: string[] = [];
+                if (details && details.trim()) {
+                  const trimmed = details.trim();
+                  if (trimmed.startsWith('[')) {
+                    try {
+                      const p = JSON.parse(trimmed);
+                      if (Array.isArray(p)) {
+                        detailArray = p.map((it: any) => {
+                          if (typeof it === 'string') return it.trim();
+                          if (it && typeof it === 'object') {
+                            return JSON.stringify({
+                              name: it.name || '',
+                              description: it.description || '',
+                              price: it.price !== undefined && it.price !== null ? String(it.price) : '',
+                              image: it.image || ''
+                            });
+                          }
+                          return String(it);
+                        }).filter(Boolean);
+                      }
+                    } catch {}
+                  }
+                  if (detailArray.length === 0) {
+                    detailArray = trimmed.split(',').map((d: string) => d.trim()).filter(Boolean);
+                  }
+                }
+
                 const commData = {
                   name: upperName,
                   whatsapp: whatsapp || '',
@@ -307,14 +350,15 @@ export async function PUT(
                     }
                   });
                 } else {
+                  const existingComm = existingSub.commerce;
                   await tx.commerce.update({
-                    where: { id: existingSub.commerce.id },
+                    where: { id: existingComm.id },
                     data: commData
                   });
-                  await tx.commerceDetail.deleteMany({ where: { commerceId: existingSub.commerce.id } });
+                  await tx.commerceDetail.deleteMany({ where: { commerceId: existingComm.id } });
                   if (detailArray.length > 0) {
                     await tx.commerceDetail.createMany({
-                      data: detailArray.map((detailName: string) => ({ name: detailName, commerceId: existingSub.commerce.id }))
+                      data: detailArray.map((detailName: string) => ({ name: detailName, commerceId: existingComm.id }))
                     });
                   }
                 }
@@ -413,15 +457,15 @@ export async function PUT(
         if (selectedPricingKeys && (selectedPricingKeys.includes('plan_comercio_completo') || selectedPricingKeys.includes('plan_basico_destacado'))) {
           if (!existingService?.portalUserId) {
             const existingEmails = new Set(matchingPortalUsers.map(u => u.email));
-            let email = `${safeName}@aluminego.ar`;
+            let email = `${safeName}@pehueniago.ar`;
             let counter = 1;
             while (existingEmails.has(email)) {
-              email = `${safeName}${counter}@aluminego.ar`;
+              email = `${safeName}${counter}@pehueniago.ar`;
               counter++;
             }
             
             const today = new Date();
-            const password = `aluminego${String(today.getDate()).padStart(2, '0')}${String(today.getMonth() + 1).padStart(2, '0')}${today.getFullYear()}`;
+            const password = `pehueniago${String(today.getDate()).padStart(2, '0')}${String(today.getMonth() + 1).padStart(2, '0')}${today.getFullYear()}`;
             
             const newUser = await tx.portalUser.create({
               data: { name: upperName, email, password: hashPassword(password) }
@@ -453,11 +497,6 @@ export async function PUT(
             }
             
             generatedCredentials = { email, password };
-          } else if (existingService.portalUser) {
-            generatedCredentials = {
-              email: existingService.portalUser.email,
-              password: "Tu contraseña ya fue creada anteriormente. Si la olvidaste, contactanos."
-            };
           }
         }
       }

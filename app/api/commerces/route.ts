@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, type, image, whatsapp, description, details, selectedPricingKeys, latitude, longitude, locality, openingHours, isVerified, showSchedule } = body;
+    const { name, type, image, whatsapp, description, details, selectedPricingKeys, latitude, longitude, locality, openingHours, isVerified, showSchedule, hasDelivery } = body;
     const finalLocality = locality || 'Aluminé';
     const slug = await generateUniqueSlug(name, finalLocality);
     
@@ -64,6 +64,7 @@ export async function POST(request: Request) {
           openingHours: finalOpeningHours,
           isVerified: Boolean(isVerified),
           showSchedule: Boolean(showSchedule),
+          hasDelivery: Boolean(hasDelivery),
           details: {
             create: details ? details.map((d: string) => ({ name: d })) : []
           }
@@ -108,13 +109,13 @@ export async function POST(request: Request) {
         // 3. Generación automática de PortalUser
         if (selectedPricingKeys.includes('plan_comercio_completo') || selectedPricingKeys.includes('plan_basico_destacado')) {
           const safeName = commerce.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-          const email = `${safeName}@aluminego.ar`;
+          const email = `${safeName}@pehueniago.ar`;
           
           const today = new Date();
           const d = String(today.getDate()).padStart(2, '0');
           const m = String(today.getMonth() + 1).padStart(2, '0');
           const y = today.getFullYear();
-          const password = `aluminego${d}${m}${y}`;
+          const password = `pehueniago${d}${m}${y}`;
 
           // Verificar si ya existe el usuario
           let portalUser = await tx.portalUser.findUnique({ where: { email } });
@@ -137,6 +138,35 @@ export async function POST(request: Request) {
             data: { portalUserId: portalUser.id }
           });
         }
+      }
+
+      if (!generatedCredentials) {
+        const safeName = (commerce.name || 'comercio').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        let email = `${safeName}@pehueniago.ar`;
+        const today = new Date();
+        const d = String(today.getDate()).padStart(2, '0');
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const y = today.getFullYear();
+        const password = `pehueniago${d}${m}${y}`;
+        
+        let portalUser = await tx.portalUser.findUnique({ where: { email } });
+        let counter = 1;
+        while (portalUser) {
+          email = `${safeName}${counter}@pehueniago.ar`;
+          portalUser = await tx.portalUser.findUnique({ where: { email } });
+          counter++;
+        }
+        
+        const newUser = await tx.portalUser.create({
+          data: { name: commerce.name, email, password: hashPassword(password) }
+        });
+        
+        await tx.commerce.update({
+          where: { id: commerce.id },
+          data: { portalUserId: newUser.id }
+        });
+        
+        generatedCredentials = { email, password };
       }
 
       return { commerce, generatedCredentials };

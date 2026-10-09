@@ -96,7 +96,7 @@ export async function POST(request: Request) {
       const dataUri = `data:${mimeType};base64,${base64}`;
 
       const result = await cloudinary.uploader.upload(dataUri, {
-        folder: 'aluminego',
+        folder: 'pehueniago',
         resource_type: 'auto',
         format: finalExtension === 'jpeg' ? 'jpg' : finalExtension,
       });

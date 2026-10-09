@@ -1,0 +1,20 @@
+# AluminéGO - Documentación Completa para Modelos de Lenguaje
+
+## Visión General
+AluminéGO (https://www.aluminego.ar) es la plataforma turística y comercial oficial de la localidad cordillerana de Aluminé, Provincia del Neuquén, Argentina.
+
+## Ubicación y Geografía
+- Localidad: Aluminé
+- Provincia: Neuquén, Argentina
+- Coordenadas: Latitud -39.2369, Longitud -70.9194
+- Atractivos principales: Río Aluminé (sede del mundial de rafting y campeonato argentino), Lago Ruca Choroy, Lago Quillén, Lago Pulmarí, Circuito Pehuenia, Cuesta del Rahue, Comunidades Mapuches (Catalán, Aigo, Puel).
+- Rutas de acceso: Ruta Provincial 23, Ruta Provincial 13, Ruta Provincial 46.
+
+## Funcionalidades de la Aplicación
+1. **Pedidos y Cartas Gastronómicas**: Integración directa con WhatsApp para recepción de pedidos con cálculo automático de totales y verificación de locales con delivery.
+2. **Directorio de Alojamientos**: Cabañas, aparts, hoteles y campings con verificación de habilitación turística.
+3. **Aventuras y Turismo Activo**: Prestadores de rafting, kayak, pesca con mosca y cabalgatas.
+4. **Comercios y Profesionales**: Catálogo comercial categorizado.
+5. **Estado de Rutas en Tiempo Real**: Conexión con datos de la Dirección Provincial de Vialidad de Neuquén (DPV) para Rutas 13, 23, 46 y pasos fronterizos.
+6. **Pronóstico Meteorológico en Vivo**: Datos meteorológicos actualizados cada 30 minutos.
+7. **PWA Instalable**: Funcionalidad offline y notificaciones push.

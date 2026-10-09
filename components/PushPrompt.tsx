@@ -127,8 +127,8 @@ export default function PushPrompt() {
         <h3>{isReminder ? '¡Vas a perderte los descuentos!' : '¡No te pierdas de nada!'}</h3>
         <p>
           {isReminder 
-            ? 'Aprovechalos activando las alertas. AluminéGO quiere enviarte notificaciones para promociones exclusivas en Aluminé.'
-            : 'AluminéGO quiere enviarte notificaciones para descuentos, promociones y alertas del clima en Aluminé.'}
+            ? 'Aprovechalos activando las alertas. PehueniaGO quiere enviarte notificaciones para promociones exclusivas en Villa Pehuenia.'
+            : 'PehueniaGO quiere enviarte notificaciones para descuentos, promociones y alertas del clima en Villa Pehuenia.'}
         </p>
         
         <div className="prompt-actions">

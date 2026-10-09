@@ -494,7 +494,7 @@ export default function MapAdminPage() {
                   type="text" 
                   value={markerFormData.title} 
                   onChange={(e) => setMarkerFormData({...markerFormData, title: e.target.value})}
-                  placeholder="Ej: Muelle de Aluminé"
+                  placeholder="Ej: Muelle de Villa Pehuenia"
                   required
                 />
               </div>

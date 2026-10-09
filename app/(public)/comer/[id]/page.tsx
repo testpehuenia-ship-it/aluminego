@@ -72,7 +72,7 @@ export default async function ComercioDetallePage({ params }: PageProps) {
       'addressLocality': 'Aluminé',
       'addressRegion': 'Neuquén',
       'addressCountry': 'AR',
-      'streetAddress': comercio.address || undefined
+      'streetAddress': (comercio as any).address || undefined
     },
     'geo': (comercio.latitude !== null && comercio.longitude !== null) ? {
       '@type': 'GeoCoordinates',
@@ -125,9 +125,9 @@ export default async function ComercioDetallePage({ params }: PageProps) {
       <div className="container" style={{ marginTop: '24px' }}>
         <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', padding: '24px', boxShadow: 'var(--shadow-sm)', marginBottom: '24px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {comercio.address && (
+            {(comercio as any).address && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
-                <MapPin color="var(--color-orange)" /> <span>{comercio.address}</span>
+                <MapPin color="var(--color-orange)" /> <span>{(comercio as any).address}</span>
               </div>
             )}
             {comercio.whatsapp && (
@@ -138,6 +138,52 @@ export default async function ComercioDetallePage({ params }: PageProps) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--color-text-main)', fontSize: '1.1rem' }}>
               <OpeningStatusBadge openingHours={comercio.openingHours} showWeeklySchedule={true} isVisible={comercio.showSchedule} />
             </div>
+
+            {comercio.hasDelivery ? (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '10px', backgroundColor: '#ecfdf5', border: '1.5px solid #a7f3d0', color: '#065f46', fontWeight: 600, fontSize: '0.95rem' }}>
+                <span style={{ fontSize: '1.2rem' }}>🛵</span>
+                <span>Cuenta con servicio de <strong>Delivery</strong></span>
+              </div>
+            ) : (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '10px', backgroundColor: '#fef2f2', border: '1.5px solid #fecaca', color: '#991b1b', fontWeight: 600, fontSize: '0.95rem' }}>
+                <span style={{ fontSize: '1.2rem' }}>🚫</span>
+                <span>No cuenta con Delivery (Solo consumo en el local / Retiro)</span>
+              </div>
+            )}
+
+            {comercio.description && (
+              <div style={{ marginTop: '8px', padding: '16px', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#1e293b', marginBottom: '6px' }}>Sobre Nosotros</h3>
+                <p style={{ margin: 0, fontSize: '0.95rem', color: '#475569', lineHeight: '1.5' }}>{comercio.description}</p>
+              </div>
+            )}
+
+            {(() => {
+              if (!comercio.details) return null;
+              let productList: string[] = [];
+              try {
+                const parsed = JSON.parse(comercio.details);
+                if (Array.isArray(parsed)) productList = parsed;
+                else if (typeof parsed === 'string') productList = parsed.split(',').map((s: string) => s.trim()).filter(Boolean);
+              } catch {
+                productList = comercio.details.split(',').map((s: string) => s.trim()).filter(Boolean);
+              }
+              if (productList.length === 0) return null;
+              return (
+                <div style={{ marginTop: '8px' }}>
+                  <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+                    ⭐ Artículos / Especialidades destacadas
+                  </h3>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {productList.map((prod: string, i: number) => (
+                      <span key={i} style={{ backgroundColor: '#fff7ed', border: '1px solid #fed7aa', color: '#c2410c', padding: '6px 14px', borderRadius: '20px', fontSize: '0.9rem', fontWeight: 600 }}>
+                        🛍️ {prod}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
           
           {comercio.whatsapp && (

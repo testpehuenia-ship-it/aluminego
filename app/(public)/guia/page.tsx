@@ -5,7 +5,7 @@ import GuiaClient from './GuiaClient';
 export const metadata: Metadata = {
   title: 'Guía Local de Aluminé | Servicios',
   description: 'Directorio completo de servicios públicos, emergencias, profesionales, instituciones y comercios en Aluminé. Dirección y contacto directo.',
-  keywords: ['guia local villa alumine', 'servicios alumine', 'farmacias en villa alumine', 'emergencias villa alumine', 'telefonos utiles alumine'],
+  keywords: ['guia local villa aluminé', 'servicios aluminé', 'farmacias en villa aluminé', 'emergencias villa aluminé', 'telefonos utiles aluminé'],
   alternates: {
     canonical: 'https://www.aluminego.ar/guia',
   },
@@ -45,23 +45,14 @@ export default async function Page() {
     let targetUrl = `/guia/${service.id}`;
     let activeSub = service.subscription;
 
-    // Si la suscripción de LocalService está vencida, la consideramos inactiva
-    if (activeSub && new Date(activeSub.dueDate) < graceDate) {
-      activeSub = null;
-    }
-
     const sName = service.name.toLowerCase().trim();
     
     if (service.category.toLowerCase().includes('alojamiento') || service.category.toLowerCase().includes('dormir')) {
       const match = alojamientos.find(a => a.name.toLowerCase().trim() === sName);
       if (match) {
         targetUrl = `/alojarse/${match.id}`;
-        let matchSub = match.subscription;
-        if (matchSub && new Date(matchSub.dueDate) < graceDate) {
-          matchSub = null;
-        }
-        if (!activeSub && matchSub) {
-          activeSub = matchSub;
+        if (!activeSub && match.subscription) {
+          activeSub = match.subscription;
         }
       }
     }
@@ -69,12 +60,8 @@ export default async function Page() {
       const match = comer.find(a => a.name.toLowerCase().trim() === sName);
       if (match) {
         targetUrl = `/comer/${match.id}`;
-        let matchSub = match.subscription;
-        if (matchSub && new Date(matchSub.dueDate) < graceDate) {
-          matchSub = null;
-        }
-        if (!activeSub && matchSub) {
-          activeSub = matchSub;
+        if (!activeSub && match.subscription) {
+          activeSub = match.subscription;
         }
       }
     }
@@ -82,12 +69,8 @@ export default async function Page() {
       const match = aventuras.find(a => a.name.toLowerCase().trim() === sName);
       if (match) {
         targetUrl = `/aventuras/${match.id}`;
-        let matchSub = match.subscription;
-        if (matchSub && new Date(matchSub.dueDate) < graceDate) {
-          matchSub = null;
-        }
-        if (!activeSub && matchSub) {
-          activeSub = matchSub;
+        if (!activeSub && match.subscription) {
+          activeSub = match.subscription;
         }
       }
     }
@@ -96,12 +79,8 @@ export default async function Page() {
       const match = comercios.find(c => c.name.toLowerCase().trim() === sName);
       if (match) {
         targetUrl = `/comercios/${match.id}`;
-        let matchSub = match.subscription;
-        if (matchSub && new Date(matchSub.dueDate) < graceDate) {
-          matchSub = null;
-        }
-        if (!activeSub && matchSub) {
-          activeSub = matchSub;
+        if (!activeSub && match.subscription) {
+          activeSub = match.subscription;
         }
       }
     }

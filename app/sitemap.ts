@@ -1,75 +1,126 @@
-﻿import { MetadataRoute } from 'next';
+import { MetadataRoute } from 'next';
 import { prisma } from '@/lib/db';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://www.AluminéGO.ar';
+  const baseUrl = 'https://www.aluminego.ar';
 
-  // Páginas estáticas pÁºblicas principales
-  const staticPages = [
-    '',
-    '/alojarse',
-    '/comer',
-    '/aventuras',
-    '/comercios',
-    '/guia',
-    '/mapa'
-  ].map(route => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date(),
-    changeFrequency: 'daily' as const,
-    priority: route === '' ? 1.0 : 0.8
-  }));
-
-  // Buscar dinámicamente los IDs para las Páginas de detalle
-  const alojamientos = await prisma.accommodation.findMany({ select: { id: true } });
-  const comer = await prisma.business.findMany({ select: { id: true } });
-  const aventuras = await prisma.adventure.findMany({ select: { id: true } });
-  const servicios = await prisma.localService.findMany({ select: { id: true } });
-  const comercios = await prisma.commerce.findMany({ select: { id: true, slug: true } });
-
-  const alojamientoRoutes = alojamientos.map(item => ({
-    url: `${baseUrl}/alojarse/${item.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.6
-  }));
-
-  const comerRoutes = comer.map(item => ({
-    url: `${baseUrl}/comer/${item.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.6
-  }));
-
-  const aventuraRoutes = aventuras.map(item => ({
-    url: `${baseUrl}/aventuras/${item.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.6
-  }));
-
-  const servicioRoutes = servicios.map(item => ({
-    url: `${baseUrl}/guia/${item.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.6
-  }));
-
-  const commerceRoutes = comercios.map(item => ({
-    url: `${baseUrl}/comercios/${item.slug || item.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.6
-  }));
-
-  return [
-    ...staticPages,
-    ...alojamientoRoutes,
-    ...comerRoutes,
-    ...aventuraRoutes,
-    ...servicioRoutes,
-    ...commerceRoutes
+  const staticRoutes: MetadataRoute.Sitemap = [
+    {
+      url: baseUrl,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/comer`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/alojarse`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/aventuras`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/comercios`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/guia`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/mapa`,
+      lastModified: new Date(),
+      changeFrequency: 'always',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/novedades`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/privacidad`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/terminos`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
   ];
+
+  try {
+    const [businesses, accommodations, adventures, commerces, articles] = await Promise.all([
+      prisma.business.findMany({ select: { id: true, updatedAt: true } }),
+      prisma.accommodation.findMany({ select: { id: true, updatedAt: true } }),
+      prisma.adventure.findMany({ select: { id: true, updatedAt: true } }),
+      prisma.commerce.findMany({ select: { id: true, slug: true, updatedAt: true } }),
+      prisma.article.findMany({ where: { published: true }, select: { slug: true, updatedAt: true } }),
+    ]);
+
+    const businessRoutes: MetadataRoute.Sitemap = businesses.map((b) => ({
+      url: `${baseUrl}/comer/${b.id}`,
+      lastModified: b.updatedAt,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    }));
+
+    const accommodationRoutes: MetadataRoute.Sitemap = accommodations.map((a) => ({
+      url: `${baseUrl}/alojarse/${a.id}`,
+      lastModified: a.updatedAt,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    }));
+
+    const adventureRoutes: MetadataRoute.Sitemap = adventures.map((ad) => ({
+      url: `${baseUrl}/aventuras/${ad.id}`,
+      lastModified: ad.updatedAt,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    }));
+
+    const commerceRoutes: MetadataRoute.Sitemap = commerces.map((c) => ({
+      url: `${baseUrl}/comercios/${c.slug || c.id}`,
+      lastModified: c.updatedAt,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    }));
+
+    const articleRoutes: MetadataRoute.Sitemap = articles.map((art) => ({
+      url: `${baseUrl}/novedades/${art.slug}`,
+      lastModified: art.updatedAt,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    }));
+
+    return [
+      ...staticRoutes,
+      ...businessRoutes,
+      ...accommodationRoutes,
+      ...adventureRoutes,
+      ...commerceRoutes,
+      ...articleRoutes,
+    ];
+  } catch (error) {
+    console.error('Error generating dynamic sitemap:', error);
+    return staticRoutes;
+  }
 }
-
-

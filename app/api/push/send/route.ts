@@ -10,7 +10,7 @@ const privateVapidKey = process.env.VAPID_PRIVATE_KEY!;
 // Initialize web-push
 // Se recomienda usar `mailto:` con tu email real para VAPID
 webPush.setVapidDetails(
-  'mailto:contacto@aluminego.ar',
+  'mailto:contacto@pehueniago.ar',
   publicVapidKey,
   privateVapidKey
 );

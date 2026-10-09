@@ -53,6 +53,11 @@ export default function AccommodationsAdminPage() {
   const [pricingOptions, setPricingOptions] = React.useState<any[]>([]);
   const [generatedCredentials, setGeneratedCredentials] = React.useState<any>(null);
 
+  const [productsList, setProductsList] = React.useState<{ name: string; description?: string; price?: string | number; image?: string }[]>([]);
+  const [newProduct, setNewProduct] = React.useState({ name: '', description: '', price: '', image: '' });
+  const [editingProductIdx, setEditingProductIdx] = React.useState<number | null>(null);
+  const [uploadingProductImg, setUploadingProductImg] = React.useState(false);
+
   // Effect for Auto-checking plan when typing WhatsApp
   React.useEffect(() => {
     if (formData.whatsapp && formData.whatsapp.length > 5) {
@@ -93,6 +98,35 @@ export default function AccommodationsAdminPage() {
   const openModal = (acc: any = null) => {
     if (acc) {
       setEditingAcc(acc);
+      // Parse details
+      let initialProds: any[] = [];
+      if (acc.details) {
+        try {
+          const trimmed = acc.details.trim();
+          if (trimmed.startsWith('[')) {
+            const p = JSON.parse(trimmed);
+            if (Array.isArray(p)) {
+              initialProds = p.map((it: any) => {
+                if (typeof it === 'string') return { name: it };
+                return {
+                  name: it.name || '',
+                  description: it.description || '',
+                  price: it.price !== undefined && it.price !== null ? String(it.price) : '',
+                  image: it.image || ''
+                };
+              }).filter((it: any) => it && it.name);
+            }
+          } else {
+            initialProds = acc.details.split(',').map((s: string) => ({ name: s.trim() })).filter((p: any) => p.name);
+          }
+        } catch {
+          initialProds = (acc.details || '').split(',').map((s: string) => ({ name: s.trim() })).filter((p: any) => p.name);
+        }
+      }
+      setProductsList(initialProds);
+      setNewProduct({ name: '', description: '', price: '', image: '' });
+      setEditingProductIdx(null);
+
       setFormData({
         name: acc.name,
         type: acc.type || '',
@@ -109,6 +143,9 @@ export default function AccommodationsAdminPage() {
       });
     } else {
       setEditingAcc(null);
+      setProductsList([]);
+      setNewProduct({ name: '', description: '', price: '', image: '' });
+      setEditingProductIdx(null);
       setFormData({ name: '', type: '', image: '', whatsapp: '', description: '', features: [], selectedPricingKeys: [], latitude: '-38.87942114574949', longitude: '-71.18375154775678', openingHours: DEFAULT_SCHEDULE_STRING, isVerified: false, showSchedule: false });
     }
     setIsModalOpen(true);
@@ -117,6 +154,80 @@ export default function AccommodationsAdminPage() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingAcc(null);
+    setProductsList([]);
+    setNewProduct({ name: '', description: '', price: '', image: '' });
+    setEditingProductIdx(null);
+  };
+
+  const handleProductImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingProductImg(true);
+    const formDataUpload = new FormData();
+    formDataUpload.append('file', file);
+
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataUpload,
+      });
+      const data = await res.json();
+      if (data.success) {
+        setNewProduct(prev => ({ ...prev, image: data.url }));
+      } else {
+        alert('Error al subir imagen: ' + data.error);
+      }
+    } catch (err) {
+      alert('Error de conexión al subir imagen');
+    } finally {
+      setUploadingProductImg(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleSaveProduct = () => {
+    if (!newProduct.name.trim()) {
+      alert('El nombre o título de la opción/servicio es obligatorio');
+      return;
+    }
+
+    if (editingProductIdx !== null) {
+      const updated = [...productsList];
+      updated[editingProductIdx] = { ...newProduct };
+      setProductsList(updated);
+      setEditingProductIdx(null);
+    } else {
+      if (productsList.length >= 5) {
+        alert('⚠️ Límite alcanzado: El máximo permitido es de 5 opciones o servicios destacados.');
+        return;
+      }
+      setProductsList([...productsList, { ...newProduct }]);
+    }
+    setNewProduct({ name: '', description: '', price: '', image: '' });
+  };
+
+  const handleEditProduct = (index: number) => {
+    const item = productsList[index];
+    setNewProduct({
+      name: item.name || '',
+      description: item.description || '',
+      price: item.price !== undefined && item.price !== null ? String(item.price) : '',
+      image: item.image || ''
+    });
+    setEditingProductIdx(index);
+  };
+
+  const handleCancelEditProduct = () => {
+    setNewProduct({ name: '', description: '', price: '', image: '' });
+    setEditingProductIdx(null);
+  };
+
+  const handleRemoveProduct = (index: number) => {
+    setProductsList(prev => prev.filter((_, idx) => idx !== index));
+    if (editingProductIdx === index) {
+      handleCancelEditProduct();
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,7 +310,10 @@ export default function AccommodationsAdminPage() {
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          details: JSON.stringify(productsList)
+        }),
       });
 
       if (res.ok) {
@@ -207,7 +321,7 @@ export default function AccommodationsAdminPage() {
         await fetchData();
         closeModal();
 
-        if (data.generatedCredentials) {
+        if (!editingAcc && data.generatedCredentials && data.generatedCredentials.password && !data.generatedCredentials.password.includes('anteriormente')) {
           const creds = {
             ...data.generatedCredentials,
             businessName: formData.name,
@@ -215,10 +329,12 @@ export default function AccommodationsAdminPage() {
           };
           setGeneratedCredentials(creds);
           
-          // Abrir WhatsApp automáticamente
+          // Abrir WhatsApp automáticamente SOLO en alta nueva
           const cleanPhone = (creds.whatsapp || '').replace(/\D/g, '');
-          const textMsg = `Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
-          window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMsg)}`, '_blank');
+          const textMsg = `Hola! Bienvenido a PehueniaGO. Ya puedes acceder a tu panel de control desde https://pehueniago.ar/portal-comercial/login \n\nTu usuario es: ${creds.email}\nTu contraseña provisoria es: ${creds.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`;
+          if (cleanPhone) {
+            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMsg)}`, '_blank');
+          }
         } else {
           const hasBanner = formData.selectedPricingKeys.some(k => k.includes('banner') || k.includes('portada'));
           if (hasBanner) {
@@ -466,8 +582,184 @@ export default function AccommodationsAdminPage() {
                 )}
               </div>
 
+              {/* SECCIÓN DE PRODUCTOS / OFERTAS / SERVICIOS DESTACADOS (HASTA 5 ITEMS) */}
+              <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label style={{ margin: 0, fontWeight: 700, color: '#1e293b', fontSize: '0.95rem' }}>
+                    🏕️ Opciones / Servicios Destacados con Foto <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 'normal' }}>(Máx. 5 ítems)</span>
+                  </label>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700, color: productsList.length >= 5 ? '#ef4444' : '#0d9488', backgroundColor: productsList.length >= 5 ? '#fee2e2' : '#ccfbf1', padding: '2px 8px', borderRadius: '12px' }}>
+                    {productsList.length}/5 cargados
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '14px', lineHeight: 1.4 }}>
+                  Carga hasta 5 opciones (ej: Parcelas de Carpa, Casillas Rodantes, Cabaña 4 pax) con su foto, descripción y precio para que se muestren destacadas en la ficha.
+                </p>
+
+                {/* Lista de Productos Cargados */}
+                {productsList.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+                    {productsList.map((prod, idx) => (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: 'white', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
+                          {prod.image ? (
+                            <img src={prod.image} alt={prod.name} style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', flexShrink: 0 }} />
+                          ) : (
+                            <div style={{ width: '40px', height: '40px', borderRadius: '6px', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', flexShrink: 0 }}>
+                              <ImageIcon size={16} />
+                            </div>
+                          )}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span style={{ fontWeight: 700, fontSize: '0.9rem', color: '#1e293b' }}>{prod.name}</span>
+                              {prod.price && !isNaN(parseFloat(String(prod.price))) && (
+                                <span style={{ color: '#16a34a', fontWeight: 700, fontSize: '0.85rem' }}>
+                                  ${new Intl.NumberFormat('es-AR').format(parseFloat(String(prod.price)))}
+                                </span>
+                              )}
+                            </div>
+                            {prod.description && (
+                              <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {prod.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                          <button type="button" onClick={() => handleEditProduct(idx)} style={{ border: 'none', background: '#f1f5f9', color: '#0d9488', padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <Edit2 size={12} /> Editar
+                          </button>
+                          <button type="button" onClick={() => handleRemoveProduct(idx)} style={{ border: 'none', background: '#fee2e2', color: '#ef4444', padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <Trash2 size={12} /> Borrar
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Formulario para Agregar / Editar Producto */}
+                <div style={{ backgroundColor: 'white', padding: '14px', borderRadius: '10px', border: '1px dashed #cbd5e1' }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '10px' }}>
+                    {editingProductIdx !== null ? `✏️ Editando: ${productsList[editingProductIdx]?.name || 'Ítem'}` : '+ Agregar Opción Destacada'}
+                  </div>
+                  
+                  <div className="form-row-2" style={{ marginBottom: '8px' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>Nombre / Título *</label>
+                      <input 
+                        type="text" 
+                        value={newProduct.name} 
+                        onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
+                        placeholder="Ej: Parcela Carpa, Casilla Rodante..."
+                        disabled={productsList.length >= 5 && editingProductIdx === null}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+                      />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>Precio (Opcional)</label>
+                      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                        <span style={{ position: 'absolute', left: '10px', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>$</span>
+                        <input 
+                          type="number" 
+                          value={newProduct.price} 
+                          onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
+                          placeholder="0.00"
+                          disabled={productsList.length >= 5 && editingProductIdx === null}
+                          style={{ width: '100%', padding: '9px 12px 9px 24px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="form-group" style={{ marginBottom: '12px' }}>
+                    <label style={{ fontSize: '0.82rem', fontWeight: 600, color: '#334155' }}>Descripción (Opcional)</label>
+                    <textarea 
+                      value={newProduct.description} 
+                      onChange={(e) => setNewProduct({...newProduct, description: e.target.value})}
+                      placeholder="Ej: Incluye fogón, toma de luz y acceso directo al lago..."
+                      rows={2}
+                      disabled={productsList.length >= 5 && editingProductIdx === null}
+                      style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <input 
+                        type="file" 
+                        id="acc-product-item-image"
+                        accept="image/*"
+                        onChange={handleProductImageUpload}
+                        style={{ display: 'none' }}
+                        disabled={productsList.length >= 5 && editingProductIdx === null}
+                      />
+                      <label 
+                        htmlFor="acc-product-item-image" 
+                        style={{ 
+                          display: 'inline-flex', 
+                          alignItems: 'center', 
+                          gap: '6px', 
+                          padding: '8px 14px', 
+                          backgroundColor: '#e2e8f0', 
+                          color: '#1e293b', 
+                          borderRadius: '8px', 
+                          fontSize: '0.82rem', 
+                          fontWeight: 600, 
+                          cursor: productsList.length >= 5 && editingProductIdx === null ? 'not-allowed' : 'pointer' 
+                        }}
+                      >
+                        {uploadingProductImg ? <Loader2 size={14} className="animate-spin" /> : <ImageIcon size={14} />}
+                        {newProduct.image ? 'Cambiar Foto' : 'Subir Foto'}
+                      </label>
+                      {newProduct.image && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#f1f5f9', padding: '4px 8px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                          <img src={newProduct.image} alt="Preview" style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '6px' }} />
+                          <button type="button" onClick={() => setNewProduct({...newProduct, image: ''})} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: 0 }} title="Quitar foto">
+                            <X size={14} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {editingProductIdx !== null && (
+                        <button 
+                          type="button" 
+                          onClick={handleCancelEditProduct} 
+                          style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', background: 'white', color: '#475569', fontWeight: 600, fontSize: '0.85rem', cursor: 'pointer' }}
+                        >
+                          Cancelar
+                        </button>
+                      )}
+                      <button 
+                        type="button" 
+                        onClick={handleSaveProduct} 
+                        disabled={productsList.length >= 5 && editingProductIdx === null}
+                        style={{ 
+                          backgroundColor: editingProductIdx !== null ? '#0d9488' : (productsList.length >= 5 ? '#94a3b8' : '#1e293b'), 
+                          color: 'white', 
+                          border: 'none', 
+                          padding: '8px 18px', 
+                          borderRadius: '8px', 
+                          fontWeight: 700, 
+                          fontSize: '0.85rem', 
+                          cursor: productsList.length >= 5 && editingProductIdx === null ? 'not-allowed' : 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        {editingProductIdx !== null ? <Check size={16} /> : <Plus size={16} />}
+                        {editingProductIdx !== null ? 'Guardar Cambios' : 'Agregar Opción'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="form-group">
-                <label>Características / Servicios</label>
+                <label>Servicios y Comodidades Generales (Tildes)</label>
                 <div className="features-input-group">
                   <input 
                     type="text" 
@@ -580,7 +872,7 @@ export default function AccommodationsAdminPage() {
             </div>
 
             <a 
-              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a AluminéGO. Ya puedes acceder a tu panel de control desde https://aluminego.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
+              href={`https://wa.me/${(generatedCredentials.whatsapp || '').replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Bienvenido a PehueniaGO. Ya puedes acceder a tu panel de control desde https://pehueniago.ar/portal-comercial/login \n\nTu usuario es: ${generatedCredentials.email}\nTu contraseña provisoria es: ${generatedCredentials.password}\n\nTe sugerimos cambiarla al ingresar en la sección Editar Perfil.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary"

@@ -5,7 +5,7 @@ import ComerClient from './ComerClient';
 export const metadata: Metadata = {
   title: 'Dónde Comer y Delivery en Aluminé | Restaurantes',
   description: 'Descubre las mejores pizzerías, hamburgueserías, cervecerías y restaurantes en Aluminé. Arma tu pedido online y envíalo por WhatsApp.',
-  keywords: ['dónde comer en alumine', 'delivery villa alumine', 'restaurantes villa alumine', 'pizzerias alumine', 'comida a domicilio alumine'],
+  keywords: ['dónde comer en aluminé', 'delivery villa aluminé', 'restaurantes villa aluminé', 'pizzerias aluminé', 'comida a domicilio aluminé'],
   alternates: {
     canonical: 'https://www.aluminego.ar/comer',
   },
@@ -22,6 +22,12 @@ export const revalidate = 60;
 export default async function Page() {
   const [categories, businesses] = await Promise.all([
     prisma.category.findMany({
+      where: {
+        AND: [
+          { link: { startsWith: '/comer' } },
+          { NOT: { link: { startsWith: '/comercios' } } }
+        ]
+      },
       orderBy: { title: 'asc' }
     }),
     prisma.business.findMany({

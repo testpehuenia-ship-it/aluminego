@@ -1,7 +1,8 @@
 /* Hero */
 .dashboard-hero {
   width: 100%;
-  height: 240px;
+  min-height: 220px;
+  height: auto;
   border-radius: 24px;
   position: relative;
   overflow: hidden;
@@ -15,20 +16,37 @@
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(20,53,42,0.85) 0%, rgba(211,84,0,0.6) 100%);
+  background: linear-gradient(135deg, rgba(20,53,42,0.88) 0%, rgba(211,84,0,0.65) 100%);
 }
 .hero-content {
   position: relative;
   z-index: 2;
-  height: 100%;
+  min-height: 220px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 40px;
+  padding: 36px 40px;
   color: white;
 }
-.hero-content h1 { font-family: 'Oswald', sans-serif; font-size: 3rem; text-transform: uppercase; margin-bottom: 8px; text-shadow: 0 4px 12px rgba(0,0,0,0.3); color: white; }
-.hero-content p { font-size: 1.1rem; font-weight: 500; opacity: 0.9; max-width: 600px; color: white; margin: 0; }
+.hero-content h1 { 
+  font-family: 'Oswald', sans-serif; 
+  font-size: clamp(1.8rem, 3.5vw, 3rem); 
+  line-height: 1.15;
+  text-transform: uppercase; 
+  margin-bottom: 12px; 
+  text-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+  color: white; 
+  word-break: break-word;
+}
+.hero-content p { 
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem); 
+  font-weight: 500; 
+  opacity: 0.95; 
+  max-width: 650px; 
+  color: white; 
+  margin: 0; 
+  line-height: 1.4;
+}
 
 /* Tabs */
 .tab-navigation {
@@ -70,7 +88,7 @@
 .btn-toggle:hover { border-color: #cbd5e1; }
 .btn-toggle.active { border-color: #d35400; background: #d35400; color: white; }
 .map-wrapper { width: 100%; height: 600px; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); position: relative; border: 4px solid white; background: #f1f5f9; }
-.map-legend { position: absolute; bottom: 24px; left: 24px; z-index: 2; padding: 16px; min-width: 200px; }
+.map-legend { margin-top: 20px; margin-bottom: 32px; padding: 18px 24px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
 
 /* Weather */
 .glass-panel { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.05); }
@@ -127,18 +145,44 @@
 @media (max-width: 768px) {
   .mapa-container { padding-top: 24px; padding-bottom: 80px; }
   
-  .dashboard-hero { height: 200px; margin-bottom: 20px; border-radius: 16px; }
-  .hero-content { padding: 20px; justify-content: flex-end; }
-  .hero-content h1 { font-size: 2.2rem; line-height: 1.1; }
-  .hero-content p { font-size: 0.95rem; line-height: 1.3; }
+  .dashboard-hero { 
+    min-height: 180px; 
+    height: auto; 
+    margin-bottom: 20px; 
+    border-radius: 16px; 
+  }
+  .hero-content { 
+    padding: 24px 18px; 
+    justify-content: center; 
+    min-height: 180px;
+  }
+  .hero-content h1 { 
+    font-size: clamp(1.35rem, 5.2vw, 1.85rem); 
+    line-height: 1.2; 
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .hero-content p { 
+    font-size: 0.88rem; 
+    line-height: 1.35; 
+  }
   
   /* Tab Navigation Stacking */
   .tab-navigation { flex-direction: column; padding: 12px; gap: 10px; margin-bottom: 24px; border-radius: 16px; background: #f8fafc; border: 1px solid #e2e8f0; }
   .tab-btn { padding: 16px; font-size: 1.05rem; border-radius: 12px; border: 1px solid #cbd5e1; background: white; }
   .tab-btn.active { border-color: #14352a; background: #14352a; color: white; }
 
-  .map-wrapper { height: 400px; border-radius: 16px; }
-  .map-legend { bottom: 12px; left: 12px; right: 12px; min-width: auto; padding: 12px; }
+  .map-wrapper { 
+    width: 100%; 
+    height: 420px; 
+    border-radius: 16px; 
+  }
+  .map-legend { 
+    margin-top: 16px; 
+    margin-bottom: 24px; 
+    padding: 16px; 
+    border-radius: 14px; 
+  }
 
   .current-weather-card { padding: 20px; border-radius: 16px; }
   .weather-header h2 { font-size: 1.4rem; }

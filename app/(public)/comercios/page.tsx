@@ -5,7 +5,7 @@ import ComerciosClient from './ComerciosClient';
 export const metadata: Metadata = {
   title: 'Comercios de Aluminé | Tiendas y Mercados',
   description: 'Directorio de comercios, tiendas de regalos, supermercados, despensas, farmacias y más locales en Aluminé.',
-  keywords: ['comercios villa alumine', 'tiendas en villa alumine', 'supermercado villa alumine', 'farmacias villa alumine', 'compras alumine'],
+  keywords: ['comercios villa aluminé', 'tiendas en villa aluminé', 'supermercado villa aluminé', 'farmacias villa aluminé', 'compras aluminé'],
   alternates: {
     canonical: 'https://www.aluminego.ar/comercios',
   },

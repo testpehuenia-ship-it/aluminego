@@ -4,7 +4,9 @@ import "./globals.css";
 import InstallPrompt from "@/components/InstallPrompt";
 import VisitTracker from "@/components/VisitTracker";
 import PushPrompt from "@/components/PushPrompt";
+import CookieConsent from "@/components/CookieConsent";
 import JsonLd from "@/components/JsonLd";
+import PWAAnalyticsTracker from "@/components/PWAAnalyticsTracker";
 import { FavoritesProvider } from "@/components/FavoritesContext";
 import { PortalProvider } from "@/components/PortalContext";
 
@@ -31,20 +33,26 @@ const caveat = Caveat({
 });
 
 export const viewport: Viewport = {
-  themeColor: '#0013C5',
+  themeColor: '#27ae60',
 };
 
 export const metadata: Metadata = {
   manifest: '/manifest.json',
   metadataBase: new URL('https://www.aluminego.ar'),
   title: {
-    default: 'AluminéGO | Guía Turística y Delivery en Aluminé',
+    default: 'AluminéGO | Guía Digital y Comercial de Aluminé, Neuquén',
     template: '%s | AluminéGO'
   },
-  description: 'La Guía Turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé.',
-  keywords: ["Aluminé", "guía local", "guía turística", "turismo", "alojamiento", "cabañas", "dónde comer", "gastronomía", "delivery", "aventuras", "servicios locales", "paseos"],
+  description: 'Guía oficial y comercial de Aluminé: alojamientos, cabañas, restaurantes, delivery, rafting en Río Aluminé, Ruca Choroy, Quillén, comercios y estado de rutas.',
+  keywords: ["Aluminé", "Alumine", "Río Aluminé", "Ruca Choroy", "Lago Quillén", "Pulmarí", "guía local", "guía turística", "turismo", "alojamiento", "cabañas", "dónde comer", "gastronomía", "delivery", "aventuras", "rafting", "pesca", "servicios locales", "comercios"],
   alternates: {
-    canonical: '/',
+    canonical: 'https://www.aluminego.ar',
+  },
+  other: {
+    'geo.region': 'AR-Q',
+    'geo.placename': 'Aluminé, Neuquén',
+    'geo.position': '-39.2369;-70.9194',
+    'ICBM': '-39.2369, -70.9194',
   },
   robots: {
     index: true,
@@ -58,26 +66,26 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'AluminéGO | Guía Turística y Delivery en Aluminé',
-    description: 'La Guía Turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé.',
+    title: 'AluminéGO | Guía Digital y Comercial de Aluminé, Neuquén',
+    description: 'Guía oficial y comercial de Aluminé: alojamientos, cabañas, restaurantes, delivery, rafting en Río Aluminé, Ruca Choroy, Quillén, comercios y estado de rutas.',
     url: 'https://www.aluminego.ar',
     siteName: 'AluminéGO',
     locale: 'es_AR',
     type: 'website',
     images: [
       {
-        url: 'https://aluminego.ar/og-muelle.jpg',
+        url: 'https://aluminego.ar/images/logo.png',
         width: 1200,
         height: 630,
-        alt: 'Paisaje en Aluminé',
+        alt: 'AluminéGO - Guía de Aluminé',
       }
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AluminéGO | Guía Turística y Delivery en Aluminé',
-    description: 'La Guía Turística y Local definitiva. Encuentra alojamiento, gastronomía, excursiones, aventuras, estado de las rutas, clima y servicios en Aluminé.',
-    images: ['https://aluminego.ar/og-muelle.jpg'],
+    title: 'AluminéGO | Guía Digital y Comercial de Aluminé, Neuquén',
+    description: 'Guía oficial y comercial de Aluminé: alojamientos, cabañas, restaurantes, delivery, rafting en Río Aluminé, Ruca Choroy, Quillén, comercios y estado de rutas.',
+    images: ['https://aluminego.ar/images/logo.png'],
   }
 };
 
@@ -108,10 +116,11 @@ export default function RootLayout({
             <InstallPrompt />
             <PushPrompt />
             <VisitTracker />
+            <PWAAnalyticsTracker />
+            <CookieConsent />
           </FavoritesProvider>
         </PortalProvider>
       </body>
     </html>
   );
 }
-

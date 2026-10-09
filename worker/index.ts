@@ -1,11 +1,14 @@
-declare let self: any;
+/// <reference lib="webworker" />
+export {};
 
-self.addEventListener('push', (event: any) => {
+const sw = self as unknown as ServiceWorkerGlobalScope;
+
+sw.addEventListener('push', (event: PushEvent) => {
   if (!event.data) return;
 
   try {
     const data = event.data.json();
-    const options = {
+    const options: NotificationOptions = {
       body: data.body,
       icon: data.icon || '/icon-192x192.png',
       badge: data.badge || '/icon-192x192.png',
@@ -15,14 +18,14 @@ self.addEventListener('push', (event: any) => {
     };
 
     event.waitUntil(
-      self.registration.showNotification(data.title, options)
+      sw.registration.showNotification(data.title, options)
     );
   } catch (err) {
     console.error('Error parseando push data:', err);
     // Fallback si es texto plano
     const text = event.data.text();
     event.waitUntil(
-      self.registration.showNotification('Alerta de AluminéGO', {
+      sw.registration.showNotification('Alerta de PehueniaGO', {
         body: text,
         icon: '/icon-192x192.png',
         badge: '/icon-192x192.png'
@@ -31,12 +34,12 @@ self.addEventListener('push', (event: any) => {
   }
 });
 
-self.addEventListener('notificationclick', (event: any) => {
+sw.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.notification.close();
   const urlToOpen = event.notification.data?.url || '/';
 
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients: any) => {
+    sw.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients: readonly WindowClient[]) => {
       // Si ya hay una pestaña abierta con esa URL, enfocarla
       for (let i = 0; i < windowClients.length; i++) {
         const client = windowClients[i];
@@ -45,8 +48,8 @@ self.addEventListener('notificationclick', (event: any) => {
         }
       }
       // Si no, abrir una nueva ventana
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(urlToOpen);
+      if (sw.clients.openWindow) {
+        return sw.clients.openWindow(urlToOpen);
       }
     })
   );

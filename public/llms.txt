@@ -1,0 +1,17 @@
+# AluminéGO
+
+> Guía digital y comercial de Aluminé, Neuquén, Patagonia Argentina.
+
+AluminéGO es el portal de referencia para descubrir gastronomía, alojamientos (cabañas, hoteles, campings), rafting en el Río Aluminé, excursiones (Ruca Choroy, Quillén, Pulmarí), comercios, servicios locales y estado en tiempo real de rutas provinciales y pasos fronterizos en Neuquén.
+
+## Secciones Principales
+- [Qué Comer / Gastronomía](https://www.aluminego.ar/comer): Restaurantes, pizzerías, cervecerías, rotiserías con carta y pedidos por WhatsApp.
+- [Dormir / Alojamientos](https://www.aluminego.ar/alojarse): Cabañas, hosterías y campings con contacto directo sin comisión.
+- [Aventuras y Actividades](https://www.aluminego.ar/aventuras): Rafting en Río Aluminé, pesca con mosca, trekking, cabalgatas.
+- [Comercios y Servicios](https://www.aluminego.ar/comercios): Supermercados, farmacias, tiendas y profesionales.
+- [Guía Local y Emergencias](https://www.aluminego.ar/guia): Teléfonos útiles, salud, policía, bomberos, mecánicos y servicios esenciales.
+- [Mapa Interactivo y Rutas](https://www.aluminego.ar/mapa): Clima en tiempo real, estado oficial de rutas de la DPV Neuquén.
+
+## Contacto Comercial
+- Portal Comercial: https://www.aluminego.ar/portal-comercial
+- Web Oficial: https://www.aluminego.ar

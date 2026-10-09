@@ -30,7 +30,11 @@ export default function OpeningStatusBadge({ openingHours, showWeeklySchedule = 
   }, [openingHours]);
 
   if (isVisible === false) {
-    return null;
+    return (
+      <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '4px', margin: '8px 0' }}>
+        <Clock size={12} /> SIN INFORMACIÓN
+      </span>
+    );
   }
 
   if (!status || !status.weeklySchedule) {
@@ -40,7 +44,7 @@ export default function OpeningStatusBadge({ openingHours, showWeeklySchedule = 
   const { isOpen, statusText, colorClass, todayScheduleText, weeklySchedule } = status;
 
   // Style definitions based on status
-  const badgeStyles = {
+  const badgeStyles: Record<string, { backgroundColor: string; color: string; border: string }> = {
     open: {
       backgroundColor: '#ecfdf5',
       color: '#047857',

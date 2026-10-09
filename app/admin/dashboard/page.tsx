@@ -17,6 +17,10 @@ import {
   LineChart as LineChartIcon,
   Utensils,
   Mountain,
+  Smartphone,
+  Download,
+  Bell,
+  CheckCircle2,
   X
 } from 'lucide-react';
 import { 
@@ -33,6 +37,35 @@ type AnalyticsData = {
   year: number;
   pageVisits: { path: string; count: number }[];
   chartData: { date: string; visits: number }[];
+};
+
+type AppStatsData = {
+  totalInstalled: number;
+  totalDevices: number;
+  activeToday: number;
+  active7Days: number;
+  active30Days: number;
+  totalSessions: number;
+  pushCount: number;
+  pushPercentage: number;
+  platforms: {
+    Android: number;
+    iOS: number;
+    Windows: number;
+    macOS: number;
+    Otro: number;
+  };
+  recentInstallations: {
+    id: string;
+    platform: string;
+    browser: string | null;
+    hasPush: boolean;
+    installedAt: string;
+    lastActiveAt: string;
+    sessionCount: number;
+    language: string | null;
+    screenSize: string | null;
+  }[];
 };
 
 export default function DashboardPage() {
@@ -53,6 +86,19 @@ export default function DashboardPage() {
     chartData: []
   });
 
+  const [appStats, setAppStats] = useState<AppStatsData>({
+    totalInstalled: 0,
+    totalDevices: 0,
+    activeToday: 0,
+    active7Days: 0,
+    active30Days: 0,
+    totalSessions: 0,
+    pushCount: 0,
+    pushPercentage: 0,
+    platforms: { Android: 0, iOS: 0, Windows: 0, macOS: 0, Otro: 0 },
+    recentInstallations: []
+  });
+
   const [chartType, setChartType] = useState<'line' | 'bar' | 'area' | 'pie'>('area');
   const [modalData, setModalData] = useState<{ isOpen: boolean; title: string; items: any[]; key: string }>({
     isOpen: false,
@@ -64,13 +110,14 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [catRes, bizRes, accRes, advRes, commRes, analyticsRes] = await Promise.all([
+        const [catRes, bizRes, accRes, advRes, commRes, analyticsRes, appStatsRes] = await Promise.all([
           fetch('/api/categories'),
           fetch('/api/businesses'),
           fetch('/api/accommodations'),
           fetch('/api/adventures'),
           fetch('/api/commerces'),
-          fetch('/api/analytics')
+          fetch('/api/analytics'),
+          fetch('/api/app-analytics')
         ]);
         
         if (catRes.ok) {
@@ -97,6 +144,10 @@ export default function DashboardPage() {
           const data = await analyticsRes.json();
           setAnalytics(data);
         }
+        if (appStatsRes.ok) {
+          const appData = await appStatsRes.json();
+          setAppStats(appData);
+        }
       } catch (e) {
         console.error('Error loading stats');
       }
@@ -106,6 +157,14 @@ export default function DashboardPage() {
   }, []);
 
   const handleCardClick = (key: string, label: string) => {
+    if (key === 'app') {
+      const el = document.querySelector('.pwa-analytics-card');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+      return;
+    }
+
     let list: any[] = [];
     if (key === 'businesses') list = stats.businesses;
     else if (key === 'commerces') list = stats.commerces;
@@ -134,6 +193,7 @@ export default function DashboardPage() {
     { label: 'Comercios (Tiendas)', value: stats.commerces.length, icon: Store, color: '#10b981', key: 'commerces' },
     { label: 'Alojamientos', value: stats.accommodations.length, icon: Home, color: '#06b6d4', key: 'accommodations' },
     { label: 'Aventuras', value: stats.adventures.length, icon: Mountain, color: '#f59e0b', key: 'adventures' },
+    { label: 'App Instaladas', value: appStats.totalInstalled, icon: Smartphone, color: '#0284c7', key: 'app' },
     { label: 'Visitas Hoy', value: analytics.today, icon: Users, color: '#8b5cf6', key: 'visits' },
   ];
 
@@ -228,7 +288,7 @@ export default function DashboardPage() {
       <div className="view-header">
         <div>
           <h1>Panel de Control</h1>
-          <p>Bienvenido al centro de administración de AluminéGO</p>
+          <p>Bienvenido al centro de administración de PehueniaGO</p>
         </div>
         <div className="date-badge">
           <Calendar size={16} />
@@ -296,6 +356,161 @@ export default function DashboardPage() {
                 <div className="no-data-small">No hay visitas registradas aún.</div>
               )}
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* SECCIÓN DE MÉTRICAS DE LA APLICACIÓN PWA */}
+      <div className="pwa-analytics-card">
+        <div className="pwa-header">
+          <div className="pwa-title-wrap">
+            <div className="pwa-icon-badge">
+              <Smartphone size={22} />
+            </div>
+            <div>
+              <h2>Métricas de la Aplicación (PWA)</h2>
+              <p>Seguimiento de descargas en celulares, dispositivos activos y suscripciones push</p>
+            </div>
+          </div>
+          <div className="pwa-header-badges">
+            <span className="pwa-badge live">
+              <span className="live-dot"></span> En Vivo
+            </span>
+          </div>
+        </div>
+
+        <div className="pwa-metrics-grid">
+          <div className="pwa-metric-box">
+            <div className="metric-icon-wrap blue">
+              <Download size={20} />
+            </div>
+            <div className="metric-details">
+              <span className="metric-num">{appStats.totalInstalled}</span>
+              <span className="metric-desc">Apps Instaladas</span>
+              <span className="metric-sub">{appStats.activeToday} activas hoy</span>
+            </div>
+          </div>
+
+          <div className="pwa-metric-box">
+            <div className="metric-icon-wrap purple">
+              <Smartphone size={20} />
+            </div>
+            <div className="metric-details">
+              <span className="metric-num">{appStats.active30Days}</span>
+              <span className="metric-desc">Celulares Activos (30d)</span>
+              <span className="metric-sub">{appStats.active7Days} en los últimos 7 días</span>
+            </div>
+          </div>
+
+          <div className="pwa-metric-box">
+            <div className="metric-icon-wrap green">
+              <Bell size={20} />
+            </div>
+            <div className="metric-details">
+              <span className="metric-num">{appStats.pushPercentage}%</span>
+              <span className="metric-desc">Con Notificaciones Push</span>
+              <span className="metric-sub">{appStats.pushCount} de {appStats.totalInstalled || 0} instaladas</span>
+            </div>
+          </div>
+
+          <div className="pwa-metric-box">
+            <div className="metric-icon-wrap amber">
+              <Activity size={20} />
+            </div>
+            <div className="metric-details">
+              <span className="metric-num">{appStats.totalSessions}</span>
+              <span className="metric-desc">Aperturas de la App</span>
+              <span className="metric-sub">Sesiones registradas en standalone</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="pwa-bottom-row">
+          {/* Desglose Plataformas */}
+          <div className="pwa-platform-card">
+            <h3>Distribución por Sistema Operativo</h3>
+            <div className="platform-bars">
+              <div className="platform-row">
+                <div className="plat-info">
+                  <span className="plat-icon">🤖</span>
+                  <span className="plat-name">Android</span>
+                  <span className="plat-count">{appStats.platforms.Android}</span>
+                </div>
+                <div className="bar-track">
+                  <div 
+                    className="bar-fill android" 
+                    style={{ width: `${appStats.totalInstalled > 0 ? Math.round((appStats.platforms.Android / appStats.totalInstalled) * 100) : 0}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              <div className="platform-row">
+                <div className="plat-info">
+                  <span className="plat-icon">🍏</span>
+                  <span className="plat-name">iOS (iPhone / iPad)</span>
+                  <span className="plat-count">{appStats.platforms.iOS}</span>
+                </div>
+                <div className="bar-track">
+                  <div 
+                    className="bar-fill ios" 
+                    style={{ width: `${appStats.totalInstalled > 0 ? Math.round((appStats.platforms.iOS / appStats.totalInstalled) * 100) : 0}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              <div className="platform-row">
+                <div className="plat-info">
+                  <span className="plat-icon">💻</span>
+                  <span className="plat-name">Computadoras / Otros</span>
+                  <span className="plat-count">{(appStats.platforms.Windows || 0) + (appStats.platforms.macOS || 0) + (appStats.platforms.Otro || 0)}</span>
+                </div>
+                <div className="bar-track">
+                  <div 
+                    className="bar-fill other" 
+                    style={{ width: `${appStats.totalInstalled > 0 ? Math.round((((appStats.platforms.Windows || 0) + (appStats.platforms.macOS || 0) + (appStats.platforms.Otro || 0)) / appStats.totalInstalled) * 100) : 0}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Últimos Dispositivos Registrados */}
+          <div className="pwa-recent-card">
+            <h3>Últimas Apps Activas / Instaladas</h3>
+            {appStats.recentInstallations.length === 0 ? (
+              <div className="no-data-small">Esperando las primeras aperturas desde celulares...</div>
+            ) : (
+              <div className="recent-devices-list">
+                {appStats.recentInstallations.slice(0, 5).map((device) => {
+                  const isIos = device.platform.toLowerCase().includes('ios');
+                  const isAndroid = device.platform.toLowerCase().includes('android');
+                  return (
+                    <div key={device.id} className="device-item">
+                      <div className="device-icon">
+                        {isAndroid ? '🤖' : isIos ? '🍏' : '💻'}
+                      </div>
+                      <div className="device-info">
+                        <span className="device-name">{device.platform} {device.browser ? `(${device.browser})` : ''}</span>
+                        <span className="device-time">
+                          Última vez: {new Date(device.lastActiveAt).toLocaleDateString('es-AR', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })} • {device.sessionCount} {device.sessionCount === 1 ? 'sesión' : 'sesiones'}
+                        </span>
+                      </div>
+                      <div className="device-tags">
+                        {device.hasPush ? (
+                          <span className="tag push-on" title="Notificaciones Push Habilitadas">
+                            <Bell size={12} /> Push
+                          </span>
+                        ) : (
+                          <span className="tag push-off" title="Notificaciones Push No Habilitadas">
+                            Sin Push
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -845,6 +1060,270 @@ export default function DashboardPage() {
         .plan-badge.basic {
           background-color: rgba(15, 23, 42, 0.1);
           color: #0f172a;
+        }
+
+        /* ESTILOS PWA ANALYTICS */
+        .pwa-analytics-card {
+          background: white;
+          border-radius: 20px;
+          border: 1px solid #e2e8f0;
+          padding: 24px;
+          margin-bottom: 32px;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .pwa-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+
+        .pwa-title-wrap {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .pwa-icon-badge {
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          background: #eff6ff;
+          color: #0284c7;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .pwa-title-wrap h2 {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #0f172a;
+          margin: 0 0 2px 0;
+        }
+
+        .pwa-title-wrap p {
+          font-size: 0.85rem;
+          color: #64748b;
+          margin: 0;
+        }
+
+        .pwa-badge.live {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border-radius: 20px;
+          background: #ecfdf5;
+          color: #059669;
+          font-size: 0.75rem;
+          font-weight: 700;
+          border: 1px solid #a7f3d0;
+        }
+
+        .live-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #10b981;
+          box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0% { transform: scale(0.95); opacity: 0.8; }
+          50% { transform: scale(1.2); opacity: 1; }
+          100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        .pwa-metrics-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 16px;
+          margin-bottom: 24px;
+        }
+
+        .pwa-metric-box {
+          background: #f8fafc;
+          border: 1px solid #f1f5f9;
+          border-radius: 16px;
+          padding: 16px;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .metric-icon-wrap {
+          width: 42px;
+          height: 42px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .metric-icon-wrap.blue { background: #e0f2fe; color: #0284c7; }
+        .metric-icon-wrap.purple { background: #f3e8ff; color: #8b5cf6; }
+        .metric-icon-wrap.green { background: #dcfce7; color: #16a34a; }
+        .metric-icon-wrap.amber { background: #fef3c7; color: #d97706; }
+
+        .metric-details {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .metric-num {
+          font-size: 1.35rem;
+          font-weight: 800;
+          color: #0f172a;
+          line-height: 1.2;
+        }
+
+        .metric-desc {
+          font-size: 0.8rem;
+          font-weight: 600;
+          color: #475569;
+        }
+
+        .metric-sub {
+          font-size: 0.72rem;
+          color: #94a3b8;
+          margin-top: 2px;
+        }
+
+        .pwa-bottom-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+          .pwa-bottom-row {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .pwa-platform-card, .pwa-recent-card {
+          background: #f8fafc;
+          border: 1px solid #f1f5f9;
+          border-radius: 16px;
+          padding: 20px;
+        }
+
+        .pwa-platform-card h3, .pwa-recent-card h3 {
+          margin: 0 0 16px 0;
+          font-size: 0.95rem;
+          font-weight: 700;
+          color: #1e293b;
+        }
+
+        .platform-bars {
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+
+        .platform-row {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .plat-info {
+          display: flex;
+          align-items: center;
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: #334155;
+        }
+
+        .plat-icon { margin-right: 6px; font-size: 1rem; }
+        .plat-name { flex-grow: 1; }
+        .plat-count { color: #64748b; font-weight: 700; }
+
+        .bar-track {
+          width: 100%;
+          height: 8px;
+          background: #e2e8f0;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+
+        .bar-fill {
+          height: 100%;
+          border-radius: 4px;
+          transition: width 0.4s ease;
+        }
+
+        .bar-fill.android { background: #10b981; }
+        .bar-fill.ios { background: #3b82f6; }
+        .bar-fill.other { background: #94a3b8; }
+
+        .recent-devices-list {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .device-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 12px;
+          background: white;
+          border-radius: 12px;
+          border: 1px solid #e2e8f0;
+        }
+
+        .device-icon {
+          font-size: 1.25rem;
+        }
+
+        .device-info {
+          display: flex;
+          flex-direction: column;
+          flex-grow: 1;
+        }
+
+        .device-name {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: #1e293b;
+        }
+
+        .device-time {
+          font-size: 0.72rem;
+          color: #64748b;
+        }
+
+        .device-tags {
+          display: flex;
+          align-items: center;
+        }
+
+        .tag {
+          font-size: 0.7rem;
+          font-weight: 700;
+          padding: 4px 8px;
+          border-radius: 12px;
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .tag.push-on {
+          background: #ecfdf5;
+          color: #059669;
+          border: 1px solid #a7f3d0;
+        }
+
+        .tag.push-off {
+          background: #f1f5f9;
+          color: #94a3b8;
         }
       `}</style>
     </div>

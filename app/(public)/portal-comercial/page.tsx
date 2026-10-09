@@ -44,9 +44,14 @@ export default function PortalDashboard() {
     router.push('/');
   };
 
+  const hasProductEntities = (data?.businesses?.length || 0) > 0 || 
+                             (data?.commerces?.length || 0) > 0 || 
+                             (data?.localServices?.length || 0) > 0;
+
   const totalServices = (data?.businesses?.length || 0) + 
                         (data?.accommodations?.length || 0) + 
                         (data?.adventures?.length || 0) + 
+                        (data?.commerces?.length || 0) +
                         (data?.localServices?.length || 0);
 
   let totalClicks = 0;
@@ -79,9 +84,9 @@ export default function PortalDashboard() {
         <Link href="/portal-comercial/perfil" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: '#f8fafc', borderRadius: '8px', textDecoration: 'none', color: '#1e293b', fontWeight: 600, border: '1px solid #e2e8f0' }}>
           <User size={18} /> Editar Perfil
         </Link>
-        {data?.businesses && data.businesses.length > 0 && (
+        {hasProductEntities && (
           <Link href="/portal-comercial/menu" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: '#f8fafc', borderRadius: '8px', textDecoration: 'none', color: '#1e293b', fontWeight: 600, border: '1px solid #e2e8f0' }}>
-            <span>🍔</span> Gestionar Menú
+            <span>🛍️</span> Gestionar Productos / Menú
           </Link>
         )}
       </div>

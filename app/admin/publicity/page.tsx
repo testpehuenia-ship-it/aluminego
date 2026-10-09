@@ -142,7 +142,7 @@ function PublicityAdminContent() {
     let finalLink = formData.link;
     if (linkType === 'whatsapp' && whatsappPhone) {
       const cleanPhone = whatsappPhone.replace(/\D/g, '');
-      finalLink = `https://wa.me/${cleanPhone}?text=Hola,%20los%20vi%20en%20la%20App%20AluminéGO%20y%20quiero%20hacer%20una%20consulta.`;
+      finalLink = `https://wa.me/${cleanPhone}?text=Hola,%20los%20vi%20en%20la%20App%20PehueniaGO%20y%20quiero%20hacer%20una%20consulta.`;
     } else if (linkType === 'none') {
       finalLink = '';
     }
@@ -354,7 +354,7 @@ function PublicityAdminContent() {
               <div className="flex flex-wrap gap-3">
                 {expectedBanners.map((exp, idx) => {
                   const isCreated = banners.some(b => 
-                    b.title?.toUpperCase() === prefillName.toUpperCase() && 
+                    b.title?.toUpperCase() === (prefillName || '').toUpperCase() && 
                     b.page === exp.page && 
                     b.section === exp.section
                   );
@@ -364,11 +364,11 @@ function PublicityAdminContent() {
                       key={idx} 
                       onClick={() => {
                         if (!isCreated) {
-                          setFormData(prev => ({
+                          setFormData((prev: any) => ({
                             ...prev,
                             page: exp.page,
                             section: exp.section,
-                            title: prefillName
+                            title: prefillName || ''
                           }));
                         }
                       }}
@@ -519,7 +519,7 @@ function PublicityAdminContent() {
                       onChange={(e) => setWhatsappPhone(e.target.value)}
                       required
                     />
-                    <p className="text-xs text-green-600 mt-1 font-medium">El usuario enviará: "Hola, los vi en la App AluminéGO y quiero hacer una consulta."</p>
+                    <p className="text-xs text-green-600 mt-1 font-medium">El usuario enviará: "Hola, los vi en la App PehueniaGO y quiero hacer una consulta."</p>
                   </div>
                 )}
               </div>

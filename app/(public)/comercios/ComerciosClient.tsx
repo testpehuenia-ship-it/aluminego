@@ -4,10 +4,40 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import PublicityBanner from '@/components/PublicityBanner';
 import Link from 'next/link';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, Search, Phone } from 'lucide-react';
 import FavoriteButton from '@/components/FavoriteButton';
 import OpeningStatusBadge from '@/components/OpeningStatusBadge';
 import VerifiedBadge from '@/components/VerifiedBadge';
+
+const parseCommerceDetailItem = (d: any) => {
+  let name = d.name || '';
+  let description = '';
+  let price: number | null = null;
+  let image: string | null = null;
+  let isFeature = false;
+
+  try {
+    if (typeof d.name === 'string' && d.name.trim().startsWith('{')) {
+      const parsed = JSON.parse(d.name);
+      name = parsed.name || d.name;
+      description = parsed.description || '';
+      if (parsed.price !== undefined && parsed.price !== null && parsed.price !== '') {
+        const num = parseFloat(String(parsed.price));
+        if (!isNaN(num)) price = num;
+      }
+      image = parsed.image || null;
+      if (parsed.type === 'feature' || parsed.isFeature) {
+        isFeature = true;
+      }
+    } else {
+      isFeature = true;
+    }
+  } catch {
+    isFeature = true;
+  }
+
+  return { id: d.id, name, description, price, image, isFeature };
+};
 
 
 export default function ComerciosClient({ initialCommerces, initialCategories }: { initialCommerces?: any[], initialCategories?: any[] }) {
@@ -23,8 +53,8 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
   }, [selectedCommerce]);
 
   const categoryStyles: { [key: string]: { color: string, bgImage: string } } = {
-    "Supermercados": { color: "#2a9d8f", bgImage: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" },
-    "Supermercados y Almacenes": { color: "#2a9d8f", bgImage: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" },
+    "Supermercados": { color: "#2a9d8f", bgImage: "/images/comer_supermercado.png" },
+    "Supermercados y Almacenes": { color: "#2a9d8f", bgImage: "/images/comer_supermercado.png" },
     "Regalerías": { color: "#f4a261", bgImage: "https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=800&q=80" },
     "Regalerías y Regionales": { color: "#f4a261", bgImage: "https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=800&q=80" },
     "Fiambrerías": { color: "#e76f51", bgImage: "/images/fiambreria_banner.jpg" },
@@ -32,8 +62,8 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
     "Farmacias": { color: "#00b4d8", bgImage: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=800&q=80" },
     "Indumentaria": { color: "#9c27b0", bgImage: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" },
     "Indumentaria y Calzado": { color: "#9c27b0", bgImage: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=80" },
-    "Mascotas y Viveros": { color: "#4caf50", bgImage: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80" },
-    "Parques, Jardines y Mascotas": { color: "#4caf50", bgImage: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80" }
+    "Mascotas y Viveros": { color: "#4caf50", bgImage: "/images/banner_peluqueria.png" },
+    "Parques, Jardines y Mascotas": { color: "#4caf50", bgImage: "/images/banner_peluqueria.png" }
   };
 
   const fetchData = async () => {
@@ -124,7 +154,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
       c.name.toLowerCase().includes(q) ||
       (c.description && c.description.toLowerCase().includes(q)) ||
       c.type.toLowerCase().includes(q) ||
-      (c.details && c.details.some((d: any) => d.name.toLowerCase().includes(q)))
+      (c.details && c.details.some((d: any) => parseCommerceDetailItem(d).name.toLowerCase().includes(q)))
     );
   }, [commerces, searchQuery]);
 
@@ -258,7 +288,7 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
         )}
       </div>
 
-      <h1 className="section-title">Comercios Locales</h1>
+      <h1 className="section-title">Comercios y Tiendas en Aluminé</h1>
 
       {/* SECCIÓN DE DESTACADOS (CON BANNER) */}
       {bannerCommerces.length > 0 && (
@@ -293,11 +323,14 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{commerce.name}</h3>
                     <OpeningStatusBadge openingHours={commerce.openingHours} isVisible={commerce.showSchedule} />
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
-                      {commerce.details?.slice(0, 3).map((d: any) => (
-                        <span key={d.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
-                          {d.name}
-                        </span>
-                      ))}
+                      {commerce.details?.slice(0, 3).map((d: any) => {
+                        const item = parseCommerceDetailItem(d);
+                        return (
+                          <span key={d.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
+                            {item.name}
+                          </span>
+                        );
+                      })}
                       {commerce.details?.length > 3 && (
                         <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '4px 8px' }}>
                           +{commerce.details.length - 3}
@@ -361,11 +394,14 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                         <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{commerce.name}</h3>
                         <OpeningStatusBadge openingHours={commerce.openingHours} isVisible={commerce.showSchedule} />
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
-                          {commerce.details?.slice(0, 3).map((d: any) => (
-                            <span key={d.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
-                              {d.name}
-                            </span>
-                          ))}
+                          {commerce.details?.slice(0, 3).map((d: any) => {
+                            const item = parseCommerceDetailItem(d);
+                            return (
+                              <span key={d.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
+                                {item.name}
+                              </span>
+                            );
+                          })}
                           {commerce.details?.length > 3 && (
                             <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '4px 8px' }}>
                               +{commerce.details.length - 3}
@@ -417,11 +453,14 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: 'var(--color-text-main)' }}>{commerce.name}</h3>
                     <OpeningStatusBadge openingHours={commerce.openingHours} isVisible={commerce.showSchedule} />
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '12px', marginTop: '6px' }}>
-                      {commerce.details?.slice(0, 3).map((d: any) => (
-                        <span key={d.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
-                          {d.name}
-                        </span>
-                      ))}
+                      {commerce.details?.slice(0, 3).map((d: any) => {
+                        const item = parseCommerceDetailItem(d);
+                        return (
+                          <span key={d.id} style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-bg)', color: 'var(--color-text-muted)', padding: '4px 8px', borderRadius: '4px' }}>
+                            {item.name}
+                          </span>
+                        );
+                      })}
                       {commerce.details?.length > 3 && (
                         <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', padding: '4px 8px' }}>
                           +{commerce.details.length - 3}
@@ -503,24 +542,111 @@ export default function ComerciosClient({ initialCommerces, initialCategories }:
             <p style={{ color: 'var(--color-green)', fontWeight: 600, marginBottom: '8px', fontSize: '1.1rem' }}>{selectedCommerce.type}</p>
             <OpeningStatusBadge openingHours={selectedCommerce.openingHours} showWeeklySchedule={true} isVisible={selectedCommerce.showSchedule} />
             
+            <div style={{ margin: '12px 0 16px 0' }}>
+              {selectedCommerce.hasDelivery ? (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', backgroundColor: '#ecfdf5', border: '1px solid #a7f3d0', color: '#065f46', fontWeight: 600, fontSize: '0.9rem' }}>
+                  <span style={{ fontSize: '1.1rem' }}>🛵</span>
+                  <span>Cuenta con servicio de <strong>Delivery</strong></span>
+                </div>
+              ) : (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 12px', borderRadius: '8px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', fontWeight: 600, fontSize: '0.9rem' }}>
+                  <span style={{ fontSize: '1.1rem' }}>🚫</span>
+                  <span>No cuenta con Delivery (Solo consumo en el local / Retiro)</span>
+                </div>
+              )}
+            </div>
+
             {selectedCommerce.description && (
               <p style={{ color: 'var(--color-text)', fontSize: '1rem', lineHeight: '1.6', marginBottom: '24px', whiteSpace: 'pre-line' }}>
                 {selectedCommerce.description}
               </p>
             )}
 
-            {selectedCommerce.details && selectedCommerce.details.length > 0 && (
-              <>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '12px' }}>Detalle</h3>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '32px' }}>
-                  {selectedCommerce.details?.map((d: any) => (
-                    <div key={d.id} style={{ backgroundColor: 'var(--color-bg)', padding: '8px 16px', borderRadius: '50px', fontSize: '0.9rem', fontWeight: 500, border: '1px solid var(--color-border)' }}>
-                      ✓ {d.name}
+            {(() => {
+              if (!selectedCommerce.details || selectedCommerce.details.length === 0) return null;
+              
+              const products: any[] = [];
+              const features: any[] = [];
+              
+              selectedCommerce.details.forEach((d: any) => {
+                const item = parseCommerceDetailItem(d);
+                if (item.isFeature || (!item.image && !item.description && item.price === null)) {
+                  features.push(item);
+                } else {
+                  products.push(item);
+                }
+              });
+
+              return (
+                <>
+                  {/* SECCIÓN 1: PRODUCTOS U OFERTAS A LA VENTA (TOPE 5) */}
+                  {products.length > 0 && (
+                    <div style={{ marginBottom: '24px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '8px', marginBottom: '14px' }}>
+                        <h3 style={{ fontSize: '1.2rem', fontWeight: 700, margin: 0, color: 'var(--color-text-main)' }}>🛍️ Productos u Ofertas Destacadas</h3>
+                        <span style={{ fontSize: '0.8rem', color: '#64748b' }}>📱 Pide la carta completa por WhatsApp</span>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '14px' }}>
+                        {products.map((prod: any, idx: number) => {
+                          const productMsg = `Hola ${selectedCommerce.name}, te contacto desde AluminéGO. Me interesa consultar por el producto: *${prod.name}*`;
+                          return (
+                            <div key={idx} style={{ backgroundColor: '#ffffff', borderRadius: '12px', border: '1.5px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column' }}>
+                              {prod.image && (
+                                <div style={{ position: 'relative', width: '100%', height: '130px', backgroundColor: '#f1f5f9' }}>
+                                  <img src={prod.image} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </div>
+                              )}
+                              <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', flex: 1, gap: '6px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                                  <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#1e293b' }}>{prod.name}</span>
+                                  {prod.price !== null && !isNaN(parseFloat(String(prod.price))) && (
+                                    <span style={{ fontWeight: 800, color: '#16a34a', fontSize: '0.9rem', backgroundColor: '#f0fdf4', padding: '2px 8px', borderRadius: '6px', border: '1px solid #bbf7d0', whiteSpace: 'nowrap' }}>
+                                      ${new Intl.NumberFormat('es-AR').format(parseFloat(String(prod.price)))}
+                                    </span>
+                                  )}
+                                </div>
+                                {prod.description && (
+                                  <p style={{ fontSize: '0.82rem', color: '#64748b', margin: 0, lineHeight: 1.4 }}>
+                                    {prod.description}
+                                  </p>
+                                )}
+                                {selectedCommerce.whatsapp && (
+                                  <a
+                                    href={`https://wa.me/${selectedCommerce.whatsapp}?text=${encodeURIComponent(productMsg)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ marginTop: 'auto', paddingTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 700, color: '#16a34a', textDecoration: 'none' }}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    Consultar por WhatsApp →
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </>
-            )}
+                  )}
+
+                  {/* SECCIÓN 2: COMODIDADES Y SERVICIOS (CON TILDES) */}
+                  {features.length > 0 && (
+                    <div style={{ marginBottom: '24px' }}>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '12px', color: 'var(--color-text-main)' }}>
+                        Servicios y Comodidades
+                      </h3>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {features.map((f: any, fIdx: number) => (
+                          <div key={f.id || fIdx} style={{ backgroundColor: 'var(--color-bg)', padding: '6px 14px', borderRadius: '50px', fontSize: '0.88rem', fontWeight: 600, color: '#334155', border: '1px solid var(--color-border)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ color: 'var(--color-green)', fontWeight: 800 }}>✓</span> {f.name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              );
+            })()}
 
             <div style={{ paddingTop: '16px', borderTop: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column' }}>
               <a 

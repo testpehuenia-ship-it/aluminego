@@ -6,7 +6,7 @@ export default function AdhereBanner() {
   return (
     <section className="container" style={{ padding: '40px 20px' }}>
       <a 
-        href="https://wa.me/5492942524300?text=Hola!%20Quiero%20sumar%20mi%20comercio%20a%20AluminéGO" 
+        href="https://wa.me/5492942524300?text=Hola!%20Quiero%20sumar%20mi%20comercio%20a%20PehueniaGO" 
         target="_blank" 
         rel="noopener noreferrer"
         style={{

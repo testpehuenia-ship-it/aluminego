@@ -1,11 +1,11 @@
-﻿const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function backfill() {
   const d = String(new Date().getDate()).padStart(2, '0');
   const m = String(new Date().getMonth() + 1).padStart(2, '0');
   const y = new Date().getFullYear();
-  const password = `AluminéGO${d}${m}${y}`;
+  const password = `pehueniago${d}${m}${y}`;
   let count = 0;
 
   // Function to process entities
@@ -25,7 +25,7 @@ async function backfill() {
 
     for (const entity of entities) {
       const safeName = entity.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      let email = `${safeName}@AluminéGO.ar`;
+      let email = `${safeName}@pehueniago.ar`;
       
       // Check if email already exists
       let portalUser = await prisma.portalUser.findUnique({ where: { email } });
@@ -33,7 +33,7 @@ async function backfill() {
       // Handle duplicates (like 2 places with same name)
       let counter = 1;
       while (portalUser) {
-        email = `${safeName}${counter}@AluminéGO.ar`;
+        email = `${safeName}${counter}@pehueniago.ar`;
         portalUser = await prisma.portalUser.findUnique({ where: { email } });
         counter++;
       }
@@ -65,4 +65,3 @@ async function backfill() {
 backfill()
   .catch(e => console.error(e))
   .finally(() => prisma.$disconnect());
-

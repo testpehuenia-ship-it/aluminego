@@ -18,11 +18,11 @@ export default function AventurasClient({ initialAdventures, initialCategories }
   const [searchQuery, setSearchQuery] = useState('');
 
   const categoryStyles: { [key: string]: { color: string, bgImage: string } } = {
-    "Trekking": { color: "#2a9d8f", bgImage: "/images/cascada-araucarias-aluminé.jpg" },
+    "Trekking": { color: "#2a9d8f", bgImage: "/images/cascada-araucarias-alumine.jpg" },
     "A. Acuaticas": { color: "#00b4d8", bgImage: "/images/aventura_rafting.png" },
     "Aventuras Acuáticas": { color: "#00b4d8", bgImage: "/images/aventura_rafting.png" },
     "Cabalgatas": { color: "#f4a261", bgImage: "/images/aventura_cabalgatas.png" },
-    "Nieve": { color: "#e9c46a", bgImage: "/images/muelle-lago-aluminé.jpg" },
+    "Nieve": { color: "#e9c46a", bgImage: "/images/muelle-lago-alumine.jpg" },
     "Pesca": { color: "#e76f51", bgImage: "/images/aventura_pesca.png" },
     "Agencia de turismo": { color: "#264653", bgImage: "/images/aventura_agencia.png" },
     "Agencias de Turismo": { color: "#264653", bgImage: "/images/aventura_agencia.png" }

@@ -51,9 +51,9 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
 
   const categoryStyles: { [key: string]: { color: string, bgImage: string } } = {
     "Cabañas": { color: "#e63946", bgImage: "/images/refugio_bosque.png" },
-    "Hoteles": { color: "#f4a261", bgImage: "/images/hotel_pehuenia.png" },
+    "Hoteles": { color: "#f4a261", bgImage: "/images/hotel_alumine.png" },
     "Hostel": { color: "#e9c46a", bgImage: "/images/refugio_bosque.png" },
-    "Campings": { color: "#2a9d8f", bgImage: "/images/atardecer-aluminé.jpg" }
+    "Campings": { color: "#2a9d8f", bgImage: "/images/atardecer-alumine.jpg" }
   };
 
   const closeModal = () => {

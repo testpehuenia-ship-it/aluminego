@@ -1,4 +1,4 @@
-﻿export interface Alojamiento {
+export interface Alojamiento {
   id: string;
   name: string;
   category: string;
@@ -31,7 +31,7 @@ export const ALOJAMIENTOS: Alojamiento[] = [
     id: "hotel-Aluminé",
     name: "Gran Hotel Aluminé",
     category: "Hoteles",
-    image: "/images/hotel_Aluminé.png",
+    image: "/images/hotel_alumine.png",
     whatsapp: "5492942123456",
     description: "El hotel más exclusivo de la villa. Habitaciones de lujo con vista al lago y servicio de primer nivel.",
     amenities: ["Wi-Fi", "Desayuno Incluido", "Piscina Climatizada", "Spa", "Restaurante"]

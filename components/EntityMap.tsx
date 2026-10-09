@@ -3,10 +3,11 @@
 import React, { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { ExternalLink, Navigation } from 'lucide-react';
 
 interface EntityMapProps {
-  latitude: number;
-  longitude: number;
+  latitude: number | string;
+  longitude: number | string;
   title: string;
 }
 
@@ -14,11 +15,13 @@ export default function EntityMap({ latitude, longitude, title }: EntityMapProps
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<maplibregl.Map | null>(null);
 
+  const numLat = typeof latitude === 'string' ? parseFloat(latitude) : latitude;
+  const numLng = typeof longitude === 'string' ? parseFloat(longitude) : longitude;
+
   useEffect(() => {
-    if (!mapContainer.current) return;
+    if (!mapContainer.current || isNaN(numLat) || isNaN(numLng)) return;
 
     try {
-      // Destruir mapa anterior si existiera
       if (map.current) {
         map.current.remove();
         map.current = null;
@@ -27,60 +30,60 @@ export default function EntityMap({ latitude, longitude, title }: EntityMapProps
       map.current = new maplibregl.Map({
         container: mapContainer.current,
         cooperativeGestures: true,
-        style: 'https://tiles.openfreemap.org/styles/liberty',
-        center: [longitude, latitude],
+        style: {
+          version: 8,
+          sources: {
+            osm: {
+              type: 'raster',
+              tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+              tileSize: 256,
+              attribution: '&copy; OpenStreetMap contributors'
+            }
+          },
+          layers: [
+            {
+              id: 'osm-tiles',
+              type: 'raster',
+              source: 'osm',
+              minzoom: 0,
+              maxzoom: 19
+            }
+          ]
+        },
+        center: [numLng, numLat],
         zoom: 15,
         attributionControl: false
       });
 
-      // Función para ocultar todos los comercios / POIs de fondo de OpenStreetMap
-      const hideBackgroundPOIs = () => {
-        if (!map.current) return;
-        const layers = map.current.getStyle()?.layers || [];
-        for (const layer of layers) {
-          const id = layer.id.toLowerCase();
-          const sourceLayer = ((layer as any)['source-layer'] || '').toLowerCase();
-          if (
-            id.includes('poi') ||
-            sourceLayer.includes('poi') ||
-            id.includes('amenity') ||
-            id.includes('shop') ||
-            id.includes('food') ||
-            id.includes('restaurant') ||
-            id.includes('hotel') ||
-            id.includes('lodging') ||
-            id.includes('tourism') ||
-            id.includes('commercial') ||
-            id.includes('place_other') ||
-            id.includes('place-other')
-          ) {
-            try {
-              map.current.setLayoutProperty(layer.id, 'visibility', 'none');
-            } catch (e) {}
-          }
-        }
-      };
-
-      map.current.on('style.load', hideBackgroundPOIs);
-      map.current.on('load', hideBackgroundPOIs);
-
       // Añadir controles de navegación (zoom, rotación)
-      map.current.addControl(new maplibregl.NavigationControl(), 'top-right');
+      map.current.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
-      // Crear y añadir el marcador rojo premium
-      new maplibregl.Marker({ color: '#ea580c' })
-        .setLngLat([longitude, latitude])
+      // Crear elemento personalizado para el pin naranja con punto blanco idéntico al diseño original
+      const el = document.createElement('div');
+      el.className = 'custom-map-pin';
+      el.style.width = '36px';
+      el.style.height = '48px';
+      el.style.cursor = 'pointer';
+      el.innerHTML = `
+        <svg viewBox="0 0 24 32" width="36" height="48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 0C5.372 0 0 5.372 0 12C0 20.25 10.68 31.02 11.136 31.476C11.604 31.944 12.396 31.944 12.864 31.476C13.32 31.02 24 20.25 24 12C24 5.372 18.628 0 12 0Z" fill="#ea580c"/>
+          <circle cx="12" cy="12" r="5" fill="white"/>
+        </svg>
+      `;
+
+      new maplibregl.Marker({ element: el, anchor: 'bottom' })
+        .setLngLat([numLng, numLat])
         .setPopup(
-          new maplibregl.Popup({ offset: 25 }).setHTML(`
-            <div style="padding: 4px; font-family: sans-serif;">
-              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #1e293b;">${title}</h4>
+          new maplibregl.Popup({ offset: 35 }).setHTML(`
+            <div style="padding: 6px 8px; font-family: sans-serif;">
+              <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #0f172a;">${title}</h4>
             </div>
           `)
         )
         .addTo(map.current);
 
     } catch (error) {
-      console.error('Error rendering MapLibre GL map:', error);
+      console.error('Error rendering map:', error);
     }
 
     return () => {
@@ -89,11 +92,33 @@ export default function EntityMap({ latitude, longitude, title }: EntityMapProps
         map.current = null;
       }
     };
-  }, [latitude, longitude, title]);
+  }, [numLat, numLng, title]);
+
+  if (isNaN(numLat) || isNaN(numLng)) return null;
+
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${numLat},${numLng}`;
 
   return (
     <div style={{ backgroundColor: 'white', borderRadius: 'var(--radius-lg)', padding: '24px 20px', boxShadow: 'var(--shadow-sm)', marginTop: '24px' }}>
-      <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-main)', marginBottom: '16px' }}>Ubicación</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+        <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--color-text-main)', margin: 0 }}>Ubicación</h2>
+        <a 
+          href={googleMapsUrl} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '6px', 
+            fontSize: '0.88rem', 
+            color: 'var(--color-orange)', 
+            fontWeight: 600, 
+            textDecoration: 'none' 
+          }}
+        >
+          <Navigation size={15} /> Cómo llegar <ExternalLink size={13} />
+        </a>
+      </div>
       <div style={{ display: 'flex', width: '100%' }}>
         <div 
           ref={mapContainer} 
@@ -106,9 +131,10 @@ export default function EntityMap({ latitude, longitude, title }: EntityMapProps
             border: '1px solid var(--color-border)' 
           }} 
         />
-        {/* Safe touch scroll gutter on the right side for mobile swiping */}
+        {/* Espacio seguro para scroll táctil en celulares */}
         <div style={{ width: '20px', flexShrink: 0 }} aria-hidden="true" />
       </div>
     </div>
   );
 }
+

@@ -195,9 +195,9 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
         <div className="banner-categories" style={{ gridTemplateColumns: 'repeat(2, 1fr)', gridTemplateRows: 'repeat(2, 150px)' }}>
           {[
             { cat: "Cabañas", color: "#e63946", bgImage: "/images/refugio_bosque.png" },
-            { cat: "Hoteles", color: "#f4a261", bgImage: "/images/hotel_pehuenia.png" },
+            { cat: "Hoteles", color: "#f4a261", bgImage: "/images/hotel_alumine.png" },
             { cat: "Hostel", color: "#e9c46a", bgImage: "/images/refugio_bosque.png" },
-            { cat: "Campings", color: "#2a9d8f", bgImage: "/images/atardecer-aluminé.jpg" }
+            { cat: "Campings", color: "#2a9d8f", bgImage: "/images/Campingalumine.webp" }
           ].map((item) => (
             <a 
               href={`#${item.cat.toLowerCase()}`} 

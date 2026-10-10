@@ -390,8 +390,8 @@ export default function GuiaClient({ initialServices }: { initialServices?: any[
         <div className="banner-categories">
           {[
             { cat: "Salud", color: "#00b4d8", bgImage: "https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=800&q=80" },
-            { cat: "Emergencias", color: "#e74c3c", bgImage: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80" },
-            { cat: "Instituciones", color: "#475569", bgImage: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80" },
+            { cat: "Emergencias", color: "#e74c3c", bgImage: "/images/alumineEmergencia.jpg" },
+            { cat: "Instituciones", color: "#475569", bgImage: "/images/municipalidadAlumine.jpg" },
             { cat: "Medios", color: "#e74c3c", bgImage: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=800&q=80" },
             { cat: "Transporte", color: "#0284c7", bgImage: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80" },
             { cat: "Oficios", color: "#d97706", bgImage: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80" }

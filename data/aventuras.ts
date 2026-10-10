@@ -13,7 +13,7 @@ export const AVENTURAS: Aventura[] = [
     id: "trekking-batea",
     name: "Trekking al Volcán Batea Mahuida",
     category: "Trekking",
-    image: "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=800&q=80",
+    image: "/images/alumine-trekking-02.jpg",
     whatsapp: "5492942123456",
     description: "Una caminata inolvidable hasta el cráter del volcán, donde podremos observar la laguna y tener una vista panorámica del lago Aluminé.",
     details: ["Dificultad: Media", "Duración: 4hs", "Edad mín: 12 años"]
@@ -40,7 +40,7 @@ export const AVENTURAS: Aventura[] = [
     id: "snowboard-batea",
     name: "Clases de Snowboard & Ski",
     category: "Nieve",
-    image: "https://images.unsplash.com/photo-1605540436563-5bca919ae766?auto=format&fit=crop&w=800&q=80",
+    image: "/images/nievealumine.jpg",
     whatsapp: "5492942123456",
     description: "Clases particulares y grupales en el Parque de Nieve Batea Mahuida. Pistas ideales para principiantes.",
     details: ["Dificultad: Adaptable", "Duración: 2hs a 4hs", "Edad mín: 6 años"]

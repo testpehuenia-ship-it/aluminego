@@ -9,7 +9,7 @@ export const CATEGORIES_DATA = [
   { title: "Parrilla y Minutas", link: "/comer#parrilla", image: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=400&q=80" },
   { title: "Cabañas", link: "/alojarse#cabañas", image: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=400&q=80" },
   { title: "Hoteles", link: "/alojarse#hoteles", image: "/images/hotel_alumine.png" },
-  { title: "Campings", link: "/alojarse#campings", image: "/images/atardecer-alumine.jpg" },
+  { title: "Campings", link: "/alojarse#campings", image: "/images/Campingalumine.webp" },
   { title: "Trekking", link: "/aventuras#trekking", image: "/images/alumine-trekking-02.jpg" },
   { title: "A. Acuaticas", link: "/aventuras#a.-acuaticas", image: "/images/aventura_rafting.png" },
   { title: "Cabalgatas", link: "/aventuras#cabalgatas", image: "/images/aventura_cabalgatas.png" },

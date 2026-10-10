@@ -53,7 +53,7 @@ export default function AlojarseClient({ initialAccommodations, initialCategorie
     "Cabañas": { color: "#e63946", bgImage: "/images/refugio_bosque.png" },
     "Hoteles": { color: "#f4a261", bgImage: "/images/hotel_alumine.png" },
     "Hostel": { color: "#e9c46a", bgImage: "/images/refugio_bosque.png" },
-    "Campings": { color: "#2a9d8f", bgImage: "/images/atardecer-alumine.jpg" }
+    "Campings": { color: "#2a9d8f", bgImage: "/images/Campingalumine.webp" }
   };
 
   const closeModal = () => {
